@@ -1,0 +1,37 @@
+# A list of multi-dot abbreviations that represent single tokens and
+# should not be split.
+#
+# Lines starting with “#” are treated as comments and will be ignored.
+
+Forsch.frage
+IT.NRW
+Komm.formen
+Mat.-Nr.
+o.k.
+Pan.do/ra
+SP.ON
+Zeitschr.titel
+
+# The following list is from Wiktionary
+
+Art.-Nr.
+At.-Gew.
+Best.-Nr.
+BT-Drs.
+Dipl.-Ing.
+H.-I.
+H.-Qu.
+klass.-lat.
+Krim.-Ob.-Insp.
+Kto.-Nr.
+L.-Abg.
+M.-Schr.
+Priv.-Doz.
+prov.-fr.
+Proz.-Bev.
+r.-k.
+Reg.-Bez.
+Rg.-Präs.
+röm.-kath.
+Uni-Kl.
+USt-IdNr.

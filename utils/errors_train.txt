@@ -1,0 +1,95 @@
+__________________________________________________________________________________________________
+tmp/cmc_train_twitter_2.txt                       ...a/all_train/tokenized/cmc_train_twitter_2.txt
+
+False Negative (linebreak inserted right):
+   238:   <posting info="AUTOR 17. Apr. 2011" />     238:   <posting info="AUTOR 17. Apr. 2011" />
+   239:   @aPfeL4321                                 239:   @aPfeL4321                            
+   240: * DasTB                                      240: * Das                                   
+   241:   sollte                                     241: * TB                                    
+   242:   allerdings                                 242:   sollte                                
+   243:   gut                                        243:   allerdings                            
+
+False Negative (linebreak inserted right):
+   654:   Vernachlässigung                           655:   Vernachlässigung                      
+   655:   ?                                          656:   ?                                     
+   656: * Wenn2                                      657: * Wenn                                  
+   657:   :                                          658: * 2                                     
+   658:   warum                                      659:   :                                     
+   659:   ?                                          660:   warum                                 
+
+__________________________________________________________________________________________________
+tmp/cmc_train_blog_comment.txt                    ...ll_train/tokenized/cmc_train_blog_comment.txt
+
+False Positive (linebreak inserted left):
+   145:   WIE                                        145:   WIE                                   
+   146:   ICH                                        146:   ICH                                   
+   147: * WEI                                        147: * WEI?                                  
+   148: * ?                                          148:   HABT                                  
+   149:   HABT                                       149:   IHR                                   
+   150:   IHR                                        150:   BEIDE                                 
+
+__________________________________________________________________________________________________
+tmp/cmc_train_social_chat.txt                     ...all_train/tokenized/cmc_train_social_chat.txt
+
+False Positive (linebreak inserted left):
+   158:   marc                                       157:   marc                                  
+   159:   .                                          158:   .                                     
+   160: * .                                          159: * .)))                                  
+   161: * )))                                        160:                                         
+   162:                                              161:   <posting id="1-39" author="quaki" />  
+   163:   <posting id="1-39" author="quaki" />       162:   ups                                   
+
+False Positive (linebreak inserted left):
+   652:                                              650:                                         
+   653:   <posting id="1-126" author="zora" />       651:   <posting id="1-126" author="zora" />  
+   654: * 8                                          652: * 8:)                                   
+   655: * :)                                         653:                                         
+   656:                                              654:   <posting id="1-127" author="Lantonie" 
+   657:   <posting id="1-127" author="Lantonie"      655:   *                                     
+
+False Negative (linebreak inserted right):
+  1017:   <posting id="1-172" author="quaki" />     1014:   <posting id="1-172" author="quaki" /> 
+  1018:   *                                         1015:   *                                     
+  1019: * 51cm                                      1016: * 51                                    
+  1020:   *                                         1017: * cm                                    
+  1021:                                             1018:   *                                     
+  1022:   <posting id="1-173" author="stoeps" />    1019:                                         
+
+False Negative (linebreak inserted right):
+  1340:                                             1338:                                         
+  1341:   <posting id="1-223" author="Bochum" />    1339:   <posting id="1-223" author="Bochum" />
+  1342: * bochum-münster                            1340: * bochum                                
+  1343:   ohne                                      1341: * -                                     
+  1344:   küche                                     1342:   münster                               
+  1345:   3500                                      1343:   ohne                                  
+
+False Negative (linebreak inserted right):
+  1340:                                             1339:   <posting id="1-223" author="Bochum" />
+  1341:   <posting id="1-223" author="Bochum" />    1340:   bochum                                
+  1342: * bochum-münster                            1341: * -                                     
+  1343:   ohne                                      1342: * münster                               
+  1344:   küche                                     1343:   ohne                                  
+  1345:   3500                                      1344:   küche                                 
+
+__________________________________________________________________________________________________
+tmp/cmc_train_professional_chat.txt               ...ain/tokenized/cmc_train_professional_chat.txt
+
+False Negative (linebreak inserted right):
+   898:   im                                         898:   im                                    
+   899:   Pott                                       899:   Pott                                  
+   900: * :-))                                       900: * :-)                                   
+   901:   ?                                          901: * )                                     
+   902:                                              902:   ?                                     
+   903:   <posting id="SEM-33" author="Student5"     903:                                         
+
+__________________________________________________________________________________________________
+tmp/cmc_train_wiki_discussion_1.txt               ...ain/tokenized/cmc_train_wiki_discussion_1.txt
+
+False Negative (linebreak inserted right):
+   499:   meine                                      499:   meine                                 
+   500:   ich                                        500:   ich                                   
+   501: * ;O))                                       501: * ;O)                                   
+   502:   .                                          502: * )                                     
+                                                     503:   .                                     
+                                                                                                  
+
