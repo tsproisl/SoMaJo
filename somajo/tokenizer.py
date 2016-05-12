@@ -79,8 +79,8 @@ class Tokenizer(object):
         #camelCase
         self.emoji = re.compile(r'\bemoji[[:alpha:]]+\b')
         camel_case_token_set = self._read_abbreviation_file("camel_case_tokens.txt")
-        # things like ImmobilienScout24.de
-        self.camel_case_url = re.compile(r'\b(?:[[:upper:]][[:lower:][:digit:]]+){2,}\.(?:de|com|org|net|edu)\b')
+        # things like ImmobilienScout24.de are already covered by URL detection
+        # self.camel_case_url = re.compile(r'\b(?:[[:upper:]][[:lower:][:digit:]]+){2,}\.(?:de|com|org|net|edu)\b')
         # self.camel_case_token = re.compile(r"\b(?:" + r"|".join([re.escape(_) for _ in camel_case_token_set]) + r"|Mac[[:upper:]][[:lower:]]*)\b")
         self.camel_case_token = re.compile(r"\b(?:\L<cctokens>|Mac[[:upper:]][[:lower:]]*)\b", cctokens=camel_case_token_set)
         self.in_and_innen = re.compile(r'\b[[:alpha:]]+[[:lower:]]In(?:nen)?[[:lower:]]*\b')
