@@ -1,4 +1,15 @@
 __________________________________________________________________________________________________
+tmp/blog_comments.txt                             ../../data/all_trial/tokenized/blog_comments.txt
+
+False Positive (linebreak inserted left):
+   145:   WIE                                        145:   WIE                                   
+   146:   ICH                                        146:   ICH                                   
+   147: * WEI                                        147: * WEI?                                  
+   148: * ?                                          148:   HABT                                  
+   149:   HABT                                       149:   IHR                                   
+   150:   IHR                                        150:   BEIDE                                 
+
+__________________________________________________________________________________________________
 tmp/social_chat.txt                               ../../data/all_trial/tokenized/social_chat.txt  
 
 False Positive (linebreak inserted left):
@@ -19,15 +30,4 @@ False Negative (linebreak inserted right):
    498:   .                                          498: * )                                     
                                                      499:   .                                     
                                                                                                   
-
-__________________________________________________________________________________________________
-tmp/blog_comments.txt                             ../../data/all_trial/tokenized/blog_comments.txt
-
-False Positive (linebreak inserted left):
-   145:   WIE                                        145:   WIE                                   
-   146:   ICH                                        146:   ICH                                   
-   147: * WEI                                        147: * WEI?                                  
-   148: * ?                                          148:   HABT                                  
-   149:   HABT                                       149:   IHR                                   
-   150:   IHR                                        150:   BEIDE                                 
 

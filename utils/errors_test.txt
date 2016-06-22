@@ -1,361 +1,32 @@
 __________________________________________________________________________________________________
-tmp/cmc_test_twitter.txt                          .../data/all_test/tokenized/cmc_test_twitter.txt
+tmp/web_test_002.txt                              ...irist_test_pos_web/tokenized/web_test_002.txt
 
 False Negative (linebreak inserted right):
-    74:   .                                           74:   .                                     
-    75:   Bd.                                         75:   Bd.                                   
-    76: * 2.                                          76: * 2                                     
-    77:   Frankfurt                                   77: * .                                     
-    78:   ,                                           78:   Frankfurt                             
-    79:   1851                                        79:   ,                                     
+    99:   der                                         99:   der                                   
+   100:   Saison                                     100:   Saison                                
+   101: * 2009/2010                                  101: * 2009                                  
+   102:   sind                                       102: * /                                     
+   103:   laut                                       103:   2010                                  
+   104:   einer                                      104:   sind                                  
 
 False Negative (linebreak inserted right):
-   165:   Wie                                        166:   Wie                                   
-   166:   wärs                                       167:   wärs                                  
-   167: * zB                                         168: * z                                     
-   168:   mit                                        169: * B                                     
-   169:   diesem                                     170:   mit                                   
-   170:   :                                          171:   diesem                                
-
-False Negative (linebreak inserted right):
-   283:   Facebook                                   285:   Facebook                              
-   284:   uind                                       286:   uind                                  
-   285: * auchE-Mail                                 287: * auch                                  
-   286:                                              288: * E-Mail                                
-   287:   <posting author="AUTOR" id="11. Mai 20     289:                                         
-   288:   #semibk                                    290:   <posting author="AUTOR" id="11. Mai 20
+    99:   der                                        100:   Saison                                
+   100:   Saison                                     101:   2009                                  
+   101: * 2009/2010                                  102: * /                                     
+   102:   sind                                       103: * 2010                                  
+   103:   laut                                       104:   sind                                  
+   104:   einer                                      105:   laut                                  
 
 False Positive (linebreak inserted left):
-   383:   Nutzer                                     386:   Nutzer                                
-   384:   (                                          387:   (                                     
-   385: * zum                                        388: * zum.                                  
-   386: * .                                          389:   die                                   
-   387:   die                                        390:   erfahrenen                            
-   388:   erfahrenen                                 391:   )                                     
-
-False Positive (linebreak inserted left):
-   546:   @Kaf_fee                                   548:   @Kaf_fee                              
-   547:   !                                          549:   !                                     
-   548: * *                                          550: * *betretenzubodenblick*                
-   549: * betretenzubodenblick                       551:   #semibk                               
-   550:   *                                          552:                                         
-   551:   #semibk                                    553:   <posting author="AUTOR" id="7. Mai 201
-
-False Positive (linebreak inserted left):
-   547:   !                                          548:   @Kaf_fee                              
-   548:   *                                          549:   !                                     
-   549: * betretenzubodenblick                       550: * *betretenzubodenblick*                
-   550: * *                                          551:   #semibk                               
-   551:   #semibk                                    552:                                         
-   552:                                              553:   <posting author="AUTOR" id="7. Mai 201
-
-False Negative (linebreak inserted right):
-   590:   dies                                       590:   dies                                  
-   591:   war                                        591:   war                                   
-   592: * der1                                       592: * der                                   
-   593:   .                                          593: * 1.                                    
-   594:   Teil                                       594:   Teil                                  
-   595:   meiner                                     595:   meiner                                
-
-False Positive (linebreak inserted left):
-   590:   dies                                       591:   war                                   
-   591:   war                                        592:   der                                   
-   592: * der1                                       593: * 1.                                    
-   593: * .                                          594:   Teil                                  
-   594:   Teil                                       595:   meiner                                
-   595:   meiner                                     596:   Anmerkungen                           
-
-False Negative (linebreak inserted right):
-   630:   Palfrey                                    630:   Palfrey                               
-   631:   /                                          631:   /                                     
-   632: * Gasser2008                                 632: * Gasser                                
-   633:   auf                                        633: * 2008                                  
-   634:   unserer                                    634:   auf                                   
-   635:   Litliste                                   635:   unserer                               
-
-False Negative (linebreak inserted right):
-   680:   Untersuchung                               681:   Untersuchung                          
-   681:   aus                                        682:   aus                                   
-   682: * Storrer2007                                683: * Storrer                               
-   683:   #semibk                                    684: * 2007                                  
-   684:                                              685:   #semibk                               
-   685:   <posting author="AUTOR" id="6. Mai 201     686:                                         
-
-False Positive (linebreak inserted left):
-   736:   @Mia1234                                   738:   @Mia1234                              
-   737:   ..                                         739:   ..                                    
-   738: * i                                          740: * i.                                    
-   739: * .                                          741:   d.                                    
-   740:   d                                          742:   Kontext                               
-   741:   .                                          743:   dessen                                
-
-False Positive (linebreak inserted left):
-   738:   i                                          739:   ..                                    
-   739:   .                                          740:   i.                                    
-   740: * d                                          741: * d.                                    
-   741: * .                                          742:   Kontext                               
-   742:   Kontext                                    743:   dessen                                
-   743:   dessen                                     744:   stellen                               
-
-False Negative (linebreak inserted right):
-   752:   herausgefunden                             752:   herausgefunden                        
-   753:   wurde                                      753:   wurde                                 
-   754: * -und                                       754: * -                                     
-   755:   mit                                        755: * und                                   
-   756:   d.                                         756:   mit                                   
-   757:   eigenen                                    757:   d.                                    
-
-False Negative (linebreak inserted right):
-   812:   Frage                                      813:   Frage                                 
-   813:   eingrenzt                                  814:   eingrenzt                             
-   814: * -dies                                      815: * -                                     
-   815:   auch                                       816: * dies                                  
-   816:   ,                                          817:   auch                                  
-   817:   um                                         818:   ,                                     
-
-False Negative (linebreak inserted right):
-   821:   <posting author="AUTOR" id="6. Mai 201     823:   <posting author="AUTOR" id="6. Mai 201
-   822:   @Mia1234                                   824:   @Mia1234                              
-   823: * IdR                                        825: * I                                     
-   824:   ist                                        826: * d                                     
-   825:   es                                         827:   R                                     
-   826:   ja                                         828:   ist                                   
-
-False Negative (linebreak inserted right):
-   821:   <posting author="AUTOR" id="6. Mai 201     824:   @Mia1234                              
-   822:   @Mia1234                                   825:   I                                     
-   823: * IdR                                        826: * d                                     
-   824:   ist                                        827: * R                                     
-   825:   es                                         828:   ist                                   
-   826:   ja                                         829:   es                                    
-
-False Positive (linebreak inserted left):
-   850:   @Hüpfy1989                                 854:   @Hüpfy1989                            
-   851:   Stimmt                                     855:   Stimmt                                
-   852: * schon                                      856: * schon.                                
-   853: * .                                          857:   Wenn                                  
-   854:   Wenn                                       858:   man                                   
-   855:   man                                        859:   die                                   
-
-False Positive (linebreak inserted left):
-   876:   <posting author="AUTOR" id="6. Mai 201     879:   <posting author="AUTOR" id="6. Mai 201
-   877:   @RioTeam                                   880:   @RioTeam                              
-   878: * Direkta                                    881: * Direkta.                              
-   879: * .                                          882:   d.                                    
-   880:   d                                          883:   Wall                                  
-   881:   .                                          884:   twittern                              
-
-False Positive (linebreak inserted left):
-   878:   Direkta                                    880:   @RioTeam                              
-   879:   .                                          881:   Direkta.                              
-   880: * d                                          882: * d.                                    
-   881: * .                                          883:   Wall                                  
-   882:   Wall                                       884:   twittern                              
-   883:   twittern                                   885:   geht                                  
-
-False Positive (linebreak inserted left):
-   893:   dass                                       894:   dass                                  
-   894:   sie                                        895:   sie                                   
-   895: * automat                                    896: * automat.                              
-   896: * .                                          897:   updatet                               
-   897:   updatet                                    898:   +                                     
-   898:   +                                          899:   man                                   
-
-False Positive (linebreak inserted left):
-  1103:   "                                         1103:   "                                     
-  1104:   <-                                        1104:   <-                                    
-  1105: * Fachfrage                                 1105: * Fachfrage:                            
-  1106: * :                                         1106:   Lässt                                 
-  1107:   Lässt                                     1107:   sich                                  
-  1108:   sich                                      1108:   Twitter                               
+   174:   Mitte                                      176:   Mitte                                 
+   175:   der                                        177:   der                                   
+   176: * 1970er                                     178: * 1970er-Jahre                          
+   177: * -Jahre                                     179:   hat                                   
+   178:   hat                                        180:   sich                                  
+   179:   sich                                       181:   Alpinski                              
 
 __________________________________________________________________________________________________
-tmp/cmc_test_professional_chat.txt                ...test/tokenized/cmc_test_professional_chat.txt
-
-False Positive (linebreak inserted left):
-  1104:   angewandt                                 1104:   angewandt                             
-  1105:   ?                                         1105:   ?                                     
-  1106: * *                                         1106: * **                                    
-  1107: * *                                         1107:                                         
-  1108:                                             1108:   <posting id="271" author="Günther Beck
-  1109:   <posting id="271" author="Günther Beck    1109:   Vollzug                               
-
-False Positive (linebreak inserted left):
-  1220:   das                                       1219:   das                                   
-  1221:   erste                                     1220:   erste                                 
-  1222: * tacheles                                  1221: * tacheles.02spezial                    
-  1223: * .                                         1222:   Duell                                 
-  1224:   02spezial                                 1223:   ist                                   
-  1225:   Duell                                     1224:   leider                                
-
-False Positive (linebreak inserted left):
-  1221:   erste                                     1219:   das                                   
-  1222:   tacheles                                  1220:   erste                                 
-  1223: * .                                         1221: * tacheles.02spezial                    
-  1224: * 02spezial                                 1222:   Duell                                 
-  1225:   Duell                                     1223:   ist                                   
-  1226:   ist                                       1224:   leider                                
-
-False Positive (linebreak inserted left):
-  1308:   "                                         1305:   "                                     
-  1309:   bei                                       1306:   bei                                   
-  1310: * WAHLTEHMEN                                1307: * WAHLTEHMEN.DE                         
-  1311: * .                                         1308:   teilzunehmen                          
-  1312:   DEteilzunehmen                            1309:   .                                     
-  1313:   .                                         1310:                                         
-
-False Positive (linebreak inserted left):
-  1309:   bei                                       1305:   "                                     
-  1310:   WAHLTEHMEN                                1306:   bei                                   
-  1311: * .                                         1307: * WAHLTEHMEN.DE                         
-  1312: * DEteilzunehmen                            1308:   teilzunehmen                          
-  1313:   .                                         1309:   .                                     
-  1314:                                             1310:                                         
-
-False Negative (linebreak inserted right):
-  1310:   WAHLTEHMEN                                1305:   "                                     
-  1311:   .                                         1306:   bei                                   
-  1312: * DEteilzunehmen                            1307: * WAHLTEHMEN.DE                         
-  1313:   .                                         1308: * teilzunehmen                          
-  1314:                                             1309:   .                                     
-  1315:   <posting id="279" author="Kolja Raube"    1310:                                         
-
-__________________________________________________________________________________________________
-tmp/cmc_test_wiki_discussion.txt                  ...l_test/tokenized/cmc_test_wiki_discussion.txt
-
-False Positive (linebreak inserted left):
-   648:   von                                        648:   von                                   
-   649:   Velvet                                     649:   Velvet                                
-   650: * Underground                                650: * Underground.                          
-   651: * .                                          651:   Alles                                 
-   652:   Alles                                      652:   weitere                               
-   653:   weitere                                    653:   wird                                  
-
-False Positive (linebreak inserted left):
-   660:                                              659:                                         
-   661:   <posting author="92.77.247.147" id="16     660:   <posting author="92.77.247.147" id="16
-   662: * Ok                                         661: * Ok.                                   
-   663: * .                                          662:   Träum                                 
-   664:   Träum                                      663:   weiter                                
-   665:   weiter                                     664:   :                                     
-
-False Negative (linebreak inserted right):
-   777:   war                                        775:   war                                   
-   778:   von                                        776:   von                                   
-   779: * xx-yy                                      777: * xx                                    
-   780:   Sänger                                     778: * -                                     
-   781:   ,                                          779:   yy                                    
-   782:   von                                        780:   Sänger                                
-
-False Negative (linebreak inserted right):
-   777:   war                                        776:   von                                   
-   778:   von                                        777:   xx                                    
-   779: * xx-yy                                      778: * -                                     
-   780:   Sänger                                     779: * yy                                    
-   781:   ,                                          780:   Sänger                                
-   782:   von                                        781:   ,                                     
-
-False Negative (linebreak inserted right):
-   781:   ,                                          781:   ,                                     
-   782:   von                                        782:   von                                   
-   783: * bb-aa                                      783: * bb                                    
-   784:   Gitarrist                                  784: * -                                     
-   785:   ,                                          785:   aa                                    
-   786:   von                                        786:   Gitarrist                             
-
-False Negative (linebreak inserted right):
-   781:   ,                                          782:   von                                   
-   782:   von                                        783:   bb                                    
-   783: * bb-aa                                      784: * -                                     
-   784:   Gitarrist                                  785: * aa                                    
-   785:   ,                                          786:   Gitarrist                             
-   786:   von                                        787:   ,                                     
-
-False Negative (linebreak inserted right):
-   785:   ,                                          787:   ,                                     
-   786:   von                                        788:   von                                   
-   787: * nn-aa                                      789: * nn                                    
-   788:   Songwriter                                 790: * -                                     
-   789:   ,                                          791:   aa                                    
-   790:   von                                        792:   Songwriter                            
-
-False Negative (linebreak inserted right):
-   785:   ,                                          788:   von                                   
-   786:   von                                        789:   nn                                    
-   787: * nn-aa                                      790: * -                                     
-   788:   Songwriter                                 791: * aa                                    
-   789:   ,                                          792:   Songwriter                            
-   790:   von                                        793:   ,                                     
-
-False Negative (linebreak inserted right):
-   789:   ,                                          793:   ,                                     
-   790:   von                                        794:   von                                   
-   791: * ee-ww                                      795: * ee                                    
-   792:   Singer-Songwriter                          796: * -                                     
-   793:   ,                                          797:   ww                                    
-   794:   von                                        798:   Singer-Songwriter                     
-
-False Negative (linebreak inserted right):
-   789:   ,                                          794:   von                                   
-   790:   von                                        795:   ee                                    
-   791: * ee-ww                                      796: * -                                     
-   792:   Singer-Songwriter                          797: * ww                                    
-   793:   ,                                          798:   Singer-Songwriter                     
-   794:   von                                        799:   ,                                     
-
-False Negative (linebreak inserted right):
-   793:   ,                                          799:   ,                                     
-   794:   von                                        800:   von                                   
-   795: * qq-zz                                      801: * qq                                    
-   796:   Sänger                                     802: * -                                     
-   797:   ,                                          803:   zz                                    
-   798:   von                                        804:   Sänger                                
-
-False Negative (linebreak inserted right):
-   793:   ,                                          800:   von                                   
-   794:   von                                        801:   qq                                    
-   795: * qq-zz                                      802: * -                                     
-   796:   Sänger                                     803: * zz                                    
-   797:   ,                                          804:   Sänger                                
-   798:   von                                        805:   ,                                     
-
-False Negative (linebreak inserted right):
-   797:   ,                                          805:   ,                                     
-   798:   von                                        806:   von                                   
-   799: * rr-tt                                      807: * rr                                    
-   800:   wieder                                     808: * -                                     
-   801:   Songwriter                                 809:   tt                                    
-   802:   ...                                        810:   wieder                                
-
-False Negative (linebreak inserted right):
-   797:   ,                                          806:   von                                   
-   798:   von                                        807:   rr                                    
-   799: * rr-tt                                      808: * -                                     
-   800:   wieder                                     809: * tt                                    
-   801:   Songwriter                                 810:   wieder                                
-   802:   ...                                        811:   Songwriter                            
-
-__________________________________________________________________________________________________
-tmp/cmc_test_social_chat.txt                      ...a/all_test/tokenized/cmc_test_social_chat.txt
-
-False Positive (linebreak inserted left):
-    70:   g                                           70:   g                                     
-    71:   *                                           71:   *                                     
-    72: * @                                           72: * @marc                                 
-    73: * marc                                        73:                                         
-    74:                                               74:   <posting id="1-268" author="quaki" /> 
-    75:   <posting id="1-268" author="quaki" />       75:   lach                                  
-
-False Positive (linebreak inserted left):
-  1442:                                             1441:                                         
-  1443:   <posting id="1-491" author="anonym" />    1442:   <posting id="1-491" author="anonym" />
-  1444: * Erdbeere                                  1443: * Erdbeere$                             
-  1445: * $                                         1444:   ist                                   
-  1446:   ist                                       1445:   ein                                   
-  1447:   ein                                       1446:   Stern                                 
-
-__________________________________________________________________________________________________
-tmp/web_test_011.txt                              ../../data/all_test/tokenized/web_test_011.txt  
+tmp/web_test_011.txt                              ...irist_test_pos_web/tokenized/web_test_011.txt
 
 False Negative (linebreak inserted right):
    238:   man                                        238:   man                                   
@@ -390,34 +61,7 @@ False Negative (linebreak inserted right):
    416:   des                                        419:   Bau                                   
 
 __________________________________________________________________________________________________
-tmp/web_test_002.txt                              ../../data/all_test/tokenized/web_test_002.txt  
-
-False Negative (linebreak inserted right):
-    99:   der                                         99:   der                                   
-   100:   Saison                                     100:   Saison                                
-   101: * 2009/2010                                  101: * 2009                                  
-   102:   sind                                       102: * /                                     
-   103:   laut                                       103:   2010                                  
-   104:   einer                                      104:   sind                                  
-
-False Negative (linebreak inserted right):
-    99:   der                                        100:   Saison                                
-   100:   Saison                                     101:   2009                                  
-   101: * 2009/2010                                  102: * /                                     
-   102:   sind                                       103: * 2010                                  
-   103:   laut                                       104:   sind                                  
-   104:   einer                                      105:   laut                                  
-
-False Positive (linebreak inserted left):
-   174:   Mitte                                      176:   Mitte                                 
-   175:   der                                        177:   der                                   
-   176: * 1970er                                     178: * 1970er-Jahre                          
-   177: * -Jahre                                     179:   hat                                   
-   178:   hat                                        180:   sich                                  
-   179:   sich                                       181:   Alpinski                              
-
-__________________________________________________________________________________________________
-tmp/web_test_012.txt                              ../../data/all_test/tokenized/web_test_012.txt  
+tmp/web_test_012.txt                              ...irist_test_pos_web/tokenized/web_test_012.txt
 
 False Positive (linebreak inserted left):
    660:   Backlinks                                  660:   Backlinks                             
@@ -436,7 +80,7 @@ False Positive (linebreak inserted left):
    670:   Navigation                                 669:   Passwort-                             
 
 __________________________________________________________________________________________________
-tmp/web_test_004.txt                              ../../data/all_test/tokenized/web_test_004.txt  
+tmp/web_test_004.txt                              ...irist_test_pos_web/tokenized/web_test_004.txt
 
 False Positive (linebreak inserted left):
    141:   Telekommunikationsgeheimnis                141:   Telekommunikationsgeheimnis           
@@ -495,7 +139,7 @@ False Positive (linebreak inserted left):
    453:   Abs.                                       447:   4                                     
 
 __________________________________________________________________________________________________
-tmp/web_test_009.txt                              ../../data/all_test/tokenized/web_test_009.txt  
+tmp/web_test_009.txt                              ...irist_test_pos_web/tokenized/web_test_009.txt
 
 False Positive (linebreak inserted left):
    169:   Pops                                       169:   Pops                                  

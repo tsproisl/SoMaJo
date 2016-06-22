@@ -18,6 +18,28 @@ False Negative (linebreak inserted right):
    659:   ?                                          660:   warum                                 
 
 __________________________________________________________________________________________________
+tmp/cmc_train_wiki_discussion_1.txt               ...ain/tokenized/cmc_train_wiki_discussion_1.txt
+
+False Negative (linebreak inserted right):
+   499:   meine                                      499:   meine                                 
+   500:   ich                                        500:   ich                                   
+   501: * ;O))                                       501: * ;O)                                   
+   502:   .                                          502: * )                                     
+                                                     503:   .                                     
+                                                                                                  
+
+__________________________________________________________________________________________________
+tmp/cmc_train_professional_chat.txt               ...ain/tokenized/cmc_train_professional_chat.txt
+
+False Negative (linebreak inserted right):
+   898:   im                                         898:   im                                    
+   899:   Pott                                       899:   Pott                                  
+   900: * :-))                                       900: * :-)                                   
+   901:   ?                                          901: * )                                     
+   902:                                              902:   ?                                     
+   903:   <posting id="SEM-33" author="Student5"     903:                                         
+
+__________________________________________________________________________________________________
 tmp/cmc_train_blog_comment.txt                    ...ll_train/tokenized/cmc_train_blog_comment.txt
 
 False Positive (linebreak inserted left):
@@ -70,26 +92,4 @@ False Negative (linebreak inserted right):
   1343:   ohne                                      1342: * münster                               
   1344:   küche                                     1343:   ohne                                  
   1345:   3500                                      1344:   küche                                 
-
-__________________________________________________________________________________________________
-tmp/cmc_train_professional_chat.txt               ...ain/tokenized/cmc_train_professional_chat.txt
-
-False Negative (linebreak inserted right):
-   898:   im                                         898:   im                                    
-   899:   Pott                                       899:   Pott                                  
-   900: * :-))                                       900: * :-)                                   
-   901:   ?                                          901: * )                                     
-   902:                                              902:   ?                                     
-   903:   <posting id="SEM-33" author="Student5"     903:                                         
-
-__________________________________________________________________________________________________
-tmp/cmc_train_wiki_discussion_1.txt               ...ain/tokenized/cmc_train_wiki_discussion_1.txt
-
-False Negative (linebreak inserted right):
-   499:   meine                                      499:   meine                                 
-   500:   ich                                        500:   ich                                   
-   501: * ;O))                                       501: * ;O)                                   
-   502:   .                                          502: * )                                     
-                                                     503:   .                                     
-                                                                                                  
 

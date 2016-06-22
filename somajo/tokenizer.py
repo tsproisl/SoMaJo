@@ -76,7 +76,7 @@ class Tokenizer(object):
         self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:\L<patokens>)(?!\w)", re.IGNORECASE, patokens=tokens_with_plus_or_ampersand)
         # self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:" + r"|".join([re.escape(_) for _ in tokens_with_plus_or_ampersand]) + r")(?!\w)")
 
-        #camelCase
+        # camelCase
         self.emoji = re.compile(r'\bemoji[[:alpha:]]+\b')
         camel_case_token_set = self._read_abbreviation_file("camel_case_tokens.txt")
         # things like ImmobilienScout24.de are already covered by URL detection
