@@ -1,3 +1,6 @@
+# python3 setup.py sdist
+# python3 setup.py sdist upload
+
 from os import path
 from setuptools import setup
 
