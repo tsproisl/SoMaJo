@@ -12,7 +12,13 @@ Token = collections.namedtuple("Token", ["token", "token_class"])
 
 class Tokenizer(object):
     def __init__(self, split_camel_case=False, token_classes=False):
-        """"""
+        """Create a Tokenizer object. If split_camel_case is set to True,
+        tokens written in CamelCase will be split. If token_classes is
+        set to true, the tokenizer will output the token class for
+        each token (if it is a number, an XML tag, an abbreviation,
+        etc.).
+
+        """
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
         self.unique_string_length = 7

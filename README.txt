@@ -44,6 +44,11 @@ option::
   
   tokenizer <file>
 
+The tokenizer can also output token class information for each token,
+i.e. if it is a number, an XML tag, an abbreviation, etc.::
+  
+  tokenizer -t <file>
+
 Using the module
 ----------------
 
@@ -53,7 +58,7 @@ projects. All you have to do is import ``somajo.Tokenizer``, create a
 
   from somajo import Tokenizer
   
-  tokenizer = Tokenizer(split_camel_case=True)
+  tokenizer = Tokenizer(split_camel_case=True, token_classes=False)
   tokens = tokenizer.tokenize(paragraph)
 
 Evaluation

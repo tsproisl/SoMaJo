@@ -9,7 +9,7 @@ def arguments():
     """"""
     parser = argparse.ArgumentParser(description="Tokenize an input file according to the guidelines of the EmpiriST 2015 shared task on automatic linguistic annotation of computer-mediated communication / social media.")
     parser.add_argument("-c", "--split_camel_case", action="store_true", help="Split items in written in camelCase (excluding several exceptions).")
-    parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (URL, number, email_address, etc.) in addition to the tokens.")
+    parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (number, XML tag, abbreviation, etc.) in addition to the tokens.")
     parser.add_argument("FILE", type=argparse.FileType("r"), help="The input file")
     args = parser.parse_args()
     return args
