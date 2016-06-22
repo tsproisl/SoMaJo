@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
 
+import collections
 import os
 import random
 
 import regex as re
 
 
+Token = collections.namedtuple("Token", ["token", "token_class"])
+
+
 class Tokenizer(object):
-    def __init__(self, split_camel_case=False):
+    def __init__(self, split_camel_case=False, token_classes=False):
         """"""
         self.split_camel_case = split_camel_case
+        self.token_classes = token_classes
         self.unique_string_length = 7
         self.mapping = {}
 
@@ -107,7 +112,8 @@ class Tokenizer(object):
                                        r"))+(?![[:alpha:]]{1,3}\.)", re.V1)
 
         # MENTIONS, HASHTAGS, ACTION WORDS
-        self.mention_hashtag = re.compile(r'(?<!\w)[@#]\w+(?!\w)')
+        self.mention = re.compile(r'[@]\w+(?!\w)')
+        self.hashtag = re.compile(r'(?<!\w)[#]\w+(?!\w)')
         # action words without spaces are to be treated as units
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
 
@@ -156,11 +162,13 @@ class Tokenizer(object):
                                        [)]        # closing paren
                                        (?=\w)))   # alphanumeric character
                                  """, re.VERBOSE)
+        self.all_paren = re.compile(r"(?<=\s+)[][(){}](?=\s+)")
         self.slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
-        self.other_punctuation = re.compile(r'([<>%‰€$£₤¥°~*„“”‚‘"»«›‹,;:+=&–])')
+        self.all_quote = re.compile(r"(?<=\s+)(?:``|''|`|['‚‘’])(?=\s+)")
+        self.other_punctuation = re.compile(r'([<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+=&–])')
         self.ellipsis = re.compile(r'\.{2,}|…+(?:\.{2,})?')
         self.dot_without_space = re.compile(r'(?<=[[:lower:]]{2})(\.)(?=[[:upper:]][[:lower:]]{2})')
         # self.dot = re.compile(r'(?<=[\w)])(\.)(?![\w])')
@@ -189,7 +197,7 @@ class Tokenizer(object):
             unique_string = "".join(random.choice(alphabet) for _ in range(self.unique_string_length))
         return unique_string
 
-    def _replace_regex(self, text, regex):
+    def _replace_regex(self, text, regex, token_class="regular"):
         """Replace instances of regex with unique strings and store
         replacements in mapping.
 
@@ -202,19 +210,29 @@ class Tokenizer(object):
             # check if there are named subgroups
             if len(match.groupdict()) > 0:
                 parts = [v for k, v in sorted(match.groupdict().items())]
-                multipart = self._multipart_replace(text, instance, parts)
+                multipart = self._multipart_replace(text, instance, parts, token_class)
                 replacements[instance] = multipart
             else:
                 replacement = self._get_unique_string(text)
-                self.mapping[replacement] = instance
+                self.mapping[replacement] = Token(instance, token_class)
                 replacements[instance] = replacement
         for beginning, end in reversed(sorted(spans)):
             text = text[:beginning] + " " + replacements[text[beginning:end]] + " " + text[end:]
         return text
 
+    def _multipart_replace(self, text, instance, parts, token_class):
+        """"""
+        replacements = []
+        for part in parts:
+            replacement = self._get_unique_string(text)
+            self.mapping[replacement] = Token(part, token_class)
+            replacements.append(replacement)
+        multipart = " ".join(replacements)
+        return multipart
+
     def _reintroduce_instances(self, tokens):
         """Replace the unique strings with the original text."""
-        tokens = [self.mapping.get(t, t) for t in tokens]
+        tokens = [self.mapping.get(t, Token(t, "regular")) for t in tokens]
         return tokens
 
     def _replace_abbreviations(self, text):
@@ -224,38 +242,28 @@ class Tokenizer(object):
         """
         replacements = {}
         spans = set()
-        text = self._replace_regex(text, self.single_letter_ellipsis)
-        text = self._replace_regex(text, self.and_cetera)
-        text = self._replace_regex(text, self.str_abbreviations)
-        text = self._replace_regex(text, self.nr_abbreviations)
-        text = self._replace_regex(text, self.single_letter_abbreviation)
-        text = self._replace_regex(text, self.single_token_abbreviation)
-        text = self._replace_regex(text, self.ps)
+        text = self._replace_regex(text, self.single_letter_ellipsis, "abbreviation")
+        text = self._replace_regex(text, self.and_cetera, "abbreviation")
+        text = self._replace_regex(text, self.str_abbreviations, "abbreviation")
+        text = self._replace_regex(text, self.nr_abbreviations, "abbreviation")
+        text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
+        text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
+        text = self._replace_regex(text, self.ps, "abbreviation")
         for match in self.abbreviation.finditer(text):
             instance = match.group(0)
             spans.add(match.span())
             # check if it is a multipart abbreviation
             if self.multipart_abbreviation.fullmatch(instance):
                 parts = [p.strip() + "." for p in instance.strip(".").split(".")]
-                multipart = self._multipart_replace(text, instance, parts)
+                multipart = self._multipart_replace(text, instance, parts, "abbreviation")
                 replacements[instance] = multipart
             else:
                 replacement = self._get_unique_string(text)
-                self.mapping[replacement] = instance
+                self.mapping[replacement] = Token(instance, "abbreviation")
                 replacements[instance] = replacement
         for beginning, end in reversed(sorted(spans)):
             text = text[:beginning] + " " + replacements[text[beginning:end]] + " " + text[end:]
         return text
-
-    def _multipart_replace(self, text, instance, parts):
-        """"""
-        replacements = []
-        for part in parts:
-            replacement = self._get_unique_string(text)
-            self.mapping[replacement] = part
-            replacements.append(replacement)
-        multipart = " ".join(replacements)
-        return multipart
 
     def tokenize(self, paragraph):
         """Tokenize paragraph (may contain newlines) according to the
@@ -267,37 +275,41 @@ class Tokenizer(object):
         # reset mappings for the current paragraph
         self.mapping = {}
 
-        # XML tags are the only tokens that may contain spaces. We
-        # first replace them with unique strings and undo that after
-        # tokenizing the text.
-        paragraph = self._replace_regex(paragraph, self.tag)
+        # Some tokens are allowed to contain whitespace. Get those out
+        # of the way first. We replace them with unique strings and
+        # undo that later on.
+        # - XML tags
+        paragraph = self._replace_regex(paragraph, self.tag, "XML_tag")
+        # - email address obfuscation may involve spaces
+        paragraph = self._replace_regex(paragraph, self.email, "email_address")
 
-        # remove email addresses and urls
-        paragraph = self._replace_regex(paragraph, self.email)
-        paragraph = self._replace_regex(paragraph, self.simple_url_with_brackets)
-        paragraph = self._replace_regex(paragraph, self.simple_url)
-        paragraph = self._replace_regex(paragraph, self.doi)
-        paragraph = self._replace_regex(paragraph, self.doi_with_space)
-        paragraph = self._replace_regex(paragraph, self.url_without_protocol)
+        # Some emoticons contain erroneous spaces. We fix this.
+        paragraph = self.space_emoticon.sub(r'\1\2', paragraph)
+
+        # urls
+        paragraph = self._replace_regex(paragraph, self.simple_url_with_brackets, "URL")
+        paragraph = self._replace_regex(paragraph, self.simple_url, "URL")
+        paragraph = self._replace_regex(paragraph, self.doi, "DOI")
+        paragraph = self._replace_regex(paragraph, self.doi_with_space, "DOI")
+        paragraph = self._replace_regex(paragraph, self.url_without_protocol, "URL")
         # paragraph = self._replace_regex(paragraph, self.url)
 
-        # remove spaces from certain emoticons
-        paragraph = self.space_emoticon.sub(r'\1\2', paragraph)
         # replace emoticons with unique strings so that they are out
         # of the way
-        paragraph = self._replace_regex(paragraph, self.emoticon)
+        paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
 
         # mentions, hashtags
-        paragraph = self._replace_regex(paragraph, self.mention_hashtag)
+        paragraph = self._replace_regex(paragraph, self.mention, "mention")
+        paragraph = self._replace_regex(paragraph, self.hashtag, "hashtag")
         # action words
-        paragraph = self._replace_regex(paragraph, self.action_word)
+        paragraph = self._replace_regex(paragraph, self.action_word, "action_word")
+        # emoji
+        paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
 
         paragraph = self._replace_regex(paragraph, self.token_with_plus_ampersand)
 
         # camelCase
         if self.split_camel_case:
-            paragraph = self._replace_regex(paragraph, self.emoji)
-            # paragraph = self._replace_regex(paragraph, self.camel_case_url)
             paragraph = self._replace_regex(paragraph, self.camel_case_token)
             paragraph = self._replace_regex(paragraph, self.in_and_innen)
             paragraph = self.camel_case.sub(r' \1', paragraph)
@@ -307,53 +319,57 @@ class Tokenizer(object):
 
         # DATES AND NUMBERS
         # dates
-        paragraph = self._replace_regex(paragraph, self.three_part_date_year_first)
-        paragraph = self._replace_regex(paragraph, self.three_part_date_dmy)
-        paragraph = self._replace_regex(paragraph, self.three_part_date_mdy)
-        paragraph = self._replace_regex(paragraph, self.two_part_date)
+        paragraph = self._replace_regex(paragraph, self.three_part_date_year_first, "date")
+        paragraph = self._replace_regex(paragraph, self.three_part_date_dmy, "date")
+        paragraph = self._replace_regex(paragraph, self.three_part_date_mdy, "date")
+        paragraph = self._replace_regex(paragraph, self.two_part_date, "date")
         # time
-        paragraph = self._replace_regex(paragraph, self.time)
+        paragraph = self._replace_regex(paragraph, self.time, "time")
         # ordinals
-        paragraph = self._replace_regex(paragraph, self.ordinal)
+        paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
         # fractions
-        paragraph = self._replace_regex(paragraph, self.fraction)
+        paragraph = self._replace_regex(paragraph, self.fraction, "number")
         # amounts (1.000,-)
-        paragraph = self._replace_regex(paragraph, self.amount)
+        paragraph = self._replace_regex(paragraph, self.amount, "amount")
         # semesters
-        paragraph = self._replace_regex(paragraph, self.semester)
+        paragraph = self._replace_regex(paragraph, self.semester, "semester")
         # measurements
-        paragraph = self._replace_regex(paragraph, self.measurement)
-        # number compunds
-        paragraph = self._replace_regex(paragraph, self.number_compound)
+        paragraph = self._replace_regex(paragraph, self.measurement, "measurement")
+        # number compounds
+        paragraph = self._replace_regex(paragraph, self.number_compound, "number_compound")
         # numbers
-        paragraph = self._replace_regex(paragraph, self.number)
+        paragraph = self._replace_regex(paragraph, self.number, "number")
 
         # (clusters of) question marks and exclamation marks
-        paragraph = self.quest_exclam.sub(r' \1 ', paragraph)
+        paragraph = self._replace_regex(paragraph, self.quest_exclam, "symbol")
         # arrows
         paragraph = self.space_right_arrow.sub(r'\1\2', paragraph)
         paragraph = self.space_left_arrow.sub(r'\1\2', paragraph)
-        paragraph = self._replace_regex(paragraph, self.arrow)
-        # @ symbol
-        paragraph = paragraph.replace("@", " @")
+        paragraph = self._replace_regex(paragraph, self.arrow, "symbol")
         # parens
         paragraph = self.paired_paren.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self.paired_bracket.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self.paren.sub(r' \1 ', paragraph)
+        paragraph = self._replace_regex(paragraph, self.all_paren, "symbol")
         # slash
-        paragraph = self.slash.sub(r' \1 ', paragraph)
+        # paragraph = self.slash.sub(r' \1 ', paragraph)
+        paragraph = self._replace_regex(paragraph, self.slash, "symbol")
         # LaTeX-style quotation marks
         paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
         # single quotation marks, apostrophes
         paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
+        paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
         # other punctuation symbols
-        paragraph = self.other_punctuation.sub(r' \1 ', paragraph)
+        # paragraph = self.other_punctuation.sub(r' \1 ', paragraph)
+        paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
         # ellipsis
-        paragraph = self._replace_regex(paragraph, self.ellipsis)
+        paragraph = self._replace_regex(paragraph, self.ellipsis, "symbol")
         # dots
-        paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
-        paragraph = self.dot.sub(r' \1 ', paragraph)
+        # paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
+        paragraph = self._replace_regex(paragraph, self.dot_without_space, "symbol")
+        # paragraph = self.dot.sub(r' \1 ', paragraph)
+        paragraph = self._replace_regex(paragraph, self.dot, "symbol")
 
         # tokenize
         tokens = paragraph.strip().split()
@@ -361,4 +377,7 @@ class Tokenizer(object):
         # reintroduce mapped tokens
         tokens = self._reintroduce_instances(tokens)
 
-        return tokens
+        if self.token_classes:
+            return tokens
+        else:
+            return [t.token for t in tokens]
