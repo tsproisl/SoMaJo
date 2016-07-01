@@ -14,7 +14,20 @@ on all kinds of written discourse, for example chats, forums, wiki
 talk pages, tweets, blog comments, social networks, SMS and WhatsApp
 dialogues.
 
-The system is described in greater detail in Proisl and Uhrig (2016).
+In addition to tokenizing the input text, SoMaJo can also output token
+class information for each token, i.e. if it is a number, an XML tag,
+an abbreviation, etc.::
+
+  echo 'Wow, superTool!;)' | tokenizer -c -t -
+  Wow	regular
+  ,	symbol
+  super	regular
+  Tool	regular
+  !	symbol
+  ;)	emoticon
+
+The system is described in greater detail in Proisl and Uhrig (to
+appear).
 
 Installation
 ============
@@ -81,6 +94,6 @@ Web    99.83     99.92  99.87
 References
 ==========
 
-- Proisl, Thomas, Peter Uhrig (2016): “SoMaJo: State-of-the-art
+- Proisl, Thomas, Peter Uhrig (to appear): “SoMaJo: State-of-the-art
   tokenization for German web and social media texts.” In: Proceedings
   of the 10th Web as Corpus Workshop (WAC-X). ACL.
