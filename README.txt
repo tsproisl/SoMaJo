@@ -26,8 +26,7 @@ an abbreviation, etc.::
   !	symbol
   ;)	emoticon
 
-The system is described in greater detail in Proisl and Uhrig (to
-appear).
+The system is described in greater detail in Proisl and Uhrig (2016).
 
 Installation
 ============
@@ -94,6 +93,8 @@ Web    99.83     99.92  99.87
 References
 ==========
 
-- Proisl, Thomas, Peter Uhrig (to appear): “SoMaJo: State-of-the-art
+- Proisl, Thomas, Peter Uhrig (2016): “SoMaJo: State-of-the-art
   tokenization for German web and social media texts.” In: Proceedings
-  of the 10th Web as Corpus Workshop (WAC-X). ACL.
+  of the 10th Web as Corpus Workshop (WAC-X) and the EmpiriST Shared
+  Task. Berlin: Association for Computational Linguistics (ACL),
+  91–96.
