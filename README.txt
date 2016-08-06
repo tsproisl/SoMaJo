@@ -97,4 +97,4 @@ References
   tokenization for German web and social media texts.” In: Proceedings
   of the 10th Web as Corpus Workshop (WAC-X) and the EmpiriST Shared
   Task. Berlin: Association for Computational Linguistics (ACL),
-  91–96.
+  91–96. `PDF <http://aclweb.org/anthology/W16-2607>`_.
