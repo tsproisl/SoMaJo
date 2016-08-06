@@ -10,7 +10,7 @@ with open(path.join(here, 'README.txt')) as fh:
 
 setup(
     name='SoMaJo',
-    version='1.0.1',
+    version='1.0.2',
     author='Thomas Proisl, Peter Uhrig',
     author_email='thomas.proisl@fau.de',
     packages=[
