@@ -7,8 +7,9 @@ Version 1.1.0, 2016-08-19
 
 SoMaJo can now output additional information about the original
 spelling of the tokens, i.e. if a token was followed by whitespace or
-if a token contained whitespace. To use this feature, provide the
-tokenizer script with the ``-e`` option.
+if a token contained internal whitespace (according to the
+tokenization guidelines, things like “: )” get normalized to “:)”). To
+use this feature, provide the tokenizer script with the ``-e`` option.
 
 Version 1.0.3, 2016-08-18
 =========================

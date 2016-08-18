@@ -27,8 +27,8 @@ an abbreviation, etc.::
   ;)	emoticon
 
 *New in version 1.1.0*: SoMaJo can output additional information for
-each token that can help to reconstruct the original untokenized
-text::
+each token that can help to reconstruct the original untokenized text
+(to a certain extent)::
 
   echo 'der beste Betreuer? - >ProfSmith! : )' | bin/tokenizer -c -e -
   der	
@@ -78,9 +78,11 @@ i.e. if it is a number, an XML tag, an abbreviation, etc.::
   
   tokenizer -t <file>
 
-If you care about the original spellings, SoMaJo can also provide you
-with additional details for each token, i.e. if the token was followed
-by whitespace or if it included internal whitespace::
+If you want to be able to reconstruct the untokenized input to a
+certain extent, SoMaJo can also provide you with additional details
+for each token, i.e. if the token was followed by whitespace or if it
+contained internal whitespace (according to the tokenization
+guidelines, things like “: )” get normalized to “:)”)::
 
   tokenizer -e <file>
 
