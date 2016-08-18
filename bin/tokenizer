@@ -38,7 +38,9 @@ def main():
         verticalized = ("\n".join(["\t".join(t) for t in tp]) for tp in tokenized_paragraphs)
     else:
         verticalized = ("\n".join(tp) for tp in tokenized_paragraphs)
-    print("\n\n".join(verticalized))
+    # print("\n\n".join(verticalized))
+    for p in verticalized:
+        print(p, "\n")
 
 
 if __name__ == "__main__":
