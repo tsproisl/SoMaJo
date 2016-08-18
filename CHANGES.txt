@@ -1,0 +1,9 @@
+=========
+CHANGELOG
+=========
+
+Version 1.0.3, 2016-08-18
+=========================
+
+This version works around a bug in the regex module that caused
+exponential runtimes on certain inputs.
