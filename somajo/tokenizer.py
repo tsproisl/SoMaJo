@@ -440,11 +440,11 @@ class Tokenizer(object):
         tokens, token_classes = zip(*tokens)
         if self.token_classes:
             if self.extra_info:
-                return zip(tokens, token_classes, extra_info)
+                return list(zip(tokens, token_classes, extra_info))
             else:
-                return zip(tokens, token_classes)
+                return list(zip(tokens, token_classes))
         else:
             if self.extra_info:
-                return zip(tokens, extra_info)
+                return list(zip(tokens, extra_info))
             else:
-                return tokens
+                return list(tokens)
