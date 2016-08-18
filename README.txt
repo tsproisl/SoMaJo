@@ -26,6 +26,23 @@ an abbreviation, etc.::
   !	symbol
   ;)	emoticon
 
+*New in version 1.1.0*: SoMaJo can output additional information for
+each token that can help to reconstruct the original untokenized
+text::
+
+  echo 'der beste Betreuer? - >ProfSmith! : )' | bin/tokenizer -c -e -
+  der	
+  beste	
+  Betreuer	SpaceAfter=No
+  ?	
+  ->	SpaceAfter=No, OriginalSpelling="- >"
+  Prof	SpaceAfter=No
+  Smith	SpaceAfter=No
+  !	
+  :)	OriginalSpelling=": )"
+
+The ``-t`` and ``-e`` options can also be used in combination, of course.
+
 The system is described in greater detail in Proisl and Uhrig (2016).
 
 Installation
@@ -61,6 +78,12 @@ i.e. if it is a number, an XML tag, an abbreviation, etc.::
   
   tokenizer -t <file>
 
+If you care about the original spellings, SoMaJo can also provide you
+with additional details for each token, i.e. if the token was followed
+by whitespace or if it included internal whitespace::
+
+  tokenizer -e <file>
+
 Using the module
 ----------------
 
@@ -70,7 +93,7 @@ projects. All you have to do is import ``somajo.Tokenizer``, create a
 
   from somajo import Tokenizer
   
-  tokenizer = Tokenizer(split_camel_case=True, token_classes=False)
+  tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
   tokens = tokenizer.tokenize(paragraph)
 
 Evaluation
@@ -80,12 +103,12 @@ SoMaJo was the system with the highest average F₁ score in the
 EmpiriST 2015 shared task. The performance of the current version on
 the two test sets is summarized in the following table\ [1]_:
 
-====== ========= ====== ===========
+====== ========= ====== =====
 Corpus Precision Recall F₁
-====== ========= ====== ===========
+====== ========= ====== =====
 CMC    99.62     99.56  99.59
 Web    99.83     99.92  99.87
-====== ========= ====== ===========
+====== ========= ====== =====
 
 .. [1] Training and test sets are available from the `official website
        <https://sites.google.com/site/empirist2015/home/shared-task-data>`_.

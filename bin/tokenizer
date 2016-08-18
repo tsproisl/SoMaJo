@@ -10,6 +10,7 @@ def arguments():
     parser = argparse.ArgumentParser(description="Tokenize an input file according to the guidelines of the EmpiriST 2015 shared task on automatic linguistic annotation of computer-mediated communication / social media.")
     parser.add_argument("-c", "--split_camel_case", action="store_true", help="Split items in written in camelCase (excluding several exceptions).")
     parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (number, XML tag, abbreviation, etc.) in addition to the tokens.")
+    parser.add_argument("-e", "--extra_info", action="store_true", help='Output additional information for each token: SpaceAfter=No if the token was not followed by a space and OriginalSpelling="…" if the token contained whitespace.')
     parser.add_argument("FILE", type=argparse.FileType("r"), help="The input file")
     args = parser.parse_args()
     return args
@@ -31,10 +32,10 @@ def get_paragraphs(fh):
 
 def main():
     args = arguments()
-    tokenizer = Tokenizer(args.split_camel_case, args.token_classes)
+    tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info)
     paragraphs = get_paragraphs(args.FILE)
     tokenized_paragraphs = (tokenizer.tokenize("".join(p)) for p in paragraphs)
-    if args.token_classes:
+    if args.token_classes or args.extra_info:
         verticalized = ("\n".join(["\t".join(t) for t in tp]) for tp in tokenized_paragraphs)
     else:
         verticalized = ("\n".join(tp) for tp in tokenized_paragraphs)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import collections
+import itertools
 import os
 import random
 
@@ -11,16 +12,18 @@ Token = collections.namedtuple("Token", ["token", "token_class"])
 
 
 class Tokenizer(object):
-    def __init__(self, split_camel_case=False, token_classes=False):
+    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False):
         """Create a Tokenizer object. If split_camel_case is set to True,
         tokens written in CamelCase will be split. If token_classes is
         set to true, the tokenizer will output the token class for
         each token (if it is a number, an XML tag, an abbreviation,
-        etc.).
+        etc.). If extra_info is set to True, the tokenizer will output
+        information about the original spelling of the tokens.
 
         """
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
+        self.extra_info = extra_info
         self.unique_string_length = 7
         self.mapping = {}
 
@@ -281,6 +284,41 @@ class Tokenizer(object):
             text = text[:beginning] + " " + replacements[text[beginning:end]] + " " + text[end:]
         return text
 
+    def check_spaces(self, tokens, original_text):
+        """Compare the tokens with the original text to see which tokens had
+        trailing whitespace (to be able to annotate SpaceAfter=No) and
+        which tokens contained internal whitespace (to be able to
+        annotate OriginalSpelling="...").
+
+        """
+        extra_info = ["" for _ in tokens]
+        normalized = self.spaces.sub(" ", original_text)
+        normalized = normalized.strip()
+        token_index = 0
+        while len(normalized) > 0:
+            token = tokens[token_index].token
+            token_length = len(token)
+            if normalized.startswith(token):
+                normalized = normalized[token_length:]
+            else:
+                orig = []
+                for char in token:
+                    first_char = None
+                    while first_char != char:
+                        first_char = normalized[0]
+                        normalized = normalized[1:]
+                        orig.append(first_char)
+                extra_info[token_index] = 'OriginalSpelling="%s"' % "".join(orig)
+            if len(normalized) > 0:
+                if normalized.startswith(" "):
+                    normalized = normalized[1:]
+                else:
+                    if len(extra_info[token_index]) > 0:
+                        extra_info[token_index] = ", " + extra_info[token_index]
+                    extra_info[token_index] = "SpaceAfter=No" + extra_info[token_index]
+            token_index += 1
+        return extra_info
+
     def tokenize(self, paragraph):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
@@ -290,6 +328,8 @@ class Tokenizer(object):
         """
         # reset mappings for the current paragraph
         self.mapping = {}
+
+        original_text = paragraph
 
         # Some tokens are allowed to contain whitespace. Get those out
         # of the way first. We replace them with unique strings and
@@ -395,7 +435,17 @@ class Tokenizer(object):
         # reintroduce mapped tokens
         tokens = self._reintroduce_instances(tokens)
 
+        if self.extra_info:
+            extra_info = self.check_spaces(tokens, original_text)
+
+        tokens, token_classes = zip(*tokens)
         if self.token_classes:
-            return tokens
+            if self.extra_info:
+                return zip(tokens, token_classes, extra_info)
+            else:
+                return zip(tokens, token_classes)
         else:
-            return [t.token for t in tokens]
+            if self.extra_info:
+                return zip(tokens, extra_info)
+            else:
+                return tokens
