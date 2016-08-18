@@ -24,6 +24,8 @@ class Tokenizer(object):
         self.unique_string_length = 7
         self.mapping = {}
 
+        self.spaces = re.compile(r"\s+")
+
         # TAGS, EMAILS, URLs
         # self.tag = re.compile(r'<(?!-)(?:/[^> ]+|[^>]+/?)(?<!-)>')
         # taken from Regular Expressions Cookbook
@@ -70,6 +72,7 @@ class Tokenizer(object):
                             "o.O", "oO", "\O/", "\m/", ":;))", "_))",
                             "*_*", "._.", ":wink:", ">_<", "*<:-)",
                             ":!:", ":;-))"])
+        emoticon_list = sorted(emoticon_set, key=len, reverse=True)
         self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variery of eyes, alt.: [:;8]
                                         [-'oO]?                       # optional nose or tear
                                         (?: \)+ | \(+ | [*] | ([DPp])\1*(?!\w)))   # a variety of mouths
@@ -77,25 +80,30 @@ class Tokenizer(object):
                                    r"|" +
                                    r"(?:xD+|XD+)" +
                                    r"|" +
-                                   r"(?<!\d[ ]|\d)\^3" +
-                                   r"|" +
-                                   r"|".join([re.escape(_) for _ in emoticon_set]), re.VERBOSE)
-        self.space_emoticon = re.compile(r'([:;])[ ]([()])')
+                                   r"|".join([re.escape(_) for _ in emoticon_list]), re.VERBOSE)
+        self.space_emoticon = re.compile(r'([:;])[ ]+([()])')
+        # ^3 is an emoticon, unless it is preceded by a number (with
+        # optional whitespace between number and ^3)
+        # ^\^3    # beginning of line, no leading characters
+        # ^\D^3   # beginning of line, one leading character
+        # (?<=\D[ ])^3   # two leading characters, non-number + space
+        # (?<=.[^\d ])^3   # two leading characters, x + non-space-non-number
+        self.heart_emoticon = re.compile(r"(?:^|^\D|(?<=\D[ ])|(?<=.[^\d ]))\^3")
 
         # special tokens containing + or &
         tokens_with_plus_or_ampersand = self._read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
-        self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:\L<patokens>)(?!\w)", re.IGNORECASE, patokens=tokens_with_plus_or_ampersand)
-        # self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:" + r"|".join([re.escape(_) for _ in tokens_with_plus_or_ampersand]) + r")(?!\w)")
+        # self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:\L<patokens>)(?!\w)", re.IGNORECASE, patokens=tokens_with_plus_or_ampersand)
+        self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:" + r"|".join([re.escape(_) for _ in tokens_with_plus_or_ampersand]) + r")(?!\w)", re.IGNORECASE)
 
         # camelCase
         self.emoji = re.compile(r'\bemoji[[:alpha:]]+\b')
-        camel_case_token_set = self._read_abbreviation_file("camel_case_tokens.txt")
+        camel_case_token_list = self._read_abbreviation_file("camel_case_tokens.txt")
         # things like ImmobilienScout24.de are already covered by URL detection
         # self.camel_case_url = re.compile(r'\b(?:[[:upper:]][[:lower:][:digit:]]+){2,}\.(?:de|com|org|net|edu)\b')
-        # self.camel_case_token = re.compile(r"\b(?:" + r"|".join([re.escape(_) for _ in camel_case_token_set]) + r"|Mac[[:upper:]][[:lower:]]*)\b")
-        self.camel_case_token = re.compile(r"\b(?:\L<cctokens>|Mac[[:upper:]][[:lower:]]*)\b", cctokens=camel_case_token_set)
+        self.camel_case_token = re.compile(r"\b(?:" + r"|".join([re.escape(_) for _ in camel_case_token_list]) + r"|:Mac[[:upper:]][[:lower:]]*)\b")
+        # self.camel_case_token = re.compile(r"\b(?:\L<cctokens>|Mac[[:upper:]][[:lower:]]*)\b", cctokens=camel_case_token_set)
         self.in_and_innen = re.compile(r'\b[[:alpha:]]+[[:lower:]]In(?:nen)?[[:lower:]]*\b')
-        self.camel_case = re.compile(r'(?<=[[:lower:]]{2,})([[:upper:]])(?![[:upper:]]|\b)')
+        self.camel_case = re.compile(r'(?<=[[:lower:]]{2})([[:upper:]])(?![[:upper:]]|\b)')
 
         # ABBREVIATIONS
         self.single_letter_ellipsis = re.compile(r"(?<![\w.])(?P<a_letter>[[:alpha:]])(?P<b_ellipsis>\.{3})(?!\.)")
@@ -104,18 +112,19 @@ class Tokenizer(object):
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])[[:alpha:]]\.(?![[:alpha:]]{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
-        single_token_abbreviation_set = self._read_abbreviation_file("single_token_abbreviations.txt")
-        self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_set]) + r')(?![[:alpha:]]{1,3}\.)')
-        self.ps = re.compile(r"(?<!\d[ ]+)\bps\.", re.IGNORECASE)
+        single_token_abbreviation_list = self._read_abbreviation_file("single_token_abbreviations.txt")
+        self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?![[:alpha:]]{1,3}\.)')
+        self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:[[:alpha:]]+\.){2,}')
         # only abbreviations that are not matched by (?:[[:alpha:]]\.)+
-        abbreviation_set = self._read_abbreviation_file("abbreviations.txt")
+        abbreviation_list = self._read_abbreviation_file("abbreviations.txt")
         self.abbreviation = re.compile(r"(?<![\w.])(?:" +
                                        r"(?:(?:[[:alpha:]]\.){2,})" +
                                        r"|" +
-                                       r"(?i:" +    # this part should be case insensitive
-                                       r'|'.join([re.escape(_) for _ in abbreviation_set]) +
-                                       r"))+(?![[:alpha:]]{1,3}\.)", re.V1)
+                                       # r"(?i:" +    # this part should be case insensitive
+                                       r'|'.join([re.escape(_) for _ in abbreviation_list]) +
+                                       # r"))+(?![[:alpha:]]{1,3}\.)", re.V1)
+                                       r")+(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
 
         # MENTIONS, HASHTAGS, ACTION WORDS
         self.mention = re.compile(r'[@]\w+(?!\w)')
@@ -133,7 +142,7 @@ class Tokenizer(object):
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
-        self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+)(?P<b_unit>(?:mm|cm|dm|m|km)(?:^?[23])?|qm|g|kg|min|h|s|sek|cent|eur)(?!\w)', re.IGNORECASE)
+        self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+)(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|qm|g|kg|min|h|s|sek|cent|eur)(?!\w)', re.IGNORECASE)
         # auch Web2.0
         self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[[:alpha:]@]+ | [[:alpha:]@]+-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
         self.number = re.compile(r"""(?<!\w)
@@ -168,12 +177,12 @@ class Tokenizer(object):
                                        [)]        # closing paren
                                        (?=\w)))   # alphanumeric character
                                  """, re.VERBOSE)
-        self.all_paren = re.compile(r"(?<=\s+)[][(){}](?=\s+)")
+        self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
         self.slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
-        self.all_quote = re.compile(r"(?<=\s+)(?:``|''|`|['‚‘’])(?=\s+)")
+        self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
         self.other_punctuation = re.compile(r'([<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+=&–])')
         self.ellipsis = re.compile(r'\.{2,}|…+(?:\.{2,})?')
         self.dot_without_space = re.compile(r'(?<=[[:lower:]]{2})(\.)(?=[[:upper:]][[:lower:]]{2})')
@@ -192,7 +201,7 @@ class Tokenizer(object):
                 if line == "":
                     continue
                 abbreviations.add(line)
-        return abbreviations
+        return sorted(abbreviations, key=len, reverse=True)
 
     def _get_unique_string(self, text):
         """Return a string that is not a substring of text."""
@@ -254,6 +263,7 @@ class Tokenizer(object):
         text = self._replace_regex(text, self.nr_abbreviations, "abbreviation")
         text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
         text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
+        text = self.spaces.sub(" ", text)
         text = self._replace_regex(text, self.ps, "abbreviation")
         for match in self.abbreviation.finditer(text):
             instance = match.group(0)
@@ -302,6 +312,8 @@ class Tokenizer(object):
 
         # replace emoticons with unique strings so that they are out
         # of the way
+        paragraph = self.spaces.sub(" ", paragraph)
+        paragraph = self._replace_regex(paragraph, self.heart_emoticon, "emoticon")
         paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
 
         # mentions, hashtags
