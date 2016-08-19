@@ -30,7 +30,7 @@ an abbreviation, etc.::
 each token that can help to reconstruct the original untokenized text
 (to a certain extent)::
 
-  echo 'der beste Betreuer? - >ProfSmith! : )' | bin/tokenizer -c -e -
+  echo 'der beste Betreuer? - >ProfSmith! : )' | tokenizer -c -e -
   der	
   beste	
   Betreuer	SpaceAfter=No
