@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+Version 1.1.1, 2016-08-19
+=========================
+
+The link in the Evaluation section of the Readme now points to the
+complete gold standard data.
+
 Version 1.1.0, 2016-08-19
 =========================
 
