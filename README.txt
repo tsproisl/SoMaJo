@@ -113,7 +113,7 @@ Web    99.83     99.92  99.87
 ====== ========= ====== =====
 
 .. [1] Training and test sets are available from the `official website
-       <https://sites.google.com/site/empirist2015/home/shared-task-data>`_.
+       <https://sites.google.com/site/empirist2015/home/gold>`_.
 
 References
 ==========
