@@ -94,9 +94,14 @@ projects. All you have to do is import ``somajo.Tokenizer``, create a
 ``Tokenizer`` object and call its ``tokenize`` method::
 
   from somajo import Tokenizer
+
+  # note that paragraphs are allowed to contain newlines
+  paragraph = "der beste Betreuer?\n- >ProfSmith! : )"
   
   tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
   tokens = tokenizer.tokenize(paragraph)
+
+  print("\n".join(tokens))
 
 Evaluation
 ==========
