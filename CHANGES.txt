@@ -2,6 +2,12 @@
 CHANGELOG
 =========
 
+Version 1.1.2, 2016-08-25
+=========================
+
+The example in the documentation is now self-contained: Sample input
+has been added and the output will be printed.
+
 Version 1.1.1, 2016-08-19
 =========================
 
