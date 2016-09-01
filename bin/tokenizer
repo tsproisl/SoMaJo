@@ -9,7 +9,7 @@ from somajo import Tokenizer
 def arguments():
     """"""
     parser = argparse.ArgumentParser(description="Tokenize an input file according to the guidelines of the EmpiriST 2015 shared task on automatic linguistic annotation of computer-mediated communication / social media.")
-    parser.add_argument("--paragraph_separator", choices=["empty_lines", "single_newline"], default="empty_lines", help="How are paragraphs separated in the input text? (Default: empty_lines)")
+    parser.add_argument("-s", "--paragraph_separator", choices=["empty_lines", "single_newlines"], default="empty_lines", help="How are paragraphs separated in the input text? (Default: empty_lines)")
     parser.add_argument("-c", "--split_camel_case", action="store_true", help="Split items in written in camelCase (excluding several exceptions).")
     parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (number, XML tag, abbreviation, etc.) in addition to the tokens.")
     parser.add_argument("-e", "--extra_info", action="store_true", help='Output additional information for each token: SpaceAfter=No if the token was not followed by a space and OriginalSpelling="…" if the token contained whitespace.')
@@ -38,7 +38,7 @@ def main():
     tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info)
     if args.paragraph_separator == "empty_lines":
         paragraphs = get_paragraphs(args.FILE)
-    elif args.paragraph_separator == "single_newline":
+    elif args.paragraph_separator == "single_newlines":
         paragraphs = (line for line in args.FILE if line.strip() != "")
     if args.parallel > 1:
         pool = multiprocessing.Pool(min(args.parallel, multiprocessing.cpu_count()))
