@@ -96,12 +96,20 @@ class Tokenizer(object):
 
         # special tokens containing + or &
         tokens_with_plus_or_ampersand = self._read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
+        plus_amp_simple = [(pa, re.search(r"^\w+[&+]+\w+$", pa)) for pa in tokens_with_plus_or_ampersand]
+        self.simple_plus_ampersand = set([pa[0].lower() for pa in plus_amp_simple if pa[1]])
+        self.simple_plus_ampersand_candidates = re.compile(r"\b\w+[&+]+\w+\b")
+        tokens_with_plus_or_ampersand = [pa[0] for pa in plus_amp_simple if not pa[1]]
         # self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:\L<patokens>)(?!\w)", re.IGNORECASE, patokens=tokens_with_plus_or_ampersand)
         self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:" + r"|".join([re.escape(_) for _ in tokens_with_plus_or_ampersand]) + r")(?!\w)", re.IGNORECASE)
 
         # camelCase
         self.emoji = re.compile(r'\bemoji[[:alpha:]]+\b')
         camel_case_token_list = self._read_abbreviation_file("camel_case_tokens.txt")
+        cc_alnum = [(cc, re.search(r"^\w+$", cc)) for cc in camel_case_token_list]
+        self.simple_camel_case_tokens = set([cc[0] for cc in cc_alnum if cc[1]])
+        self.simple_camel_case_candidates = re.compile(r"\b\w*[[:lower:]][[:upper:]]\w*\b")
+        camel_case_token_list = [cc[0] for cc in cc_alnum if not cc[1]]
         # things like ImmobilienScout24.de are already covered by URL detection
         # self.camel_case_url = re.compile(r'\b(?:[[:upper:]][[:lower:][:digit:]]+){2,}\.(?:de|com|org|net|edu)\b')
         self.camel_case_token = re.compile(r"\b(?:" + r"|".join([re.escape(_) for _ in camel_case_token_list]) + r"|:Mac[[:upper:]][[:lower:]]*)\b")
@@ -122,6 +130,10 @@ class Tokenizer(object):
         self.multipart_abbreviation = re.compile(r'(?:[[:alpha:]]+\.){2,}')
         # only abbreviations that are not matched by (?:[[:alpha:]]\.)+
         abbreviation_list = self._read_abbreviation_file("abbreviations.txt")
+        # abbrev_simple = [(a, re.search(r"^[[:alpha:]]{2,}\.$", a)) for a in abbreviation_list]
+        # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
+        # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])[[:alpha:]]{2,}\.(?![[:alpha:]]{1,3}\.)")
+        # abbreviation_list = [a[0] for a in abbrev_simple if not a[1]]
         self.abbreviation = re.compile(r"(?<![\w.])(?:" +
                                        r"(?:(?:[[:alpha:]]\.){2,})" +
                                        r"|" +
@@ -281,6 +293,7 @@ class Tokenizer(object):
         text = self._replace_regex(text, self.nr_abbreviations, "abbreviation")
         text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
         text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
+        # text = self._replace_set(text, self.simple_single_token_abbreviation_candidates, self.simple_single_token_abbreviations, "abbreviation")
         text = self.spaces.sub(" ", text)
         text = self._replace_regex(text, self.ps, "abbreviation")
 
@@ -295,7 +308,27 @@ class Tokenizer(object):
                     replacement = replacements.setdefault(instance, self._get_unique_string())
                     self.mapping[replacement] = Token(instance, "abbreviation")
             return " %s " % replacements[instance]
-        return self.abbreviation.sub(repl, text)
+        text = self.abbreviation.sub(repl, text)
+        # text = self._replace_set(text, self.simple_abbreviation_candidates, self.simple_abbreviations, "abbreviation", ignore_case=True)
+        return text
+
+    def _replace_set(self, text, regex, items, token_class="regular", ignore_case=False):
+        """Replace all elements from items in text with unique strings."""
+        replacements = {}
+
+        def repl(match):
+            instance = match.group(0)
+            ic_instance = instance
+            if ignore_case:
+                ic_instance = instance.lower()
+            if ic_instance in items:
+                if instance not in replacements:
+                    replacement = replacements.setdefault(instance, self._get_unique_string())
+                    self.mapping[replacement] = Token(instance, token_class)
+                return " %s " % replacements[instance]
+            else:
+                return instance
+        return regex.sub(repl, text)
 
     def check_spaces(self, tokens, original_text):
         """Compare the tokens with the original text to see which tokens had
@@ -379,10 +412,12 @@ class Tokenizer(object):
         paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
 
         paragraph = self._replace_regex(paragraph, self.token_with_plus_ampersand)
+        paragraph = self._replace_set(paragraph, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
 
         # camelCase
         if self.split_camel_case:
             paragraph = self._replace_regex(paragraph, self.camel_case_token)
+            paragraph = self._replace_set(paragraph, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
             paragraph = self._replace_regex(paragraph, self.in_and_innen)
             paragraph = self.camel_case.sub(r' \1', paragraph)
 
