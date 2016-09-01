@@ -25,6 +25,8 @@ class Tokenizer(object):
         self.extra_info = extra_info
         self.unique_string_length = 7
         self.mapping = {}
+        self.unique_prefix = None
+        self.replacement_counter = 0
 
         self.spaces = re.compile(r"\s+")
 
@@ -205,14 +207,32 @@ class Tokenizer(object):
                 abbreviations.add(line)
         return sorted(abbreviations, key=len, reverse=True)
 
-    def _get_unique_string(self, text):
+    def _get_unique_prefix(self, text):
         """Return a string that is not a substring of text."""
         alphabet = "abcdefghijklmnopqrstuvwxyz"
         # create random string of length self.unique_string_length
         unique_string = ""
-        while unique_string in self.mapping or unique_string in text:
+        while unique_string in text:
             unique_string = "".join(random.choice(alphabet) for _ in range(self.unique_string_length))
         return unique_string
+
+    def _get_unique_suffix(self):
+        """Obtain a unique suffix for combination with self.unique_prefix.
+
+        """
+        digits = "abcdefghijklmnopqrstuvwxyz"
+        n = self.replacement_counter
+        b26 = ""
+        while n > 0:
+            quotient, remainder = divmod(n, 26)
+            b26 = digits[remainder] + b26
+            n = quotient
+        self.replacement_counter += 1
+        return b26.rjust(self.unique_string_length, "a")
+
+    def _get_unique_string(self):
+        """Return a string that is not a substring of text."""
+        return self.unique_prefix + self._get_unique_suffix()
 
     def _replace_regex(self, text, regex, token_class="regular"):
         """Replace instances of regex with unique strings and store
@@ -220,28 +240,25 @@ class Tokenizer(object):
 
         """
         replacements = {}
-        spans = set()
-        for match in regex.finditer(text):
-            instance = match.group(0)
-            spans.add(match.span())
-            # check if there are named subgroups
-            if len(match.groupdict()) > 0:
-                parts = [v for k, v in sorted(match.groupdict().items())]
-                multipart = self._multipart_replace(text, instance, parts, token_class)
-                replacements[instance] = multipart
-            else:
-                replacement = self._get_unique_string(text)
-                self.mapping[replacement] = Token(instance, token_class)
-                replacements[instance] = replacement
-        for beginning, end in reversed(sorted(spans)):
-            text = text[:beginning] + " " + replacements[text[beginning:end]] + " " + text[end:]
-        return text
 
-    def _multipart_replace(self, text, instance, parts, token_class):
+        def repl(match):
+            instance = match.group(0)
+            if instance not in replacements:
+                # check if there are named subgroups
+                if len(match.groupdict()) > 0:
+                    parts = [v for k, v in sorted(match.groupdict().items())]
+                    replacements[instance] = self._multipart_replace(instance, parts, token_class)
+                else:
+                    replacement = replacements.setdefault(instance, self._get_unique_string())
+                    self.mapping[replacement] = Token(instance, token_class)
+            return " %s " % replacements[instance]
+        return regex.sub(repl, text)
+
+    def _multipart_replace(self, instance, parts, token_class):
         """"""
         replacements = []
         for part in parts:
-            replacement = self._get_unique_string(text)
+            replacement = self._get_unique_string()
             self.mapping[replacement] = Token(part, token_class)
             replacements.append(replacement)
         multipart = " ".join(replacements)
@@ -258,7 +275,6 @@ class Tokenizer(object):
 
         """
         replacements = {}
-        spans = set()
         text = self._replace_regex(text, self.single_letter_ellipsis, "abbreviation")
         text = self._replace_regex(text, self.and_cetera, "abbreviation")
         text = self._replace_regex(text, self.str_abbreviations, "abbreviation")
@@ -267,21 +283,19 @@ class Tokenizer(object):
         text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
         text = self.spaces.sub(" ", text)
         text = self._replace_regex(text, self.ps, "abbreviation")
-        for match in self.abbreviation.finditer(text):
+
+        def repl(match):
             instance = match.group(0)
-            spans.add(match.span())
-            # check if it is a multipart abbreviation
-            if self.multipart_abbreviation.fullmatch(instance):
-                parts = [p.strip() + "." for p in instance.strip(".").split(".")]
-                multipart = self._multipart_replace(text, instance, parts, "abbreviation")
-                replacements[instance] = multipart
-            else:
-                replacement = self._get_unique_string(text)
-                self.mapping[replacement] = Token(instance, "abbreviation")
-                replacements[instance] = replacement
-        for beginning, end in reversed(sorted(spans)):
-            text = text[:beginning] + " " + replacements[text[beginning:end]] + " " + text[end:]
-        return text
+            if instance not in replacements:
+                # check if it is a multipart abbreviation
+                if self.multipart_abbreviation.fullmatch(instance):
+                    parts = [p.strip() + "." for p in instance.strip(".").split(".")]
+                    replacements[instance] = self._multipart_replace(instance, parts, "abbreviation")
+                else:
+                    replacement = replacements.setdefault(instance, self._get_unique_string())
+                    self.mapping[replacement] = Token(instance, "abbreviation")
+            return " %s " % replacements[instance]
+        return self.abbreviation.sub(repl, text)
 
     def check_spaces(self, tokens, original_text):
         """Compare the tokens with the original text to see which tokens had
@@ -327,6 +341,7 @@ class Tokenizer(object):
         """
         # reset mappings for the current paragraph
         self.mapping = {}
+        self.unique_prefix = self._get_unique_prefix(paragraph)
 
         original_text = paragraph
 
