@@ -86,6 +86,18 @@ guidelines, things like “: )” get normalized to “:)”)::
 
   tokenizer -e <file>
 
+SoMaJo assumes that paragraphs are delimited by empty lines in the
+input file. If your input file uses single newlines instead, use have
+to tell that to the tokenizer via the ``-s`` or
+``--paragraph_separator`` option::
+
+  tokenizer --paragraph_separator single_newlines <file>
+
+To speed up tokenization, you can specify the number of worker
+processes used via the ``--processes`` option::
+
+  tokenizer --processes <number> <file>
+
 Using the module
 ----------------
 

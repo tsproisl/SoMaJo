@@ -5,7 +5,10 @@ CHANGELOG
 Version 1.2.0, 2016-09-01
 =========================
 
-parallelization, configurable paragraph separator
+Two new options added: With -s/--paragraph_separator, you can specify
+how paragraphs are delimited in the input data, i.e. by empty lines or
+by single newlines. The --parallelization option makes it possible to
+use a pool of worker processes to speed up tokenization.
 
 Version 1.1.2, 2016-08-25
 =========================
