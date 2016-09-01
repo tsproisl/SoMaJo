@@ -742,3 +742,23 @@ class OwnAdditions(TestTokenizer):
 
     def test_own_92(self):
         self._equal("2009/2010", "2009 / 2010")
+
+
+class TestSuffixes(TestTokenizer):
+    """"""
+    def test_suffixes_01(self):
+        self.tokenizer.replacement_counter = 0
+        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaaaa")
+
+    def test_suffixes_02(self):
+        self.tokenizer.replacement_counter = 1
+        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaaab")
+
+    def test_suffixes_03(self):
+        self.tokenizer.replacement_counter = 26
+        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaaba")
+
+    def test_suffixes_04(self):
+        self.tokenizer.replacement_counter = 27
+        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaabb")
+        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaabc")
