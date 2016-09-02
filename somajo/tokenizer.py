@@ -354,7 +354,9 @@ class Tokenizer(object):
                         try:
                             first_char = normalized[0]
                         except IndexError:
-                            print(original_text, tokens, file=sys.stderr)
+                            print(original_text, file=sys.stderr)
+                            print(tokens, file=sys.stderr)
+                            print(token, file=sys.stderr)
                             sys.exit()
                         normalized = normalized[1:]
                         orig.append(first_char)
