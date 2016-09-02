@@ -383,6 +383,7 @@ class Tokenizer(object):
         self.unique_prefix = self._get_unique_prefix(paragraph)
 
         original_text = paragraph
+        paragraph = self.spaces.sub(" ", paragraph)
 
         # Some tokens are allowed to contain whitespace. Get those out
         # of the way first. We replace them with unique strings and
