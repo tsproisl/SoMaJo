@@ -3,7 +3,6 @@
 import collections
 import os
 import random
-import sys
 
 import regex as re
 
@@ -351,13 +350,7 @@ class Tokenizer(object):
                 for char in token:
                     first_char = None
                     while first_char != char:
-                        try:
-                            first_char = normalized[0]
-                        except IndexError:
-                            print(original_text, file=sys.stderr)
-                            print(tokens, file=sys.stderr)
-                            print(token, file=sys.stderr)
-                            sys.exit()
+                        first_char = normalized[0]
                         normalized = normalized[1:]
                         orig.append(first_char)
                 extra_info[token_index] = 'OriginalSpelling="%s"' % "".join(orig)
