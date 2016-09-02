@@ -355,6 +355,7 @@ class Tokenizer(object):
                             first_char = normalized[0]
                         except IndexError:
                             print(original_text, tokens, file=sys.stderr)
+                            sys.exit()
                         normalized = normalized[1:]
                         orig.append(first_char)
                 extra_info[token_index] = 'OriginalSpelling="%s"' % "".join(orig)
