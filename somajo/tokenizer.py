@@ -96,9 +96,9 @@ class Tokenizer(object):
 
         # special tokens containing + or &
         tokens_with_plus_or_ampersand = self._read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
-        plus_amp_simple = [(pa, re.search(r"^\w+[&+]+\w+$", pa)) for pa in tokens_with_plus_or_ampersand]
+        plus_amp_simple = [(pa, re.search(r"^\w+[&+]\w+$", pa)) for pa in tokens_with_plus_or_ampersand]
         self.simple_plus_ampersand = set([pa[0].lower() for pa in plus_amp_simple if pa[1]])
-        self.simple_plus_ampersand_candidates = re.compile(r"\b\w+[&+]+\w+\b")
+        self.simple_plus_ampersand_candidates = re.compile(r"\b\w+[&+]\w+\b")
         tokens_with_plus_or_ampersand = [pa[0] for pa in plus_amp_simple if not pa[1]]
         # self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:\L<patokens>)(?!\w)", re.IGNORECASE, patokens=tokens_with_plus_or_ampersand)
         self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:" + r"|".join([re.escape(_) for _ in tokens_with_plus_or_ampersand]) + r")(?!\w)", re.IGNORECASE)
@@ -293,7 +293,6 @@ class Tokenizer(object):
         text = self._replace_regex(text, self.nr_abbreviations, "abbreviation")
         text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
         text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
-        # text = self._replace_set(text, self.simple_single_token_abbreviation_candidates, self.simple_single_token_abbreviations, "abbreviation")
         text = self.spaces.sub(" ", text)
         text = self._replace_regex(text, self.ps, "abbreviation")
 
