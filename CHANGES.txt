@@ -2,6 +2,13 @@
 CHANGELOG
 =========
 
+Version 1.3.0, 2016-09-02
+=========================
+
+Matching of items containing “+” or “&” or being written in camel case
+has been optimized a bit. Now the tokenizer runs roughly three to four
+times faster.
+
 Version 1.2.0, 2016-09-01
 =========================
 
