@@ -197,7 +197,6 @@ AltaModa
 AltaRoma
 AltaVista
 AltEinkG
-Altenpflege+ProPflege
 AlterVista
 AltGr
 AltGr-Taste
@@ -1373,7 +1372,6 @@ DinoCroc
 DinoPark
 DioGuardi
 DirectAccess
-DirectConnect++
 DirectDraw
 DirectGroup
 DirectInput
@@ -3003,7 +3001,6 @@ kkStB
 KlangArt
 KlangKonzepteEnsemble
 KlangNetz
-Klassik&JazzMagazin
 KleinKunstBühne
 KleinKunstPreis
 KleyReX
@@ -6013,7 +6010,6 @@ TallyGenicom
 TamaTech
 TamTam
 TanQuid
-Tanz&FolkFest
 TanzSpeicher
 TanzSportCentrum
 TanzSportGemeinschaft
