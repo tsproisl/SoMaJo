@@ -8,7 +8,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst')) as fh:
     long_description = fh.read()
 
-version = "1.2.1"
+version = "1.2.0"
 
 setup(
     name='SoMaJo',
