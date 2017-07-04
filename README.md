@@ -17,27 +17,27 @@ class information for each token, i.e. if it is a number, an XML tag,
 an abbreviation, etc.:
 
     echo 'Wow, superTool!;)' | tokenizer -c -t -
-    Wow   regular
-    , symbol
-    super regular
-    Tool  regular
-    ! symbol
-    ;)    emoticon
+    Wow	regular
+    ,	symbol
+    super	regular
+    Tool	regular
+    !	symbol
+    ;)	emoticon
 
 *New in version 1.1.0*: SoMaJo can output additional information for
 each token that can help to reconstruct the original untokenized text
 (to a certain extent):
 
     echo 'der beste Betreuer? - >ProfSmith! : )' | tokenizer -c -e -
-    der   
-    beste 
-    Betreuer  SpaceAfter=No
-    ? 
-    ->    SpaceAfter=No, OriginalSpelling="- >"
-    Prof  SpaceAfter=No
-    Smith SpaceAfter=No
-    ! 
-    :)    OriginalSpelling=": )"
+    der	
+    beste	
+    Betreuer	SpaceAfter=No
+    ?	
+    ->	SpaceAfter=No, OriginalSpelling="- >"
+    Prof	SpaceAfter=No
+    Smith	SpaceAfter=No
+    !	
+    :)	OriginalSpelling=": )"
 
 The `-t` and `-e` options can also be used in combination, of course.
 
@@ -94,6 +94,7 @@ To speed up tokenization, you can specify the number of worker
 processes used via the `--processes` option:
 
     tokenizer --processes <number> <file>
+
 
 ### Using the module ###
 
