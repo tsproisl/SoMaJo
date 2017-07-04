@@ -1,36 +1,34 @@
-=========
-CHANGELOG
-=========
+# CHANGELOG #
 
-Version 1.3.0, 2016-09-02
-=========================
+## Version 1.3.1, 2017-07-04 ##
+
+SoMaJo is now hosted on Github and the changes made in this version
+reflect that change.
+
+## Version 1.3.0, 2016-09-02 ##
 
 Matching of items containing “+” or “&” or being written in camel case
 has been optimized a bit. Now the tokenizer runs roughly three to four
 times faster.
 
-Version 1.2.0, 2016-09-01
-=========================
+## Version 1.2.0, 2016-09-01 ##
 
 Two new options added: With -s/--paragraph_separator, you can specify
 how paragraphs are delimited in the input data, i.e. by empty lines or
 by single newlines. The --parallelization option makes it possible to
 use a pool of worker processes to speed up tokenization.
 
-Version 1.1.2, 2016-08-25
-=========================
+## Version 1.1.2, 2016-08-25 ##
 
 The example in the documentation is now self-contained: Sample input
 has been added and the output will be printed.
 
-Version 1.1.1, 2016-08-19
-=========================
+## Version 1.1.1, 2016-08-19 ##
 
 The link in the Evaluation section of the Readme now points to the
 complete gold standard data.
 
-Version 1.1.0, 2016-08-19
-=========================
+## Version 1.1.0, 2016-08-19 ##
 
 SoMaJo can now output additional information about the original
 spelling of the tokens, i.e. if a token was followed by whitespace or
@@ -38,8 +36,7 @@ if a token contained internal whitespace (according to the
 tokenization guidelines, things like “: )” get normalized to “:)”). To
 use this feature, provide the tokenizer script with the ``-e`` option.
 
-Version 1.0.3, 2016-08-18
-=========================
+## Version 1.0.3, 2016-08-18 ##
 
 This version works around a bug in the regex module that caused
 exponential runtimes on certain inputs.
