@@ -5,12 +5,14 @@ from os import path
 from setuptools import setup
 
 here = path.abspath(path.dirname(__file__))
-with open(path.join(here, 'README.txt')) as fh:
+with open(path.join(here, 'README.rst')) as fh:
     long_description = fh.read()
+
+version = "1.2.1"
 
 setup(
     name='SoMaJo',
-    version='1.2.0',
+    version=version,
     author='Thomas Proisl, Peter Uhrig',
     author_email='thomas.proisl@fau.de',
     packages=[
@@ -26,7 +28,8 @@ setup(
                    "single_token_abbreviations.txt",
                    "tokens_with_plus_or_ampersand.txt"]
     },
-    url='http://pypi.python.org/pypi/SoMaJo/',
+    url="https://github.com/tsproisl/SoMaJo",
+    download_url='https://github.com/tsproisl/SoMaJo/archive/v%s.tar.gz' % version,
     license='GNU General Public License v3 or later (GPLv3+)',
     description='A tokenizer for German web and social media texts.',
     long_description=long_description,
