@@ -1,5 +1,11 @@
+# 1. Upload to PyPI:
 # python3 setup.py sdist
 # python3 setup.py sdist upload
+#
+# 2. Check if everything looks all right: https://pypi.python.org/pypi/SoMaJo
+#
+# 3. Go to https://github.com/tsproisl/SoMaJo/releases/new and
+# create a new release
 
 from os import path
 from setuptools import setup
@@ -8,7 +14,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst')) as fh:
     long_description = fh.read()
 
-version = "1.2.0"
+version = "1.3.1"
 
 setup(
     name='SoMaJo',
