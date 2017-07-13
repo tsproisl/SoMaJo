@@ -14,7 +14,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst')) as fh:
     long_description = fh.read()
 
-version = "1.3.1"
+version = "1.4.0"
 
 setup(
     name='SoMaJo',
@@ -37,7 +37,7 @@ setup(
     url="https://github.com/tsproisl/SoMaJo",
     download_url='https://github.com/tsproisl/SoMaJo/archive/v%s.tar.gz' % version,
     license='GNU General Public License v3 or later (GPLv3+)',
-    description='A tokenizer for German web and social media texts.',
+    description='A tokenizer and sentence splitter for German web and social media texts.',
     long_description=long_description,
     install_requires=[
         "regex",
