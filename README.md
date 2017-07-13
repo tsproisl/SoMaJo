@@ -41,6 +41,9 @@ each token that can help to reconstruct the original untokenized text
 
 The `-t` and `-e` options can also be used in combination, of course.
 
+*New in version 1.4.0*: SoMaJo can split the input text into sentences
+using the `--split_sentences` option.
+
 The system is described in greater detail in Proisl and Uhrig (2016).
 
 
@@ -95,6 +98,10 @@ processes used via the `--processes` option:
 
     tokenizer --processes <number> <file>
 
+SoMaJo can also split the input paragraphs into sentences:
+
+    tokenizer --split_sentences <file>
+
 
 ### Using the module ###
 
@@ -105,12 +112,23 @@ projects. All you have to do is import `somajo.Tokenizer`, create a
     from somajo import Tokenizer
 
     # note that paragraphs are allowed to contain newlines
-    paragraph = "der beste Betreuer?\n- >ProfSmith! : )"
+    paragraph = "der beste Betreuer?\n-- ProfSmith! : )"
 
     tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
     tokens = tokenizer.tokenize(paragraph)
 
-    print("\n".join(tokens))
+    print("\n".join(tokens), "\n")
+
+Sentence splitting operates on tokenized text:
+
+    from somajo import SentenceSplitter
+    
+    # set is_tuple=True if token_classes=True or extra_info=True
+    sentence_splitter = SentenceSplitter(is_tuple=False)
+    sentences = sentence_splitter.split(tokens)
+    
+    for sentence in sentences:
+        print("\n".join(sentence), "\n")
 
 
 ## Evaluation ##
