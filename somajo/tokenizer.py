@@ -3,6 +3,7 @@
 import collections
 import os
 import random
+import warnings
 
 import regex as re
 
@@ -350,9 +351,12 @@ class Tokenizer(object):
                 for char in token:
                     first_char = None
                     while first_char != char:
-                        first_char = normalized[0]
-                        normalized = normalized[1:]
-                        orig.append(first_char)
+                        try:
+                            first_char = normalized[0]
+                            normalized = normalized[1:]
+                            orig.append(first_char)
+                        except IndexError:
+                            warnings.warn("IndexError in this paragraph: " + original_text)
                 extra_info[token_index] = 'OriginalSpelling="%s"' % "".join(orig)
             if len(normalized) > 0:
                 if normalized.startswith(" "):
