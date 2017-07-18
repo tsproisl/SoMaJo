@@ -356,7 +356,7 @@ class Tokenizer(object):
                             normalized = normalized[1:]
                             orig.append(first_char)
                         except IndexError:
-                            warnings.warn("IndexError in this paragraph: " + original_text)
+                            warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
                 extra_info[token_index] = 'OriginalSpelling="%s"' % "".join(orig)
             if len(normalized) > 0:
                 if normalized.startswith(" "):
