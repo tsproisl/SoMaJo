@@ -224,6 +224,9 @@ class TestTimeDate(TestTokenizer):
     def test_time_24(self):
         self._equal("24-stündig", "24-stündig")
 
+    def test_time_25(self):
+        self._equal("Punkte 2-4. Das System", "Punkte 2 - 4 . Das System")
+
 
 class TestAbbreviations(TestTokenizer):
     """"""
