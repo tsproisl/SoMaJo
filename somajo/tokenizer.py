@@ -94,6 +94,14 @@ class Tokenizer(object):
         # (?<=\D[ ])^3   # two leading characters, non-number + space
         # (?<=.[^\d ])^3   # two leading characters, x + non-space-non-number
         self.heart_emoticon = re.compile(r"(?:^|^\D|(?<=\D[ ])|(?<=.[^\d ]))\^3")
+        # U+2600..U+26FF	Miscellaneous Symbols
+        # U+2700..U+27BF	Dingbats
+        # U+1F300..U+1F5FF	Miscellaneous Symbols and Pictographs
+        # U+1F600..U+1F64F	Emoticons
+        # U+1F680..U+1F6FF	Transport and Map Symbols
+        # U+1F900..U+1F9FF	Supplemental Symbols and Pictographs
+        # self.unicode_symbols = re.compile(r"[\u2600-\u27BF]|[\u1F300-\u1F64F]|[\u1F680-\u1F6FF]|[\u1F900-\u1F9FF]")
+        self.unicode_symbols = re.compile(r"[\u2600-\u27BF\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
 
         # special tokens containing + or &
         tokens_with_plus_or_ampersand = self._read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
@@ -105,7 +113,7 @@ class Tokenizer(object):
         self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:" + r"|".join([re.escape(_) for _ in tokens_with_plus_or_ampersand]) + r")(?!\w)", re.IGNORECASE)
 
         # camelCase
-        self.emoji = re.compile(r'\bemoji[[:alpha:]]+\b')
+        self.emoji = re.compile(r'\bemojiQ[[:alpha:]]{3,}\b')
         camel_case_token_list = self._read_abbreviation_file("camel_case_tokens.txt")
         cc_alnum = [(cc, re.search(r"^\w+$", cc)) for cc in camel_case_token_list]
         self.simple_camel_case_tokens = set([cc[0] for cc in cc_alnum if cc[1]])
@@ -406,13 +414,14 @@ class Tokenizer(object):
         paragraph = self.spaces.sub(" ", paragraph)
         paragraph = self._replace_regex(paragraph, self.heart_emoticon, "emoticon")
         paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
+        paragraph = self._replace_regex(paragraph, self.unicode_symbols, "emoticon")
 
         # mentions, hashtags
         paragraph = self._replace_regex(paragraph, self.mention, "mention")
         paragraph = self._replace_regex(paragraph, self.hashtag, "hashtag")
         # action words
         paragraph = self._replace_regex(paragraph, self.action_word, "action_word")
-        # emoji
+        # textual representations of emoji
         paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
 
         paragraph = self._replace_regex(paragraph, self.token_with_plus_ampersand)
