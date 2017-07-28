@@ -1,5 +1,9 @@
 # CHANGELOG #
 
+## Version 1.4.1, 2017-07-28 ##
+
+Added support for Unicode emoticons and various other Unicode symbols.
+
 ## Version 1.4.0, 2017-07-13 ##
 
 SoMaJo can now perform sentence splitting (using the new option
