@@ -122,6 +122,9 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_32(self):
         self._equal("f - > d", "f -> d")
 
+    def test_punctuation_32a(self):
+        self._equal("f→d", "f → d")
+
     def test_punctuation_33(self):
         self._equal("(Neu-)Veröffentlichung", "( Neu- ) Veröffentlichung")
 
@@ -394,6 +397,12 @@ class TestEmoticons(TestTokenizer):
 
     def test_emoticons_17(self):
         self._equal("Das hab ich auch schon gehört (find ich super :-)", "Das hab ich auch schon gehört ( find ich super :-)")
+
+    def test_emoticons_18(self):
+        self._equal("bla🙅fasel", "bla 🙅 fasel")
+
+    def test_emoticons_19(self):
+        self._equal("🙄😖✈♨🎧🤒🚗", "🙄 😖 ✈ ♨ 🎧 🤒 🚗")
 
 
 class TestActions(TestTokenizer):
