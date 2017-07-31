@@ -30,7 +30,10 @@ class Tokenizer(object):
         self.replacement_counter = 0
 
         self.spaces = re.compile(r"\s+")
-
+        self.controls = re.compile(r"[\u0000-\u001F\u007F-\u009F]")
+        # soft hyphen (00AD), zero-width space (200B)
+        self.other_nasties = re.compile(r"[\u00AD\u200B]")
+        
         # TAGS, EMAILS, URLs
         # self.tag = re.compile(r'<(?!-)(?:/[^> ]+|[^>]+/?)(?<!-)>')
         # taken from Regular Expressions Cookbook
@@ -388,7 +391,13 @@ class Tokenizer(object):
         self.unique_prefix = self._get_unique_prefix(paragraph)
 
         original_text = paragraph
+
+        # normalize whitespace
         paragraph = self.spaces.sub(" ", paragraph)
+
+        # get rid of junk characters
+        paragraph = self.controls.sub("", paragraph)
+        paragraph = self.other_nasties.sub("", paragraph)
 
         # Some tokens are allowed to contain whitespace. Get those out
         # of the way first. We replace them with unique strings and

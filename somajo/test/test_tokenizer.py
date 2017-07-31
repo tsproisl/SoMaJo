@@ -774,3 +774,22 @@ class TestSuffixes(TestTokenizer):
         self.tokenizer.replacement_counter = 27
         self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaabb")
         self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaabc")
+
+
+class TestJunk(TestTokenizer):
+    """"""
+    def test_junk_01(self):
+        # zero width space
+        self._equal("foo​bar", "foobar")
+
+    def test_junk_02(self):
+        # soft hyphen
+        self._equal("foo­bar", "foobar")
+
+    def test_junk_03(self):
+        # soft hyphen
+        self._equal("foo\nbar", "foo bar")
+
+    def test_junk_04(self):
+        # control characters
+        self._equal("foobarbazquxalphabetagamma", "foobarbazquxalphabetagamma")
