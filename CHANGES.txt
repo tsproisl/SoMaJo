@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version 1.4.2, 2017-07-31 ##
+
+Control characters and other “nasty” characters (soft hyphens and
+zero-width spaces) are removed from the input.
+
 ## Version 1.4.1, 2017-07-28 ##
 
 Added support for Unicode emoticons and various other Unicode symbols.
