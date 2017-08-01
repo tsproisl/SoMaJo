@@ -35,6 +35,7 @@ class Tokenizer(object):
         self.other_nasties = re.compile(r"[\u00AD\u200B]")
         # combination
         self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u200B]+")
+        self.junk_between_spaces = re.compile(r"\s+[\s\u0000-\u001F\u007F-\u009F\u00AD\u200B]+\s+")
         
         # TAGS, EMAILS, URLs
         # self.tag = re.compile(r'<(?!-)(?:/[^> ]+|[^>]+/?)(?<!-)>')
@@ -352,6 +353,7 @@ class Tokenizer(object):
         """
         extra_info = ["" for _ in tokens]
         normalized = self.spaces.sub(" ", original_text)
+        normalized = self.junk_between_spaces.sub(" ", normalized)
         normalized = normalized.strip()
         for token_index, t in enumerate(tokens):
             original_spelling = None
