@@ -524,6 +524,8 @@ class Tokenizer(object):
         if self.extra_info:
             extra_info = self.check_spaces(tokens, original_text)
 
+        if len(tokens) == 0:
+            return []
         tokens, token_classes = zip(*tokens)
         if self.token_classes:
             if self.extra_info:

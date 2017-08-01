@@ -48,6 +48,7 @@ def main():
         tokenized_paragraphs = pool.imap(tokenizer.tokenize, paragraphs, 250)
     else:
         tokenized_paragraphs = map(tokenizer.tokenize, paragraphs)
+    tokenized_paragraphs = (tp for tp in tokenized_paragraphs if tp)
     if args.split_sentences:
         tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
         tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)

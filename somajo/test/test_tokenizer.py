@@ -832,3 +832,6 @@ class TestMisc(TestTokenizerExtra):
 
     def test_misc_08(self):
         self._equal("foo ­ ​ bar", "foo bar")
+
+    def test_misc_09(self):
+        self.assertEqual(self.tokenizer.tokenize("­ \n­"), [])
