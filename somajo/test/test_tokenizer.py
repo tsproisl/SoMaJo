@@ -793,3 +793,33 @@ class TestJunk(TestTokenizer):
     def test_junk_04(self):
         # control characters
         self._equal("foobarbazquxalphabetagamma", "foobarbazquxalphabetagamma")
+
+
+class TestTokenizerExtra(unittest.TestCase):
+    """"""
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = Tokenizer(split_camel_case=True, extra_info=True)
+
+    def _equal(self, raw, tokenized):
+        """"""
+        tokens, extra_info = zip(*self.tokenizer.tokenize(raw))
+        self.assertEqual(list(tokens), tokenized.split())
+
+
+class TestMisc(TestTokenizerExtra):
+    """"""
+    def test_misc_01(self):
+        self._equal("[Alt] + 240 =­\n", "[ Alt ] + 240 =")
+
+    def test_misc_02(self):
+        self._equal("[Alt] + 240 =\n", "[ Alt ] + 240 =")
+
+    def test_misc_03(self):
+        self._equal("foo­bar", "foobar")
+
+    def test_misc_04(self):
+        self._equal("foo­ bar", "foo bar")
+
+    def test_misc_05(self):
+        self._equal("foo­", "foo")
