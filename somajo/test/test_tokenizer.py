@@ -823,3 +823,12 @@ class TestMisc(TestTokenizerExtra):
 
     def test_misc_05(self):
         self._equal("foo­", "foo")
+
+    def test_misc_06(self):
+        self._equal("Christian von Faber-Castell, 4. Juli 2014 ​\n", "Christian von Faber-Castell , 4. Juli 2014")
+
+    def test_misc_07(self):
+        self._equal("Vgl. Schott, E., Markt und Geschäftsbeziehung beim Outsourcing ­\n", "Vgl. Schott , E. , Markt und Geschäftsbeziehung beim Outsourcing")
+
+    def test_misc_08(self):
+        self._equal("foo ­ ​ bar", "foo bar")
