@@ -33,6 +33,8 @@ class Tokenizer(object):
         self.controls = re.compile(r"[\u0000-\u001F\u007F-\u009F]")
         # soft hyphen (00AD), zero-width space (200B)
         self.other_nasties = re.compile(r"[\u00AD\u200B]")
+        # combination
+        self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u200B]+")
         
         # TAGS, EMAILS, URLs
         # self.tag = re.compile(r'<(?!-)(?:/[^> ]+|[^>]+/?)(?<!-)>')
@@ -351,9 +353,9 @@ class Tokenizer(object):
         extra_info = ["" for _ in tokens]
         normalized = self.spaces.sub(" ", original_text)
         normalized = normalized.strip()
-        token_index = 0
-        while len(normalized) > 0:
-            token = tokens[token_index].token
+        for token_index, t in enumerate(tokens):
+            original_spelling = None
+            token = t.token
             token_length = len(token)
             if normalized.startswith(token):
                 normalized = normalized[token_length:]
@@ -368,7 +370,15 @@ class Tokenizer(object):
                             orig.append(first_char)
                         except IndexError:
                             warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
-                extra_info[token_index] = 'OriginalSpelling="%s"' % "".join(orig)
+                original_spelling = "".join(orig)
+            m = self.starts_with_junk.search(normalized)
+            if m:
+                if original_spelling is None:
+                    original_spelling = token
+                original_spelling += normalized[:m.end()]
+                normalized = normalized[m.end():]
+            if original_spelling is not None:
+                extra_info[token_index] = 'OriginalSpelling="%s"' % original_spelling
             if len(normalized) > 0:
                 if normalized.startswith(" "):
                     normalized = normalized[1:]
@@ -376,7 +386,10 @@ class Tokenizer(object):
                     if len(extra_info[token_index]) > 0:
                         extra_info[token_index] = ", " + extra_info[token_index]
                     extra_info[token_index] = "SpaceAfter=No" + extra_info[token_index]
-            token_index += 1
+        try:
+            assert len(normalized) == 0
+        except AssertionError:
+            warnings.warn("AssertionError in this paragraph: '%s'\nTokens: %s\nRemaining normalized text: '%s'" % (original_text, tokens, normalized))
         return extra_info
 
     def tokenize(self, paragraph):
