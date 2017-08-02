@@ -84,7 +84,7 @@ class Tokenizer(object):
                             "*_*", "._.", ":wink:", ">_<", "*<:-)",
                             ":!:", ":;-))"])
         emoticon_list = sorted(emoticon_set, key=len, reverse=True)
-        self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variery of eyes, alt.: [:;8]
+        self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variety of eyes, alt.: [:;8]
                                         [-'oO]?                       # optional nose or tear
                                         (?: \)+ | \(+ | [*] | ([DPp])\1*(?!\w)))   # a variety of mouths
                                     """ +
