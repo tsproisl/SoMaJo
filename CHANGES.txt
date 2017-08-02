@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version 1.4.3, 2017-08-02 ##
+
+This is a bugfix release that fixes a bug that occured in 1.4.2 when
+using the option -e on some inputs containing control characters and
+other “nasty” characters.
+
 ## Version 1.4.2, 2017-07-31 ##
 
 Control characters and other “nasty” characters (soft hyphens and
