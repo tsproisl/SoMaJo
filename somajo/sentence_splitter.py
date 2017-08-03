@@ -32,7 +32,7 @@ class SentenceSplitter(object):
                     if token_j[0].isupper():
                         sentence_boundaries.append(boundary)
                         break
-                    elif self.opening_punct.search(token_j):
+                    elif self.opening_punct.search(token_j) and token_j != "“":
                         last = "opening"
                     elif self.closing_punct.search(token_j) and last != "opening":
                         boundary = j + 1
