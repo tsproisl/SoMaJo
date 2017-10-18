@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 
 import argparse
+import logging
 import multiprocessing
+import time
 
 from somajo import Tokenizer
 from somajo import SentenceSplitter
+
+
+logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 def arguments():
@@ -37,6 +42,8 @@ def get_paragraphs(fh):
 
 def main():
     args = arguments()
+    n_tokens = 0
+    t0 = time.perf_counter()
     tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info)
     sentence_splitter = SentenceSplitter(args.token_classes or args.extra_info)
     if args.paragraph_separator == "empty_lines":
@@ -53,11 +60,12 @@ def main():
         tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
         tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)
     if args.token_classes or args.extra_info:
-        verticalized = ("\n".join(["\t".join(t) for t in tp]) for tp in tokenized_paragraphs)
-    else:
-        verticalized = ("\n".join(tp) for tp in tokenized_paragraphs)
-    for p in verticalized:
-        print(p, "\n")
+        tokenized_paragraphs = (["\t".join(t) for t in tp] for tp in tokenized_paragraphs)
+    for tp in tokenized_paragraphs:
+        n_tokens += len(tp)
+        print("\n".join(tp), "\n")
+    t1 = time.perf_counter()
+    logging.info("Tokenized %d tokens in %d seconds (%d tokens/s)" % (n_tokens, t1 - t0, n_tokens / (t1 - t0)))
 
 
 if __name__ == "__main__":
