@@ -1,5 +1,113 @@
 __________________________________________________________________________________________________
-tmp/web_test_004.txt                              ...irist_test_pos_web/tokenized/web_test_004.txt
+tmp/web_test_009.txt                              ..._standard/test_web/tokenized/web_test_009.txt
+
+False Positive (linebreak inserted left):
+   169:   Pops                                       169:   Pops                                  
+   170:                                              170:                                         
+   171: * 1.                                         171: * 1.1.                                  
+   172: * 1.                                         172:   Kuchen                                
+   173:   Kuchen                                     173:   für                                   
+   174:   für                                        174:   Cake                                  
+
+False Positive (linebreak inserted left):
+   311:   .                                          310:   .                                     
+   312:                                              311:                                         
+   313: * 1.                                         312: * 1.2.                                  
+   314: * 2.                                         313:   Kuchen                                
+   315:   Kuchen                                     314:   für                                   
+   316:   für                                        315:   Cake                                  
+
+False Positive (linebreak inserted left):
+   448:   .                                          446:   .                                     
+   449:                                              447:                                         
+   450: * 1.                                         448: * 1.3.                                  
+   451: * 3.                                         449:   Kekse                                 
+   452:   Kekse                                      450:   für                                   
+   453:   für                                        451:   Cake                                  
+
+__________________________________________________________________________________________________
+tmp/web_test_011.txt                              ..._standard/test_web/tokenized/web_test_011.txt
+
+False Negative (linebreak inserted right):
+   238:   man                                        238:   man                                   
+   239:   sie                                        239:   sie                                   
+   240: * 1829/30                                    240: * 1829                                  
+   241:   in                                         241: * /                                     
+   242:   das                                        242:   30                                    
+   243:   Herrschaftliche                            243:   in                                    
+
+False Negative (linebreak inserted right):
+   238:   man                                        239:   sie                                   
+   239:   sie                                        240:   1829                                  
+   240: * 1829/30                                    241: * /                                     
+   241:   in                                         242: * 30                                    
+   242:   das                                        243:   in                                    
+   243:   Herrschaftliche                            244:   das                                   
+
+False Negative (linebreak inserted right):
+   411:   Garten                                     413:   Garten                                
+   412:   musste                                     414:   musste                                
+   413: * 1864/65                                    415: * 1864                                  
+   414:   dem                                        416: * /                                     
+   415:   Bau                                        417:   65                                    
+   416:   des                                        418:   dem                                   
+
+False Negative (linebreak inserted right):
+   411:   Garten                                     414:   musste                                
+   412:   musste                                     415:   1864                                  
+   413: * 1864/65                                    416: * /                                     
+   414:   dem                                        417: * 65                                    
+   415:   Bau                                        418:   dem                                   
+   416:   des                                        419:   Bau                                   
+
+__________________________________________________________________________________________________
+tmp/web_test_002.txt                              ..._standard/test_web/tokenized/web_test_002.txt
+
+False Negative (linebreak inserted right):
+    99:   der                                         99:   der                                   
+   100:   Saison                                     100:   Saison                                
+   101: * 2009/2010                                  101: * 2009                                  
+   102:   sind                                       102: * /                                     
+   103:   laut                                       103:   2010                                  
+   104:   einer                                      104:   sind                                  
+
+False Negative (linebreak inserted right):
+    99:   der                                        100:   Saison                                
+   100:   Saison                                     101:   2009                                  
+   101: * 2009/2010                                  102: * /                                     
+   102:   sind                                       103: * 2010                                  
+   103:   laut                                       104:   sind                                  
+   104:   einer                                      105:   laut                                  
+
+False Positive (linebreak inserted left):
+   174:   Mitte                                      176:   Mitte                                 
+   175:   der                                        177:   der                                   
+   176: * 1970er                                     178: * 1970er-Jahre                          
+   177: * -Jahre                                     179:   hat                                   
+   178:   hat                                        180:   sich                                  
+   179:   sich                                       181:   Alpinski                              
+
+__________________________________________________________________________________________________
+tmp/web_test_012.txt                              ..._standard/test_web/tokenized/web_test_012.txt
+
+False Positive (linebreak inserted left):
+   660:   Backlinks                                  660:   Backlinks                             
+   661:   :                                          661:   :                                     
+   662: * [                                          662: * [[                                    
+   663: * [                                          663:   security                              
+   664:   security                                   664:   :                                     
+   665:   :                                          665:   verschlüsselung                       
+
+False Positive (linebreak inserted left):
+   665:   :                                          664:   :                                     
+   666:   verschlüsselung                            665:   verschlüsselung                       
+   667: * ]                                          666: * ]]                                    
+   668: * ]                                          667:                                         
+   669:                                              668:   Navigation                            
+   670:   Navigation                                 669:   Passwort-                             
+
+__________________________________________________________________________________________________
+tmp/web_test_004.txt                              ..._standard/test_web/tokenized/web_test_004.txt
 
 False Positive (linebreak inserted left):
    141:   Telekommunikationsgeheimnis                141:   Telekommunikationsgeheimnis           
@@ -56,112 +164,4 @@ False Positive (linebreak inserted left):
    451: * .                                          445:   20                                    
    452:   20                                         446:   Abs.                                  
    453:   Abs.                                       447:   4                                     
-
-__________________________________________________________________________________________________
-tmp/web_test_009.txt                              ...irist_test_pos_web/tokenized/web_test_009.txt
-
-False Positive (linebreak inserted left):
-   169:   Pops                                       169:   Pops                                  
-   170:                                              170:                                         
-   171: * 1.                                         171: * 1.1.                                  
-   172: * 1.                                         172:   Kuchen                                
-   173:   Kuchen                                     173:   für                                   
-   174:   für                                        174:   Cake                                  
-
-False Positive (linebreak inserted left):
-   311:   .                                          310:   .                                     
-   312:                                              311:                                         
-   313: * 1.                                         312: * 1.2.                                  
-   314: * 2.                                         313:   Kuchen                                
-   315:   Kuchen                                     314:   für                                   
-   316:   für                                        315:   Cake                                  
-
-False Positive (linebreak inserted left):
-   448:   .                                          446:   .                                     
-   449:                                              447:                                         
-   450: * 1.                                         448: * 1.3.                                  
-   451: * 3.                                         449:   Kekse                                 
-   452:   Kekse                                      450:   für                                   
-   453:   für                                        451:   Cake                                  
-
-__________________________________________________________________________________________________
-tmp/web_test_002.txt                              ...irist_test_pos_web/tokenized/web_test_002.txt
-
-False Negative (linebreak inserted right):
-    99:   der                                         99:   der                                   
-   100:   Saison                                     100:   Saison                                
-   101: * 2009/2010                                  101: * 2009                                  
-   102:   sind                                       102: * /                                     
-   103:   laut                                       103:   2010                                  
-   104:   einer                                      104:   sind                                  
-
-False Negative (linebreak inserted right):
-    99:   der                                        100:   Saison                                
-   100:   Saison                                     101:   2009                                  
-   101: * 2009/2010                                  102: * /                                     
-   102:   sind                                       103: * 2010                                  
-   103:   laut                                       104:   sind                                  
-   104:   einer                                      105:   laut                                  
-
-False Positive (linebreak inserted left):
-   174:   Mitte                                      176:   Mitte                                 
-   175:   der                                        177:   der                                   
-   176: * 1970er                                     178: * 1970er-Jahre                          
-   177: * -Jahre                                     179:   hat                                   
-   178:   hat                                        180:   sich                                  
-   179:   sich                                       181:   Alpinski                              
-
-__________________________________________________________________________________________________
-tmp/web_test_011.txt                              ...irist_test_pos_web/tokenized/web_test_011.txt
-
-False Negative (linebreak inserted right):
-   238:   man                                        238:   man                                   
-   239:   sie                                        239:   sie                                   
-   240: * 1829/30                                    240: * 1829                                  
-   241:   in                                         241: * /                                     
-   242:   das                                        242:   30                                    
-   243:   Herrschaftliche                            243:   in                                    
-
-False Negative (linebreak inserted right):
-   238:   man                                        239:   sie                                   
-   239:   sie                                        240:   1829                                  
-   240: * 1829/30                                    241: * /                                     
-   241:   in                                         242: * 30                                    
-   242:   das                                        243:   in                                    
-   243:   Herrschaftliche                            244:   das                                   
-
-False Negative (linebreak inserted right):
-   411:   Garten                                     413:   Garten                                
-   412:   musste                                     414:   musste                                
-   413: * 1864/65                                    415: * 1864                                  
-   414:   dem                                        416: * /                                     
-   415:   Bau                                        417:   65                                    
-   416:   des                                        418:   dem                                   
-
-False Negative (linebreak inserted right):
-   411:   Garten                                     414:   musste                                
-   412:   musste                                     415:   1864                                  
-   413: * 1864/65                                    416: * /                                     
-   414:   dem                                        417: * 65                                    
-   415:   Bau                                        418:   dem                                   
-   416:   des                                        419:   Bau                                   
-
-__________________________________________________________________________________________________
-tmp/web_test_012.txt                              ...irist_test_pos_web/tokenized/web_test_012.txt
-
-False Positive (linebreak inserted left):
-   660:   Backlinks                                  660:   Backlinks                             
-   661:   :                                          661:   :                                     
-   662: * [                                          662: * [[                                    
-   663: * [                                          663:   security                              
-   664:   security                                   664:   :                                     
-   665:   :                                          665:   verschlüsselung                       
-
-False Positive (linebreak inserted left):
-   665:   :                                          664:   :                                     
-   666:   verschlüsselung                            665:   verschlüsselung                       
-   667: * ]                                          666: * ]]                                    
-   668: * ]                                          667:                                         
-   669:                                              668:   Navigation                            
-   670:   Navigation                                 669:   Passwort-                             
 
