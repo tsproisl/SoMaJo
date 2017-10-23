@@ -1,0 +1,11 @@
+# A list of abbreviations that frequently occur at the end of a
+# sentence. If such an abbreviation is followed by a potential
+# sentence start, e.g. by a capital letter, it will be interpreted as
+# the end of a sentence.
+#
+# Lines starting with “#” are treated as comments and will be ignored.
+
+usw.
+usf.
+etc.
+uvam.
