@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 import collections
-import os
 import random
 import warnings
 
 import regex as re
 
+from somajo import utils
 
 Token = collections.namedtuple("Token", ["token", "token_class"])
 
@@ -36,7 +36,7 @@ class Tokenizer(object):
         # combination
         self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u200B]+")
         self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u200B]+(?:\s+|$)")
-        
+
         # TAGS, EMAILS, URLs
         # self.tag = re.compile(r'<(?!-)(?:/[^> ]+|[^>]+/?)(?<!-)>')
         # taken from Regular Expressions Cookbook
@@ -115,7 +115,7 @@ class Tokenizer(object):
         self.unicode_symbols = re.compile(r"[\u2600-\u27BF\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
 
         # special tokens containing + or &
-        tokens_with_plus_or_ampersand = self._read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
+        tokens_with_plus_or_ampersand = utils.read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
         plus_amp_simple = [(pa, re.search(r"^\w+[&+]\w+$", pa)) for pa in tokens_with_plus_or_ampersand]
         self.simple_plus_ampersand = set([pa[0].lower() for pa in plus_amp_simple if pa[1]])
         self.simple_plus_ampersand_candidates = re.compile(r"\b\w+[&+]\w+\b")
@@ -125,7 +125,7 @@ class Tokenizer(object):
 
         # camelCase
         self.emoji = re.compile(r'\bemojiQ[[:alpha:]]{3,}\b')
-        camel_case_token_list = self._read_abbreviation_file("camel_case_tokens.txt")
+        camel_case_token_list = utils.read_abbreviation_file("camel_case_tokens.txt")
         cc_alnum = [(cc, re.search(r"^\w+$", cc)) for cc in camel_case_token_list]
         self.simple_camel_case_tokens = set([cc[0] for cc in cc_alnum if cc[1]])
         self.simple_camel_case_candidates = re.compile(r"\b\w*[[:lower:]][[:upper:]]\w*\b")
@@ -144,12 +144,12 @@ class Tokenizer(object):
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])[[:alpha:]]\.(?![[:alpha:]]{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
-        single_token_abbreviation_list = self._read_abbreviation_file("single_token_abbreviations.txt")
+        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations.txt")
         self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?![[:alpha:]]{1,3}\.)')
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:[[:alpha:]]+\.){2,}')
         # only abbreviations that are not matched by (?:[[:alpha:]]\.)+
-        abbreviation_list = self._read_abbreviation_file("abbreviations.txt")
+        abbreviation_list = utils.read_abbreviation_file("abbreviations.txt")
         # abbrev_simple = [(a, re.search(r"^[[:alpha:]]{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])[[:alpha:]]{2,}\.(?![[:alpha:]]{1,3}\.)")
@@ -225,19 +225,6 @@ class Tokenizer(object):
         # self.dot = re.compile(r'(?<=[\w)])(\.)(?![\w])')
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
-
-    def _read_abbreviation_file(self, filename):
-        """Return the abbreviations from the given filename."""
-        abbreviations = set()
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)) as fh:
-            for line in fh:
-                line = line.strip()
-                if line.startswith("#"):
-                    continue
-                if line == "":
-                    continue
-                abbreviations.add(line)
-        return sorted(abbreviations, key=len, reverse=True)
 
     def _get_unique_prefix(self, text):
         """Return a string that is not a substring of text."""
