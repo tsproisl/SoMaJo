@@ -324,6 +324,21 @@ class TestTags(TestTokenizer):
         self._equal("</A>", "</A>")
 
 
+class TestEntities(TestTokenizer):
+    """"""
+    def test_tags_01(self):
+        self._equal("&amp;", "&amp;")
+
+    def test_tags_02(self):
+        self._equal("&#x2fb1;", "&#x2fb1;")
+
+    def test_tags_03(self):
+        self._equal("&#75;", "&#75;")
+
+    def test_tags_04(self):
+        self._equal("foo&amp;bar", "foo &amp; bar")
+
+
 class TestEmailsURLs(TestTokenizer):
     """"""
     def test_emails_urls_01(self):

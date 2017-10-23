@@ -74,6 +74,11 @@ class Tokenizer(object):
         # we also allow things like tagesschau.de-App
         self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|org|net|edu|info|jpg|png|gif|log|txt)(?:-\w+)?\b', re.IGNORECASE)
 
+        # XML entities
+        self.entity_name = re.compile(r'&(?:quot|amp|apos|lt|gt);', re.IGNORECASE)
+        self.entity_decimal = re.compile(r'&#\d+;')
+        self.entity_hex = re.compile(r'&#x[0-9a-f]+;', re.IGNORECASE)
+
         # EMOTICONS
         # TODO: Peter, SMS von gestern Nacht -> hauptsächlich entities -> hilft nicht so wahnsinnig.
         emoticon_set = set(["(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
@@ -432,6 +437,11 @@ class Tokenizer(object):
         paragraph = self._replace_regex(paragraph, self.doi_with_space, "DOI")
         paragraph = self._replace_regex(paragraph, self.url_without_protocol, "URL")
         # paragraph = self._replace_regex(paragraph, self.url)
+
+        # XML entities
+        paragraph = self._replace_regex(paragraph, self.entity_name, "XML_entity")
+        paragraph = self._replace_regex(paragraph, self.entity_decimal, "XML_entity")
+        paragraph = self._replace_regex(paragraph, self.entity_hex, "XML_entity")
 
         # replace emoticons with unique strings so that they are out
         # of the way
