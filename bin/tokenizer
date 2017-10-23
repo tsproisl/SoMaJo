@@ -63,7 +63,7 @@ def main():
         tokenized_paragraphs = (["\t".join(t) for t in tp] for tp in tokenized_paragraphs)
     for tp in tokenized_paragraphs:
         n_tokens += len(tp)
-        print("\n".join(tp), "\n")
+        print("\n".join(tp), "\n", sep="")
     t1 = time.perf_counter()
     logging.info("Tokenized %d tokens in %d seconds (%d tokens/s)" % (n_tokens, t1 - t0, n_tokens / (t1 - t0)))
 
