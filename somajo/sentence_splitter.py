@@ -2,6 +2,8 @@
 
 import regex as re
 
+from somajo import utils
+
 
 class SentenceSplitter(object):
     def __init__(self, is_tuple=False):
@@ -14,6 +16,7 @@ class SentenceSplitter(object):
         self.sentence_ending_punct = re.compile(r"^(?:\.+|…+\.*|[!?]+)$")
         self.opening_punct = re.compile(r"^(?:['\"¿¡\p{Pi}\p{Ps}–—]|-{2,})$")
         self.closing_punct = re.compile(r"^(?:['\"“\p{Pf}\p{Pe}])$")
+        self.eos_abbreviations = utils.read_abbreviation_file("eos_abbreviations.txt")
 
     def split(self, tokenized_paragraph):
         """Split tokenized_paragraph into sentences."""
@@ -24,7 +27,7 @@ class SentenceSplitter(object):
         if self.is_tuple:
             tokens = [t[0] for t in tokenized_paragraph]
         for i, token in enumerate(tokens):
-            if self.sentence_ending_punct.search(token):
+            if self.sentence_ending_punct.search(token) or token.lower() in self.eos_abbreviations:
                 last = None
                 boundary = i + 1
                 for j in range(i + 1, paragraph_length):
