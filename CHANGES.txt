@@ -4,6 +4,9 @@
 
 - Bugfix: Removed trailing space from last token in
   paragraph/sentence.
+- XML entities (&amp;, &#75;, &#x7f;) are recognized as single tokens.
+- Some abbreviations (usw., usf., etc., uvam.) indicate sentence
+  boundaries if they are followed by a potential sentence start.
 - We also print a log message that indicates tokenization speed.
 
 ## Version 1.4.4, 2017-08-03 ##
