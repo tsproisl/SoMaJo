@@ -2,21 +2,20 @@
 
 ## Introduction ##
 
-SoMaJo is a state-of-the-art tokenizer for German web and social media
-texts that won
-the
-[EmpiriST 2015 shared task](https://sites.google.com/site/empirist2015/) on
-automatic linguistic annotation of computer-mediated communication /
-social media. As such, it is particularly well-suited to perform
-tokenization on all kinds of written discourse, for example chats,
-forums, wiki talk pages, tweets, blog comments, social networks, SMS
-and WhatsApp dialogues.
+SoMaJo is a state-of-the-art tokenizer and sentence splitter for
+German web and social media texts that won the [EmpiriST 2015 shared
+task](https://sites.google.com/site/empirist2015/) on automatic
+linguistic annotation of computer-mediated communication / social
+media. As such, it is particularly well-suited to perform tokenization
+on all kinds of written discourse, for example chats, forums, wiki
+talk pages, tweets, blog comments, social networks, SMS and WhatsApp
+dialogues.
 
 In addition to tokenizing the input text, SoMaJo can also output token
 class information for each token, i.e. if it is a number, an XML tag,
 an abbreviation, etc.:
 
-    echo 'Wow, superTool!;)' | tokenizer -c -t -
+    echo 'Wow, superTool!;)' | somajo-tokenizer -c -t -
     Wow	regular
     ,	symbol
     super	regular
@@ -24,11 +23,11 @@ an abbreviation, etc.:
     !	symbol
     ;)	emoticon
 
-*New in version 1.1.0*: SoMaJo can output additional information for
-each token that can help to reconstruct the original untokenized text
-(to a certain extent):
+SoMaJo can also output additional information for each token that can
+help to reconstruct the original untokenized text (to a certain
+extent):
 
-    echo 'der beste Betreuer? - >ProfSmith! : )' | tokenizer -c -e -
+    echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -e -
     der	
     beste	
     Betreuer	SpaceAfter=No
@@ -41,10 +40,16 @@ each token that can help to reconstruct the original untokenized text
 
 The `-t` and `-e` options can also be used in combination, of course.
 
-*New in version 1.4.0*: SoMaJo can split the input text into sentences
-using the `--split_sentences` option.
+SoMaJo can split the input text into sentences using the
+`--split_sentences` option.
 
-The system is described in greater detail in Proisl and Uhrig (2016).
+The system is described in greater detail in [Proisl and Uhrig
+(2016)](http://aclweb.org/anthology/W16-2607).
+
+For part-of-speech tagging, we recommend
+[SoMeWeTa](https://github.com/tsproisl/SoMeWeTa), a part-of-speech
+tagger with state-of-the-art performance on German web and social
+media texts.
 
 
 ## Installation ##
@@ -53,30 +58,40 @@ SoMaJo can be easily installed using pip:
 
     pip install SoMaJo
 
+Alternatively, you can download and decompress the [latest
+release](https://github.com/tsproisl/SoMaJo/releases/latest) or clone
+the git repository:
+
+    git clone https://github.com/tsproisl/SoMaJo.git
+
+In the new directory, run the following command:
+
+    python3 setup.py install
+
 
 ## Usage ##
 
-### Using the tokenizer executable
+### Using the somajo-tokenizer executable
 
 You can use the tokenizer as a standalone program from the command
 line. General usage information is available via the `-h` option:
 
-    tokenizer -h
+    somajo-tokenizer -h
 
 To tokenize a text file according to the guidelines of the EmpiriST
 2015 shared task, just call the tokenizer like this:
 
-    tokenizer -c <file>
+    somajo-tokenizer -c <file>
 
 If you do not want to split camel-cased tokens, simply drop the `-c`
 option:
 
-    tokenizer <file>
+    somajo-tokenizer <file>
 
 The tokenizer can also output token class information for each token,
 i.e. if it is a number, an XML tag, an abbreviation, etc.:
 
-    tokenizer -t <file>
+    somajo-tokenizer -t <file>
 
 If you want to be able to reconstruct the untokenized input to a
 certain extent, SoMaJo can also provide you with additional details
@@ -84,23 +99,23 @@ for each token, i.e. if the token was followed by whitespace or if it
 contained internal whitespace (according to the tokenization
 guidelines, things like “: )” get normalized to “:)”):
 
-    tokenizer -e <file>
+    somajo-tokenizer -e <file>
 
 SoMaJo assumes that paragraphs are delimited by empty lines in the
 input file. If your input file uses single newlines instead, use have
 to tell that to the tokenizer via the `-s` or `--paragraph_separator`
 option:
 
-    tokenizer --paragraph_separator single_newlines <file>
+    somajo-tokenizer --paragraph_separator single_newlines <file>
 
 To speed up tokenization, you can specify the number of worker
 processes used via the `--processes` option:
 
-    tokenizer --processes <number> <file>
+    somajo-tokenizer --processes <number> <file>
 
 SoMaJo can also split the input paragraphs into sentences:
 
-    tokenizer --split_sentences <file>
+    somajo-tokenizer --split_sentences <file>
 
 
 ### Using the module ###
@@ -136,9 +151,8 @@ Sentence splitting operates on tokenized text:
 SoMaJo was the system with the highest average F₁ score in the
 EmpiriST 2015 shared task. The performance of the current version on
 the two test sets is summarized in the following table (Training and
-test sets are available from
-the
-[official website](https://sites.google.com/site/empirist2015/home/gold)):
+test sets are available from the [official
+website](https://sites.google.com/site/empirist2015/home/gold)):
 
 | Corpus | Precision | Recall | F₁    |
 |--------|-----------|--------|-------|
@@ -152,5 +166,5 @@ the
     tokenization for German web and social media texts.” In:
     Proceedings of the 10th Web as Corpus Workshop (WAC-X) and the
     EmpiriST Shared Task. Berlin: Association for Computational
-    Linguistics (ACL),
-    91–96. [PDF](http://aclweb.org/anthology/W16-2607).
+    Linguistics (ACL), 57–62.
+    [PDF](http://aclweb.org/anthology/W16-2607).
