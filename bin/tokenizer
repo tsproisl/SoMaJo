@@ -9,5 +9,5 @@ logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
 if __name__ == "__main__":
-    logging.warning("The 'tokenizer' command is obsolete and will be removed in future versions. Please run SoMaJo via the 'somajo-tokenizer' command.")
+    logging.warning("The 'tokenizer' command is deprecated and will be removed in future versions. Please run SoMaJo via the 'somajo-tokenizer' command.")
     somajo.cli.main()
