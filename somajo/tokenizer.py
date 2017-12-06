@@ -38,6 +38,17 @@ class Tokenizer(object):
         self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u200B]+(?:\s+|$)")
 
         # TAGS, EMAILS, URLs
+        self.xml_declaration = re.compile(r"""<\?xml
+                                              (?:                #   This group permits zero or more attributes
+                                                \s+              #   Whitespace to separate attributes
+                                                [_:A-Z][-.:\w]*  #   Attribute name
+                                                \s*=\s*          #   Attribute name-value delimiter
+                                                (?: "[^"]*"      #   Double-quoted attribute value
+                                                  | '[^']*'      #   Single-quoted attribute value
+                                                )
+                                              )*
+                                              \s*                #   Permit trailing whitespace
+                                              \?>""", re.VERBOSE | re.IGNORECASE)
         # self.tag = re.compile(r'<(?!-)(?:/[^> ]+|[^>]+/?)(?<!-)>')
         # taken from Regular Expressions Cookbook
         self.tag = re.compile(r"""
@@ -410,6 +421,7 @@ class Tokenizer(object):
         # of the way first. We replace them with unique strings and
         # undo that later on.
         # - XML tags
+        paragraph = self._replace_regex(paragraph, self.xml_declaration, "XML_tag")
         paragraph = self._replace_regex(paragraph, self.tag, "XML_tag")
         # - email address obfuscation may involve spaces
         paragraph = self._replace_regex(paragraph, self.email, "email_address")

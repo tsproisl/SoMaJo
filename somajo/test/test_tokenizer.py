@@ -323,6 +323,12 @@ class TestTags(TestTokenizer):
     def test_tags_02(self):
         self._equal("</A>", "</A>")
 
+    def test_tags_03(self):
+        self.assertEqual(self.tokenizer.tokenize("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"), ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
+
+    def test_tags_04(self):
+        self.assertEqual(self.tokenizer.tokenize('<?xml version="1.0" encoding="UTF-8"?>'), ['<?xml version="1.0" encoding="UTF-8"?>'])
+
 
 class TestEntities(TestTokenizer):
     """"""
