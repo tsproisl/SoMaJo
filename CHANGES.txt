@@ -1,11 +1,15 @@
 # CHANGELOG #
 
+## next version ##
+
+- XML declarations are recognized as single tokens.
+
 ## Version 1.5.0, 2017-10-23 ##
 
 - Bugfix: Removed trailing space from last token in
   paragraph/sentence.
 - SoMaJo should be run as 'somajo-tokenizer'. The 'tokenizer' command
-  is obsolete.
+  is deprecated.
 - XML entities (&amp;, &#75;, &#x7f;) are recognized as single tokens.
 - Some abbreviations (usw., usf., etc., uvam.) indicate sentence
   boundaries if they are followed by a potential sentence start.
