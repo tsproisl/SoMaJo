@@ -31,11 +31,13 @@ class Tokenizer(object):
 
         self.spaces = re.compile(r"\s+")
         self.controls = re.compile(r"[\u0000-\u001F\u007F-\u009F]")
-        # soft hyphen (00AD), zero-width space (200B)
-        self.other_nasties = re.compile(r"[\u00AD\u200B]")
+        # soft hyphen (00AD), zero-width space (200B), zero-width
+        # non-joiner (200C), zero-width joiner (200D), left-to-right
+        # mark (200E), right-to-left mark (200F)
+        self.other_nasties = re.compile(r"[\u00AD\u200B-\u200F]")
         # combination
-        self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u200B]+")
-        self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u200B]+(?:\s+|$)")
+        self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u200B-\u200F]+")
+        self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u200B-\u200F]+(?:\s+|$)")
 
         # TAGS, EMAILS, URLs
         self.xml_declaration = re.compile(r"""<\?xml

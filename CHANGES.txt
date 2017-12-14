@@ -3,6 +3,8 @@
 ## next version ##
 
 - XML declarations are recognized as single tokens.
+- Additional “nasty” characters (zero-width joiners and non-joiners,
+  left-to-right and right-to-left marks) are removed from the input.
 
 ## Version 1.5.0, 2017-10-23 ##
 
