@@ -809,6 +809,14 @@ class TestJunk(TestTokenizer):
         # control characters
         self._equal("foobarbazquxalphabetagamma", "foobarbazquxalphabetagamma")
 
+    def test_junk_05(self):
+        # zero width joiner and non-joiner
+        self._equal("foo‌bar‍baz", "foobarbaz")
+
+    def test_junk_06(self):
+        # left-to-right and right-to-left mark
+        self._equal("foo‏bar‎baz", "foobarbaz")
+
 
 class TestTokenizerExtra(unittest.TestCase):
     """"""
