@@ -6,7 +6,7 @@ import os
 import xml.etree.ElementTree as ET
 
 
-def read_abbreviation_file(filename):
+def read_abbreviation_file(filename, mode="r", encoding="utf-8"):
     """Return the abbreviations from the given filename."""
     abbreviations = set()
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), filename)) as fh:

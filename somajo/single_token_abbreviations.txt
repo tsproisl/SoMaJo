@@ -12,6 +12,18 @@ Pan.do/ra
 SP.ON
 Zeitschr.titel
 
+# http://abkürzung.info/Top-Abkürzungen-deutsch.html (21.12.2017)
+v.Chr.
+s.o.
+s.u.
+MwSt.
+Mitgl.
+m.M.n.
+i.d.R.
+i.Allg.
+e.V.
+
+
 # The following list is from Wiktionary
 
 Art.-Nr.
