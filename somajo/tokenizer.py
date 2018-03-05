@@ -409,7 +409,7 @@ class Tokenizer(object):
         """
         # convert paragraph to Unicode normal form C (NFC)
         paragraph = unicodedata.normalize("NFC", paragraph)
-        
+
         # reset mappings for the current paragraph
         self.mapping = {}
         self.unique_prefix = self._get_unique_prefix(paragraph)
