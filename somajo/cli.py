@@ -61,8 +61,7 @@ def parse_xml(fh):
     tree = ET.parse(fh)
     root = tree.getroot()
     elements = list(text_getter(root))
-    text = "".join((e.text for e in elements))
-    return elements, text
+    return root, elements
 
 
 def main():
@@ -80,8 +79,12 @@ def main():
         eos_tags = args.tag
         if eos_tags is None:
             eos_tags = ["title h1 h2 h3 h4 h5 h6 p br div ol ul dl table".split()]
-        elements, text = parse_xml(args.FILE)
-        paragraphs = [text]
+        root, elements = parse_xml(args.FILE)
+        paragraphs = [elements]
+        for element in elements:
+            element.element.text = "\nfoo\n"
+            element.element.tail = "\nbar\n"
+        print(ET.tostring(root).decode("utf8"))
     elif args.paragraph_separator == "empty_lines":
         paragraphs = get_paragraphs(args.FILE)
     elif args.paragraph_separator == "single_newlines":

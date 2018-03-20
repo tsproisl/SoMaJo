@@ -13,7 +13,7 @@ Token = collections.namedtuple("Token", ["token", "token_class"])
 
 
 class Tokenizer(object):
-    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False):
+    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, xml=False):
         """Create a Tokenizer object. If split_camel_case is set to True,
         tokens written in CamelCase will be split. If token_classes is
         set to true, the tokenizer will output the token class for
@@ -25,6 +25,7 @@ class Tokenizer(object):
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
         self.extra_info = extra_info
+        self.xml = xml
         self.unique_string_length = 7
         self.mapping = {}
         self.unique_prefix = None
@@ -400,6 +401,32 @@ class Tokenizer(object):
             warnings.warn("AssertionError in this paragraph: '%s'\nTokens: %s\nRemaining normalized text: '%s'" % (original_text, tokens, normalized))
         return extra_info
 
+    def finalize_text(self, tokens, original_text):
+        """"""
+        if self.extra_info:
+            extra_info = self.check_spaces(tokens, original_text)
+
+        tokens, token_classes = zip(*tokens)
+        if self.token_classes:
+            if self.extra_info:
+                return list(zip(tokens, token_classes, extra_info))
+            else:
+                return list(zip(tokens, token_classes))
+        else:
+            if self.extra_info:
+                return list(zip(tokens, extra_info))
+            else:
+                return list(tokens)
+
+    def match_xml(self, tokens, elements):
+        """"""
+        pass
+
+    def finalize_xml(self, tokens, elements):
+        """"""
+        # NFC
+        pass
+
     def tokenize(self, paragraph):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
@@ -407,6 +434,10 @@ class Tokenizer(object):
         social media.
 
         """
+        if self.xml:
+            elements = paragraph
+            paragraph = "".join((e.text for e in elements))
+
         # convert paragraph to Unicode normal form C (NFC)
         paragraph = unicodedata.normalize("NFC", paragraph)
 
@@ -536,19 +567,10 @@ class Tokenizer(object):
         # reintroduce mapped tokens
         tokens = self._reintroduce_instances(tokens)
 
-        if self.extra_info:
-            extra_info = self.check_spaces(tokens, original_text)
-
         if len(tokens) == 0:
             return []
-        tokens, token_classes = zip(*tokens)
-        if self.token_classes:
-            if self.extra_info:
-                return list(zip(tokens, token_classes, extra_info))
-            else:
-                return list(zip(tokens, token_classes))
+
+        if self.xml:
+            return self.finalize_xml(tokens, elements)
         else:
-            if self.extra_info:
-                return list(zip(tokens, extra_info))
-            else:
-                return list(tokens)
+            return self.finalize_text(tokens, original_text)
