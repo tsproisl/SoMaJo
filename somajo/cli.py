@@ -69,35 +69,36 @@ def main():
     args = arguments()
     n_tokens = 0
     t0 = time.perf_counter()
-    tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info)
+    if args.xml or args.tag is not None:
+        is_xml = True
+    tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info, is_xml)
     sentence_splitter = SentenceSplitter(args.token_classes or args.extra_info)
-    if args.xml:
+    if is_xml:
+        if args.parallel > 1:
+            logging.warning("Parallel tokenization of XML files is currently not supported.")
+            args.parallel = 1
         eos_tags = args.tag
         if eos_tags is None:
             eos_tags = ["title h1 h2 h3 h4 h5 h6 p br div ol ul dl table".split()]
         elements, text = parse_xml(args.FILE)
-        # print(elements)
-        for e in elements:
-            print(e.element.tag)
-        print(text)
+        paragraphs = [text]
+    elif args.paragraph_separator == "empty_lines":
+        paragraphs = get_paragraphs(args.FILE)
+    elif args.paragraph_separator == "single_newlines":
+        paragraphs = (line for line in args.FILE if line.strip() != "")
+    if args.parallel > 1:
+        pool = multiprocessing.Pool(min(args.parallel, multiprocessing.cpu_count()))
+        tokenized_paragraphs = pool.imap(tokenizer.tokenize, paragraphs, 250)
     else:
-        if args.paragraph_separator == "empty_lines":
-            paragraphs = get_paragraphs(args.FILE)
-        elif args.paragraph_separator == "single_newlines":
-            paragraphs = (line for line in args.FILE if line.strip() != "")
-        if args.parallel > 1:
-            pool = multiprocessing.Pool(min(args.parallel, multiprocessing.cpu_count()))
-            tokenized_paragraphs = pool.imap(tokenizer.tokenize, paragraphs, 250)
-        else:
-            tokenized_paragraphs = map(tokenizer.tokenize, paragraphs)
-        tokenized_paragraphs = (tp for tp in tokenized_paragraphs if tp)
-        if args.split_sentences:
-            tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
-            tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)
-        if args.token_classes or args.extra_info:
-            tokenized_paragraphs = (["\t".join(t) for t in tp] for tp in tokenized_paragraphs)
-        for tp in tokenized_paragraphs:
-            n_tokens += len(tp)
-            print("\n".join(tp), "\n", sep="")
-        t1 = time.perf_counter()
-        logging.info("Tokenized %d tokens in %d seconds (%d tokens/s)" % (n_tokens, t1 - t0, n_tokens / (t1 - t0)))
+        tokenized_paragraphs = map(tokenizer.tokenize, paragraphs)
+    tokenized_paragraphs = (tp for tp in tokenized_paragraphs if tp)
+    if args.split_sentences:
+        tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
+        tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)
+    if args.token_classes or args.extra_info:
+        tokenized_paragraphs = (["\t".join(t) for t in tp] for tp in tokenized_paragraphs)
+    for tp in tokenized_paragraphs:
+        n_tokens += len(tp)
+        print("\n".join(tp), "\n", sep="")
+    t1 = time.perf_counter()
+    logging.info("Tokenized %d tokens in %d seconds (%d tokens/s)" % (n_tokens, t1 - t0, n_tokens / (t1 - t0)))
