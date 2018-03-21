@@ -4,6 +4,7 @@ import collections
 import random
 import unicodedata
 import warnings
+import xml.etree.ElementTree as ET
 
 import regex as re
 
@@ -13,7 +14,7 @@ Token = collections.namedtuple("Token", ["token", "token_class"])
 
 
 class Tokenizer(object):
-    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, xml=False):
+    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False):
         """Create a Tokenizer object. If split_camel_case is set to True,
         tokens written in CamelCase will be split. If token_classes is
         set to true, the tokenizer will output the token class for
@@ -25,7 +26,6 @@ class Tokenizer(object):
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
         self.extra_info = extra_info
-        self.xml = xml
         self.unique_string_length = 7
         self.mapping = {}
         self.unique_prefix = None
@@ -351,7 +351,7 @@ class Tokenizer(object):
                 return instance
         return regex.sub(repl, text)
 
-    def check_spaces(self, tokens, original_text):
+    def _check_spaces(self, tokens, original_text):
         """Compare the tokens with the original text to see which tokens had
         trailing whitespace (to be able to annotate SpaceAfter=No) and
         which tokens contained internal whitespace (to be able to
@@ -374,8 +374,7 @@ class Tokenizer(object):
                     first_char = None
                     while first_char != char:
                         try:
-                            first_char = normalized[0]
-                            normalized = normalized[1:]
+                            first_char = normalized.pop(0)
                             orig.append(first_char)
                         except IndexError:
                             warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
@@ -401,51 +400,74 @@ class Tokenizer(object):
             warnings.warn("AssertionError in this paragraph: '%s'\nTokens: %s\nRemaining normalized text: '%s'" % (original_text, tokens, normalized))
         return extra_info
 
-    def finalize_text(self, tokens, original_text):
+    def _match_xml(self, tokens, elements):
         """"""
-        if self.extra_info:
-            extra_info = self.check_spaces(tokens, original_text)
-
-        tokens, token_classes = zip(*tokens)
-        if self.token_classes:
-            if self.extra_info:
-                return list(zip(tokens, token_classes, extra_info))
+        agenda = list(reversed(tokens))
+        for element in elements:
+            original_text = unicodedata.normalize("NFC", element.text)
+            normalized = self.spaces.sub(" ", original_text)
+            normalized = self.junk_between_spaces.sub(" ", normalized)
+            normalized = normalized.strip()
+            output = []
+            while len(normalized) > 0:
+                t = agenda.pop()
+                original_spelling = None
+                extra_info = ""
+                token = t.token
+                token_length = len(token)
+                if normalized.startswith(token):
+                    normalized = normalized[token_length:]
+                else:
+                    orig = []
+                    for char in token:
+                        first_char = None
+                        while first_char != char:
+                            try:
+                                first_char = normalized.pop(0)
+                                orig.append(first_char)
+                            except IndexError:
+                                warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
+                    original_spelling = "".join(orig)
+                m = self.starts_with_junk.search(normalized)
+                if m:
+                    if original_spelling is None:
+                        original_spelling = token
+                    original_spelling += normalized[:m.end()]
+                    normalized = normalized[m.end():]
+                if original_spelling is not None:
+                    extra_info = 'OriginalSpelling="%s"' % original_spelling
+                if len(normalized) > 0:
+                    if normalized.startswith(" "):
+                        normalized = normalized[1:]
+                    else:
+                        if len(extra_info) > 0:
+                            extra_info = ", " + extra_info
+                        extra_info = "SpaceAfter=No" + extra_info
+                output.append("\t".join((token, t.token_class, extra_info)))
+            if len(output) > 0:
+                tokenized_text = "\n" + "\n".join(output) + "\n"
             else:
-                return list(zip(tokens, token_classes))
-        else:
-            if self.extra_info:
-                return list(zip(tokens, extra_info))
-            else:
-                return list(tokens)
+                tokenized_text = "\n"
+            if element.type == "text":
+                element.element.text = tokenized_text
+            elif element.type == "tail":
+                element.element.tail = tokenized_text
+        try:
+            assert len(agenda) == 0
+        except AssertionError:
+            warnings.warn("AssertionError: %d tokens left over" % len(agenda))
+        return elements
 
-    def match_xml(self, tokens, elements):
-        """"""
-        pass
-
-    def finalize_xml(self, tokens, elements):
-        """"""
-        # NFC
-        pass
-
-    def tokenize(self, paragraph):
+    def _tokenize(self, paragraph):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
         social media.
 
         """
-        if self.xml:
-            elements = paragraph
-            paragraph = "".join((e.text for e in elements))
-
-        # convert paragraph to Unicode normal form C (NFC)
-        paragraph = unicodedata.normalize("NFC", paragraph)
-
         # reset mappings for the current paragraph
         self.mapping = {}
         self.unique_prefix = self._get_unique_prefix(paragraph)
-
-        original_text = paragraph
 
         # normalize whitespace
         paragraph = self.spaces.sub(" ", paragraph)
@@ -567,10 +589,52 @@ class Tokenizer(object):
         # reintroduce mapped tokens
         tokens = self._reintroduce_instances(tokens)
 
+        return tokens
+
+    def tokenize(self, paragraph):
+        """Tokenize paragraph (may contain newlines) according to the
+        guidelines of the EmpiriST 2015 shared task on automatic
+        linguistic annotation of computer-mediated communication /
+        social media.
+
+        """
+        # convert paragraph to Unicode normal form C (NFC)
+        paragraph = unicodedata.normalize("NFC", paragraph)
+
+        tokens = self._tokenize(paragraph)
+
         if len(tokens) == 0:
             return []
 
-        if self.xml:
-            return self.finalize_xml(tokens, elements)
+        if self.extra_info:
+            extra_info = self._check_spaces(tokens, paragraph)
+
+        tokens, token_classes = zip(*tokens)
+        if self.token_classes:
+            if self.extra_info:
+                return list(zip(tokens, token_classes, extra_info))
+            else:
+                return list(zip(tokens, token_classes))
         else:
-            return self.finalize_text(tokens, original_text)
+            if self.extra_info:
+                return list(zip(tokens, extra_info))
+            else:
+                return list(tokens)
+
+    def tokenize_xml(self, xml, is_file=True):
+        """Tokenize XML file or XML string according to the guidelines of the
+        EmpiriST 2015 shared task on automatic linguistic annotation
+        of computer-mediated communication / social media.
+
+        """
+        elements = utils.parse_xml(xml, is_file)
+        whole_text = " ".join((e.text for e in elements))
+
+        # convert paragraph to Unicode normal form C (NFC)
+        whole_text = unicodedata.normalize("NFC", whole_text)
+
+        tokens = self._tokenize(whole_text)
+
+        tokenized_elements = self._match_xml(tokens, elements)
+        xml = ET.tostring(tokenized_elements[0].element, encoding="unicode").rstrip()
+        return xml.split("\n")

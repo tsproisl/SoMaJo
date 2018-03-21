@@ -41,60 +41,33 @@ def get_paragraphs(fh):
         yield "".join(paragraph)
 
 
-def parse_xml(fh):
-    """Return a list of XML elements and their text/tail as well as the
-    whole text of the document.
-
-    """
-    Element = collections.namedtuple("Element", ["element", "type", "text"])
-
-    def text_getter(elem):
-        text = elem.text
-        tail = elem.tail
-        if text is not None:
-            yield Element(elem, "text", text)
-        for child in elem:
-            for t in text_getter(child):
-                yield t
-        if tail is not None:
-            yield Element(elem, "tail", tail)
-    tree = ET.parse(fh)
-    root = tree.getroot()
-    elements = list(text_getter(root))
-    return root, elements
-
-
 def main():
     args = arguments()
     n_tokens = 0
     t0 = time.perf_counter()
+    is_xml = False
     if args.xml or args.tag is not None:
         is_xml = True
-    tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info, is_xml)
+    tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info)
     sentence_splitter = SentenceSplitter(args.token_classes or args.extra_info)
     if is_xml:
         if args.parallel > 1:
             logging.warning("Parallel tokenization of XML files is currently not supported.")
-            args.parallel = 1
         eos_tags = args.tag
         if eos_tags is None:
             eos_tags = ["title h1 h2 h3 h4 h5 h6 p br div ol ul dl table".split()]
-        root, elements = parse_xml(args.FILE)
-        paragraphs = [elements]
-        for element in elements:
-            element.element.text = "\nfoo\n"
-            element.element.tail = "\nbar\n"
-        print(ET.tostring(root).decode("utf8"))
-    elif args.paragraph_separator == "empty_lines":
-        paragraphs = get_paragraphs(args.FILE)
-    elif args.paragraph_separator == "single_newlines":
-        paragraphs = (line for line in args.FILE if line.strip() != "")
-    if args.parallel > 1:
-        pool = multiprocessing.Pool(min(args.parallel, multiprocessing.cpu_count()))
-        tokenized_paragraphs = pool.imap(tokenizer.tokenize, paragraphs, 250)
+        tokenized_paragraphs = [tokenizer.tokenize_xml(args.FILE)]
     else:
-        tokenized_paragraphs = map(tokenizer.tokenize, paragraphs)
-    tokenized_paragraphs = (tp for tp in tokenized_paragraphs if tp)
+        if args.paragraph_separator == "empty_lines":
+            paragraphs = get_paragraphs(args.FILE)
+        elif args.paragraph_separator == "single_newlines":
+            paragraphs = (line for line in args.FILE if line.strip() != "")
+        if args.parallel > 1:
+            pool = multiprocessing.Pool(min(args.parallel, multiprocessing.cpu_count()))
+            tokenized_paragraphs = pool.imap(tokenizer.tokenize, paragraphs, 250)
+        else:
+            tokenized_paragraphs = map(tokenizer.tokenize, paragraphs)
+        tokenized_paragraphs = (tp for tp in tokenized_paragraphs if tp)
     if args.split_sentences:
         tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
         tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)
