@@ -374,7 +374,8 @@ class Tokenizer(object):
                     first_char = None
                     while first_char != char:
                         try:
-                            first_char = normalized.pop(0)
+                            first_char = normalized[0]
+                            normalized = normalized[1:]
                             orig.append(first_char)
                         except IndexError:
                             warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
@@ -414,16 +415,20 @@ class Tokenizer(object):
                 original_spelling = None
                 extra_info = ""
                 token = t.token
-                token_length = len(token)
                 if normalized.startswith(token):
-                    normalized = normalized[token_length:]
+                    normalized = normalized[len(token):]
+                elif token.startswith(normalized):
+                    agenda.append(Token(token[len(normalized):], t.token_class))
+                    token = normalized
+                    normalized = ""
                 else:
                     orig = []
                     for char in token:
                         first_char = None
                         while first_char != char:
                             try:
-                                first_char = normalized.pop(0)
+                                first_char = normalized[0]
+                                normalized = normalized[1:]
                                 orig.append(first_char)
                             except IndexError:
                                 warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
@@ -637,4 +642,15 @@ class Tokenizer(object):
 
         tokenized_elements = self._match_xml(tokens, elements)
         xml = ET.tostring(tokenized_elements[0].element, encoding="unicode").rstrip()
-        return xml.split("\n")
+
+        tokens = [l.split("\t") for l in xml.split("\n")]
+        if self.token_classes:
+            if self.extra_info:
+                return [t if len(t) == 3 else (t[0], None, None) for t in tokens]
+            else:
+                return [(t[0], t[1]) if len(t) == 3 else (t[0], None) for t in tokens]
+        else:
+            if self.extra_info:
+                return [(t[0], t[2]) if len(t) == 3 else (t[0], None) for t in tokens]
+            else:
+                return [t[0] for t in tokens]

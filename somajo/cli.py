@@ -71,7 +71,10 @@ def main():
     if args.split_sentences:
         tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
         tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)
+    print(tokenized_paragraphs)
     if args.token_classes or args.extra_info:
+        if is_xml:
+            tokenized_paragraphs = ([(l[0],) if l[1] is None else l for l in tp] for tp in tokenized_paragraphs)
         tokenized_paragraphs = (["\t".join(t) for t in tp] for tp in tokenized_paragraphs)
     for tp in tokenized_paragraphs:
         n_tokens += len(tp)

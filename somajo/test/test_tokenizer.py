@@ -15,6 +15,10 @@ class TestTokenizer(unittest.TestCase):
         """"""
         self.assertEqual(self.tokenizer.tokenize(raw), tokenized.split())
 
+    def _equal_xml(self, raw, tokenized):
+        """"""
+        self.assertEqual(self.tokenizer.tokenize_xml(raw, is_file=False), tokenized.split())
+
     def _fail_means_improvement(self, raw, tokenized):
         """"""
         self.assertNotEqual(self.tokenizer.tokenize(raw), tokenized.split())
@@ -826,6 +830,18 @@ class TestJunk(TestTokenizer):
     def test_junk_06(self):
         # left-to-right and right-to-left mark
         self._equal("foo‏bar‎baz", "foobarbaz")
+
+
+class TestXML(TestTokenizer):
+    """"""
+    def test_xml_01(self):
+        self._equal_xml("<foo><p>Most of myWork is in the areas of <a>language technology</a>, stylometry&amp;Digital Humanities. Recurring key aspects of my research are:</p>foobar</foo>", "<foo> <p> Most of my Work is in the areas of <a> language technology </a> , stylometry &amp; Digital Humanities . Recurring key aspects of my research are : </p> foobar </foo>")
+
+    def test_xml_02(self):
+        self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! : )</foo>", "<foo> der beste Betreuer ? -&gt; Prof Smith ! :) </foo>")
+
+    def test_xml_03(self):
+        self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! <x>:</x>)</foo>", "<foo> der beste Betreuer ? -&gt; Prof Smith ! <x> : </x> ) </foo>")
 
 
 class TestTokenizerExtra(unittest.TestCase):
