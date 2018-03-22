@@ -1,5 +1,12 @@
 # CHANGELOG #
 
+## Version 1.7.0, 2018-03-22 ##
+
+SoMaJo has now full XML support. To tokenize an XML file, use the
+option -x/--xml. Via the option --tag (can be used multiple times),
+you can specify which tags always constitute sentence breaks, e.g.
+title, h1 or p tags in an HTML file.
+
 ## Version 1.6.0, 2018-03-05 ##
 
 - XML declarations are recognized as single tokens.
