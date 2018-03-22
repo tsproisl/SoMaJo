@@ -55,8 +55,11 @@ def main():
             logging.warning("Parallel tokenization of XML files is currently not supported.")
         eos_tags = args.tag
         if eos_tags is None:
-            eos_tags = ["title h1 h2 h3 h4 h5 h6 p br div ol ul dl table".split()]
+            eos_tags = "title h1 h2 h3 h4 h5 h6 p br div ol ul dl table".split()
+        eos_tags = set(eos_tags)
         tokenized_paragraphs = [tokenizer.tokenize_xml(args.FILE)]
+        if args.split_sentences:
+            tokenized_paragraphs = list(sentence_splitter.split_xml(tokenized_paragraphs[0], eos_tags))
     else:
         if args.paragraph_separator == "empty_lines":
             paragraphs = get_paragraphs(args.FILE)
@@ -68,10 +71,9 @@ def main():
         else:
             tokenized_paragraphs = map(tokenizer.tokenize, paragraphs)
         tokenized_paragraphs = (tp for tp in tokenized_paragraphs if tp)
-    if args.split_sentences:
-        tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
-        tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)
-    print(tokenized_paragraphs)
+        if args.split_sentences:
+            tokenized_paragraphs = map(sentence_splitter.split, tokenized_paragraphs)
+            tokenized_paragraphs = (s for tp in tokenized_paragraphs for s in tp)
     if args.token_classes or args.extra_info:
         if is_xml:
             tokenized_paragraphs = ([(l[0],) if l[1] is None else l for l in tp] for tp in tokenized_paragraphs)
