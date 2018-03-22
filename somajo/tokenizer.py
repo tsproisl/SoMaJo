@@ -63,7 +63,7 @@ class Tokenizer(object):
                                       \s+              #   Whitespace to separate attributes
                                       [_:A-Z][-.:\w]*  #   Attribute name
                                       \s*=\s*          #   Attribute name-value delimiter
-                                      (?: "[^"”“]*"      #   Double-quoted attribute value
+                                      (?: "[^"]*"      #   Double-quoted attribute value
                                         | '[^']*'      #   Single-quoted attribute value
                                       )
                                     )*

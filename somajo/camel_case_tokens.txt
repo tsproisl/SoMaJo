@@ -7007,5 +7007,5 @@ ZynAddSubFX
 ČeskéNoviny
 ŠkodaAuto
 
-# Mocoda
+# Mocoda (from Tobias Horsmann)
 MisterMcFluff
