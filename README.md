@@ -62,7 +62,9 @@ The system is described in greater detail in [Proisl and Uhrig
 For part-of-speech tagging, we recommend
 [SoMeWeTa](https://github.com/tsproisl/SoMeWeTa), a part-of-speech
 tagger with state-of-the-art performance on German web and social
-media texts.
+media texts:
+
+    somajo-tokenizer <file> | somewe-tagger --tag <model> -
 
 
 ## Installation ##
@@ -130,6 +132,20 @@ SoMaJo can also split the input paragraphs into sentences:
 
     somajo-tokenizer --split_sentences <file>
 
+SoMaJo can also process XML files. Use the `-x` or `--xml` option to
+tell the tokenizer that your input is an XML file:
+
+    somajo-tokenizer --xml <xml-file>
+
+If you also want to do sentence splitting, you can use (multiple
+instances of) the `--tag` option to specify XML tags that are always
+sentence breaks, i.e. that can never occur in the middle of a
+sentence. Per default, the sentence splitter uses the following list
+of tags: title, h1, h2, h3, h4, h5, h6, p, br, div, ol, ul, dl and
+table.
+
+    somajo-tokenizer --xml --tag h1 --tag p --tag div <xml-file>
+
 
 ### Using the module ###
 
@@ -158,6 +174,21 @@ Sentence splitting operates on tokenized text:
     for sentence in sentences:
         print("\n".join(sentence), "\n")
 
+For processing XML data, use the `tokenize_xml` and `split_xml` methods:
+
+    # you can read from an open file object
+    tokens = tokenizer.tokenize_xml(file_object)
+	# or you can pass a string with XML data
+	tokens = tokenizer.tokenize_xml(xml_string, is_file=False)
+	
+	print("\n".join(tokens), "\n")
+	
+	eos_tags = set(["title", "h1", "p"])
+	sentences = sentence_splitter.split_xml(tokens, eos_tags)
+	
+    for sentence in sentences:
+        print("\n".join(sentence), "\n")
+	
 
 ## Evaluation ##
 
