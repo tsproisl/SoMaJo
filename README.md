@@ -1,5 +1,14 @@
 # SoMaJo #
 
+  * [Introduction](#introduction)
+  * [Installation](#installation)
+  * [Usage](#usage)
+      * [Using the somajo-tokenizer executable](#using-the-somajo-tokenizer-executable)
+      * [Using the module](#using-the-module)
+  * [Evaluation](#evaluation)
+  * [References](#references)
+
+
 ## Introduction ##
 
 SoMaJo is a state-of-the-art tokenizer and sentence splitter for
@@ -12,7 +21,7 @@ talk pages, tweets, blog comments, social networks, SMS and WhatsApp
 dialogues.
 
 In addition to tokenizing the input text, SoMaJo can also output token
-class information for each token, i.e. if it is a number, an XML tag,
+class information for each token, i.e. if it is a number, an emoticon,
 an abbreviation, etc.:
 
     echo 'Wow, superTool!;)' | somajo-tokenizer -c -t -
@@ -42,6 +51,10 @@ The `-t` and `-e` options can also be used in combination, of course.
 
 SoMaJo can split the input text into sentences using the
 `--split_sentences` option.
+
+SoMaJo has full XML support, i.e. it can perform sensible tokenization
+and sentence splitting on well-formed XML files using the `--xml` and
+`--tag` options.
 
 The system is described in greater detail in [Proisl and Uhrig
 (2016)](http://aclweb.org/anthology/W16-2607).
@@ -89,7 +102,7 @@ option:
     somajo-tokenizer <file>
 
 The tokenizer can also output token class information for each token,
-i.e. if it is a number, an XML tag, an abbreviation, etc.:
+i.e. if it is a number, an emoticon, an abbreviation, etc.:
 
     somajo-tokenizer -t <file>
 
@@ -102,7 +115,7 @@ guidelines, things like “: )” get normalized to “:)”):
     somajo-tokenizer -e <file>
 
 SoMaJo assumes that paragraphs are delimited by empty lines in the
-input file. If your input file uses single newlines instead, use have
+input file. If your input file uses single newlines instead, you have
 to tell that to the tokenizer via the `-s` or `--paragraph_separator`
 option:
 
