@@ -64,7 +64,7 @@ For part-of-speech tagging, we recommend
 tagger with state-of-the-art performance on German web and social
 media texts:
 
-    somajo-tokenizer <file> | somewe-tagger --tag <model> -
+    somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 
 
 ## Installation ##
