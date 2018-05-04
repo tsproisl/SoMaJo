@@ -149,11 +149,15 @@ table.
 
 ### Using the module ###
 
-You can easily incorporate the tokenizer into your own Python
-projects. All you have to do is import `somajo.Tokenizer`, create a
-`Tokenizer` object and call its `tokenize` method:
+You can easily incorporate both the tokenizer and the sentence
+splitter into your own Python projects. For tokenization, you have to
+import `somajo.Tokenizer`, create a `Tokenizer` object and call its
+`tokenize` method. Sentence splitting operates on tokenized text, i.e.
+on the output of the `tokenize` method. You have to import
+`somajo.SentenceSplitter`, create a `SentenceSplitter` object and call
+its `split` method:
 
-    from somajo import Tokenizer
+    from somajo import Tokenizer, SentenceSplitter
 
     # note that paragraphs are allowed to contain newlines
     paragraph = "der beste Betreuer?\n-- ProfSmith! : )"
@@ -163,10 +167,6 @@ projects. All you have to do is import `somajo.Tokenizer`, create a
 
     print("\n".join(tokens), "\n")
 
-Sentence splitting operates on tokenized text:
-
-    from somajo import SentenceSplitter
-    
     # set is_tuple=True if token_classes=True or extra_info=True
     sentence_splitter = SentenceSplitter(is_tuple=False)
     sentences = sentence_splitter.split(tokens)
