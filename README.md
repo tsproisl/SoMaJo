@@ -206,7 +206,7 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 
 ## References ##
 
--   Proisl, Thomas, Peter Uhrig (2016): “SoMaJo: State-of-the-art
+  * Proisl, Thomas, Peter Uhrig (2016): “SoMaJo: State-of-the-art
     tokenization for German web and social media texts.” In:
     Proceedings of the 10th Web as Corpus Workshop (WAC-X) and the
     EmpiriST Shared Task. Berlin: Association for Computational
