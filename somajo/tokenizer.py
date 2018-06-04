@@ -14,7 +14,11 @@ Token = collections.namedtuple("Token", ["token", "token_class"])
 
 
 class Tokenizer(object):
-    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False):
+
+    supported_languages = set(["de", "en"])
+    default_language = "de"
+
+    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de"):
         """Create a Tokenizer object. If split_camel_case is set to True,
         tokens written in CamelCase will be split. If token_classes is
         set to true, the tokenizer will output the token class for
@@ -26,6 +30,7 @@ class Tokenizer(object):
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
         self.extra_info = extra_info
+        self.language = language if language in self.supported_languages else self.default_language
         self.unique_string_length = 7
         self.mapping = {}
         self.unique_prefix = None
@@ -230,6 +235,21 @@ class Tokenizer(object):
                                  """, re.VERBOSE)
         self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
         self.slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
+        # English possessive and contracted forms
+        self.en_trailing_apos = re.compile(r"(?<!')(')(?=\s)")
+        self.en_dms = re.compile(r"(?<=\w)('[dms])\b", re.IGNORECASE)
+        self.en_llreve = re.compile(r"(?<=\w)('(?:ll|re|ve))\b", re.IGNORECASE)
+        self.en_not = re.compile(r"(?<=\w)(n't)\b", re.IGNORECASE)
+        self.en_cannot = re.compile(r"(?<=\w)(n't)\b", re.IGNORECASE)
+        en_twopart_contractions = [r"\b(can)(not)\b", r"\b(d')(ye)\b",
+                                   r"\b(gim)(me)\b", r"\b(gon)(na)\b",
+                                   r"\b(got)(ta)\b", r"\b(lem)(me)\b",
+                                   r"\b(more)('n)\b", r"(?<!\w)('t)(is)\b",
+                                   r"(?<!\w)('t)(was)\b", r"\b(wan)(na)\b"]
+        en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b"]
+        self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
+        self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
+        # quotation marks
         self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
@@ -571,6 +591,16 @@ class Tokenizer(object):
         # slash
         # paragraph = self.slash.sub(r' \1 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.slash, "symbol")
+        # English possessive and contracted forms
+        if self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.en_trailing_apos, "symbol")
+            paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_not, "regular")
+            for contraction in self.en_twopart_contractions:
+                paragraph = contraction.sub(r' \1 \2 ', paragraph)
+            for contraction in self.en_threepart_contractions:
+                paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
         # LaTeX-style quotation marks
         paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)

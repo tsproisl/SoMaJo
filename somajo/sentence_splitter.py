@@ -6,7 +6,7 @@ from somajo import utils
 
 
 class SentenceSplitter(object):
-    def __init__(self, is_tuple=False):
+    def __init__(self, is_tuple=False, language="de"):
         """Create a SentenceSplitter object. If the tokenized paragraphs
         contain token classes or extra info, set is_tuple=True.
 
@@ -15,7 +15,10 @@ class SentenceSplitter(object):
         # full stop, ellipsis, exclamation and question marks
         self.sentence_ending_punct = re.compile(r"^(?:\.+|…+\.*|[!?]+)$")
         self.opening_punct = re.compile(r"^(?:['\"¿¡\p{Pi}\p{Ps}–—]|-{2,})$")
-        self.closing_punct = re.compile(r"^(?:['\"“\p{Pf}\p{Pe}])$")
+        if language == "de":
+            self.closing_punct = re.compile(r"^(?:['\"“\p{Pf}\p{Pe}])$")
+        else:
+            self.closing_punct = re.compile(r"^(?:['\"\p{Pf}\p{Pe}])$")
         self.eos_abbreviations = utils.read_abbreviation_file("eos_abbreviations.txt")
 
     def split(self, tokenized_paragraph):

@@ -18,6 +18,7 @@ def arguments():
     parser.add_argument("-c", "--split_camel_case", action="store_true", help="Split items in written in camelCase (excluding several exceptions).")
     parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (number, XML tag, abbreviation, etc.) in addition to the tokens.")
     parser.add_argument("-e", "--extra_info", action="store_true", help='Output additional information for each token: SpaceAfter=No if the token was not followed by a space and OriginalSpelling="…" if the token contained whitespace.')
+    parser.add_argument("-l", "--language", choices=Tokenizer.supported_languages, default=Tokenizer.default_language, help="Choose a language. Currently supported are German (de) and English (en). (Default: de)")
     parser.add_argument("--parallel", type=int, default=1, metavar="N", help="Run N worker processes (up to the number of CPUs) to speed up tokenization.")
     parser.add_argument("--split_sentences", action="store_true", help="Do also split the paragraphs into sentences.")
     parser.add_argument("FILE", type=argparse.FileType("r"), help="The input file")
@@ -46,8 +47,8 @@ def main():
     is_xml = False
     if args.xml or args.tag is not None:
         is_xml = True
-    tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info)
-    sentence_splitter = SentenceSplitter(args.token_classes or args.extra_info)
+    tokenizer = Tokenizer(args.split_camel_case, args.token_classes, args.extra_info, args.language)
+    sentence_splitter = SentenceSplitter(args.token_classes or args.extra_info, args.language)
     if is_xml:
         if args.parallel > 1:
             logging.warning("Parallel tokenization of XML files is currently not supported.")
