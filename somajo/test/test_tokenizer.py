@@ -28,7 +28,7 @@ class TestEnglishTokenizer(TestTokenizer):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True, lang="en")
+        self.tokenizer = Tokenizer(split_camel_case=True, language="en")
 
 
 class TestWhitespace(TestTokenizer):
@@ -918,3 +918,6 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_07(self):
         self._equal("You know 'twas just a joke.", "You know 't was just a joke .")
+
+    def test_english_08(self):
+        self._equal("I'd like to try ``Sarah's cake''.", "I 'd like to try `` Sarah 's cake '' .")
