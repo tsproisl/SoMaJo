@@ -800,6 +800,12 @@ class OwnAdditions(TestTokenizer):
     def test_own_92(self):
         self._fail_means_improvement("2009/2010", "2009 / 2010")
 
+    def test_own_93(self):
+        self._equal("1970er", "1970er")
+
+    def test_own_94(self):
+        self._equal("The book 'Algorithm Design', too", "The book ' Algorithm Design ' , too")
+
 
 class TestSuffixes(TestTokenizer):
     """"""
@@ -930,3 +936,15 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_09(self):
         self._equal("Blah'twas", "Blah'twas")
+
+    def test_english_10(self):
+        self._equal("the center-north of the country", "the center - north of the country")
+
+    def test_english_11(self):
+        self._equal("1970s", "1970s")
+
+    def test_english_12(self):
+        self._equal("Sunni and Shi'ite clerics", "Sunni and Shi'ite clerics")
+
+    def test_english_13(self):
+        self._equal("The book 'Algorithm Design', too", "The book ' Algorithm Design ' , too")
