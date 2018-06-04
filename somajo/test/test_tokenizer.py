@@ -24,6 +24,13 @@ class TestTokenizer(unittest.TestCase):
         self.assertNotEqual(self.tokenizer.tokenize(raw), tokenized.split())
 
 
+class TestEnglishTokenizer(TestTokenizer):
+    """"""
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = Tokenizer(split_camel_case=True, lang="en")
+
+
 class TestWhitespace(TestTokenizer):
     """"""
     def test_whitespace_01(self):
@@ -156,6 +163,9 @@ class TestPunctuation(TestTokenizer):
 
     def test_punctuation_40(self):
         self._equal("Magen- Darm- Erkrankung", "Magen- Darm- Erkrankung")
+
+    def test_punctuation_41(self):
+        self._equal("Das ist ein Zitat im ``LaTeX-Stil''!", "Das ist ein Zitat im `` LaTeX-Stil '' !")
 
 
 class TestTimeDate(TestTokenizer):
@@ -884,3 +894,27 @@ class TestMisc(TestTokenizerExtra):
 
     def test_misc_09(self):
         self.assertEqual(self.tokenizer.tokenize("­ \n­"), [])
+
+
+class TestEnglish(TestEnglishTokenizer):
+    """"""
+    def test_english_01(self):
+        self._equal("I don't know.", "I do n't know .")
+
+    def test_english_02(self):
+        self._equal("This is Peter's book.", "This is Peter 's book .")
+
+    def test_english_03(self):
+        self._equal("This is Alex' book .", "This is Alex ' book .")
+
+    def test_english_04(self):
+        self._equal("What's up?", "What 's up ?")
+
+    def test_english_05(self):
+        self._equal("I'll see you", "I 'll see you")
+
+    def test_english_06(self):
+        self._equal("You cannot come!", "You can not come !")
+
+    def test_english_07(self):
+        self._equal("You know 'twas just a joke.", "You know 't was just a joke .")
