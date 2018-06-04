@@ -167,6 +167,12 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_41(self):
         self._equal("Das ist ein Zitat im ``LaTeX-Stil''!", "Das ist ein Zitat im `` LaTeX-Stil '' !")
 
+    def test_punctuation_42(self):
+        self._equal("Das ist ein 'Zitat', gell?", "Das ist ein ' Zitat ' , gell ?")
+
+    def test_punctuation_43(self):
+        self._equal('Das ist ein "Zitat", gell?', 'Das ist ein " Zitat " , gell ?')
+
 
 class TestTimeDate(TestTokenizer):
     """"""
@@ -921,3 +927,6 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_08(self):
         self._equal("I'd like to try ``Sarah's cake''.", "I 'd like to try `` Sarah 's cake '' .")
+
+    def test_english_09(self):
+        self._equal("Blah'twas", "Blah'twas")
