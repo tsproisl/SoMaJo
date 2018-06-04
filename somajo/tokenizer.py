@@ -169,7 +169,7 @@ class Tokenizer(object):
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:[[:alpha:]]+\.){2,}')
         # only abbreviations that are not matched by (?:[[:alpha:]]\.)+
-        abbreviation_list = utils.read_abbreviation_file("abbreviations.txt")
+        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % language)
         # abbrev_simple = [(a, re.search(r"^[[:alpha:]]{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])[[:alpha:]]{2,}\.(?![[:alpha:]]{1,3}\.)")
@@ -236,19 +236,27 @@ class Tokenizer(object):
         self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
         self.slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         # English possessive and contracted forms
-        self.en_trailing_apos = re.compile(r"(?<!')(')(?=\s)")
-        self.en_dms = re.compile(r"(?<=\w)('[dms])\b", re.IGNORECASE)
-        self.en_llreve = re.compile(r"(?<=\w)('(?:ll|re|ve))\b", re.IGNORECASE)
-        self.en_not = re.compile(r"(?<=\w)(n't)\b", re.IGNORECASE)
-        self.en_cannot = re.compile(r"(?<=\w)(n't)\b", re.IGNORECASE)
-        en_twopart_contractions = [r"\b(can)(not)\b", r"\b(d')(ye)\b",
+        self.en_trailing_apos = re.compile(r"(?<!')(['’])(?!\w)")
+        self.en_dms = re.compile(r"(?<=\w)(['’][dms])\b", re.IGNORECASE)
+        self.en_llreve = re.compile(r"(?<=\w)(['’](?:ll|re|ve))\b", re.IGNORECASE)
+        self.en_not = re.compile(r"(?<=\w)(n['’]t)\b", re.IGNORECASE)
+        en_twopart_contractions = [r"\b(can)(not)\b", r"\b(d['’])(ye)\b",
                                    r"\b(gim)(me)\b", r"\b(gon)(na)\b",
                                    r"\b(got)(ta)\b", r"\b(lem)(me)\b",
-                                   r"\b(more)('n)\b", r"(?<!\w)('t)(is)\b",
-                                   r"(?<!\w)('t)(was)\b", r"\b(wan)(na)\b"]
-        en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b"]
+                                   r"\b(more)(['’]n)\b", r"(?<!\w)(['’]t)(is)\b",
+                                   r"(?<!\w)(['’]t)(was)\b", r"\b(wan)(na)\b",
+                                   r"\b(do)(nt)\b", r"\b(could)(nt)\b",
+                                   r"\b(would)(nt)\b", r"\b(does)(nt)\b",
+                                   r"\b(i)(m)\b", r"\b(u)(r)\b", r"\b(did)(nt)\b",
+                                   r"\b(he)(s)\b", r"\b(she)(s)\b", r"\b(you)(re)\b",
+                                   r"\b(ca)(nt)\b", r"\b(out)(ta)\b", r"\b(you)(ll)\b",
+                                   r"\b(i)(ve)\b", r"\b(there)(s)\b", r"\b(c'm)(on)\b",
+                                   r"\b(are)(nt)\b", r"\b(is)(nt)\b", r"\b(wo)(nt)\b"]
+        en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
+        self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
+        self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
         # quotation marks
         self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
@@ -551,6 +559,19 @@ class Tokenizer(object):
             paragraph = self._replace_regex(paragraph, self.in_and_innen)
             paragraph = self.camel_case.sub(r' \1', paragraph)
 
+        # English possessive and contracted forms
+        if self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_not, "regular")
+            paragraph = self.en_trailing_apos.sub(r' \1', paragraph)
+            for contraction in self.en_twopart_contractions:
+                paragraph = contraction.sub(r' \1 \2 ', paragraph)
+            for contraction in self.en_threepart_contractions:
+                paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
+            paragraph = self._replace_regex(paragraph, self.en_no, "regular")
+            # paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
+
         # remove known abbreviations
         paragraph = self._replace_abbreviations(paragraph)
 
@@ -591,16 +612,6 @@ class Tokenizer(object):
         # slash
         # paragraph = self.slash.sub(r' \1 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.slash, "symbol")
-        # English possessive and contracted forms
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_trailing_apos, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_not, "regular")
-            for contraction in self.en_twopart_contractions:
-                paragraph = contraction.sub(r' \1 \2 ', paragraph)
-            for contraction in self.en_threepart_contractions:
-                paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
         # LaTeX-style quotation marks
         paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
