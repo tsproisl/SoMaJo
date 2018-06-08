@@ -257,9 +257,10 @@ class Tokenizer(object):
                                    r"\b(are)(nt)\b", r"\b(is)(nt)\b", r"\b(wo)(nt)\b",
                                    r"\b(let)(s)\b"]
         en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
-        # w/o, w/out, b/t, l/c
+        # w/o, w/out, b/c, b/t, l/c
         self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c)\b", re.IGNORECASE)
         # word--word
+        self.en_double_hyphen = re.compile(r"(?<=\w)--+(?=\w)")
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
         self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
@@ -579,6 +580,7 @@ class Tokenizer(object):
                 paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
             paragraph = self._replace_regex(paragraph, self.en_no, "regular")
             # paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
+            paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
 
         # remove known abbreviations
         paragraph = self._replace_abbreviations(paragraph)
