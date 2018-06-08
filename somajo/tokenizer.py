@@ -271,7 +271,7 @@ class Tokenizer(object):
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
         self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
-        self.dividing_line = re.compile(r"(?<=[ ]|^)(?:~{5,}|={5,}|\*{5,})(?=[ ]<|$)")
+        self.dividing_line = re.compile(r"(?<=\s|^)(?:~{5,}|={5,}|\*{5,})(?=\s|$)")
         self.other_punctuation = re.compile(r'([<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+=&–])')
         self.ellipsis = re.compile(r'\.{2,}|…+(?:\.{2,})?')
         self.dot_without_space = re.compile(r'(?<=[[:lower:]]{2})(\.)(?=[[:upper:]][[:lower:]]{2})')
