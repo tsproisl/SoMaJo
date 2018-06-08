@@ -258,6 +258,7 @@ class Tokenizer(object):
                                    r"\b(let)(s)\b"]
         en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
         # w/o, w/out, b/t, l/c
+        self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c)\b", re.IGNORECASE)
         # word--word
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
@@ -621,6 +622,8 @@ class Tokenizer(object):
         paragraph = self.paren.sub(r' \1 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.all_paren, "symbol")
         # slash
+        if self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.en_slash_words, "regular")
         # paragraph = self.slash.sub(r' \1 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.slash, "symbol")
         # French omitted vocals: L'Enfer, d'accord
