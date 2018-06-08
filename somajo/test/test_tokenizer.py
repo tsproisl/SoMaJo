@@ -987,3 +987,6 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_18(self):
         self._equal("Give me all your lovin' please", "Give me all your lovin' please")
+
+    def test_english_19(self):
+        self._equal("foo bar--my favourite---gave me", "foo bar -- my favourite --- gave me")
