@@ -145,6 +145,7 @@ Bks.
 Bord.
 Bp.
 Braz.
+Bros.
 Bur.
 Cal.
 Calc.
@@ -330,6 +331,7 @@ ellipt.
 Emb.
 Embryol.
 emph.
+encl.
 Encycl.
 Eng.
 Engin.
@@ -880,6 +882,7 @@ Spec.
 Specif.
 Specim.
 Spectrosc.
+Sq.
 SS.
 St.
 Staffordsh.
