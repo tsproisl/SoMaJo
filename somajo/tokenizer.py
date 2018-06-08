@@ -271,6 +271,7 @@ class Tokenizer(object):
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
         self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
+        self.dividing_line = re.compile(r"(?<=[ ]|^)(?:~{5,}|={5,})(?=[ ]<|$)")
         self.other_punctuation = re.compile(r'([<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+=&–])')
         self.ellipsis = re.compile(r'\.{2,}|…+(?:\.{2,})?')
         self.dot_without_space = re.compile(r'(?<=[[:lower:]]{2})(\.)(?=[[:upper:]][[:lower:]]{2})')
@@ -637,6 +638,7 @@ class Tokenizer(object):
         paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
         # other punctuation symbols
+        paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
         # paragraph = self.other_punctuation.sub(r' \1 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
         # ellipsis
