@@ -104,17 +104,18 @@ class Tokenizer(object):
         emoticon_set = set(["(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
                             "(-:", ")=", ")o:", ")x", ":'C", ":/",
                             ":<", ":C", ":[", "=(", "=)", "=D", "=P",
-                            ">:", "D':", "D:", "\:", "]:", "x(", "^^",
-                            "o.O", "oO", "\O/", "\m/", ":;))", "_))",
-                            "*_*", "._.", ":wink:", ">_<", "*<:-)",
-                            ":!:", ":;-))"])
+                            ">:", "\:", "]:", "x(", "^^", "o.O", "oO",
+                            "\O/", "\m/", ":;))", "_))", "*_*", "._.",
+                            ":wink:", ">_<", "*<:-)", ":!:", ":;-))"])
         emoticon_list = sorted(emoticon_set, key=len, reverse=True)
         self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variety of eyes, alt.: [:;8]
                                         [-'oO]?                       # optional nose or tear
                                         (?: \)+ | \(+ | [*] | ([DPp])\1*(?!\w)))   # a variety of mouths
                                     """ +
                                    r"|" +
-                                   r"(?:xD+|XD+)" +
+                                   r"(?:\b[Xx]D+\b)" +
+                                   r"|" +
+                                   r"(?:\bD'?:\b)" +
                                    r"|" +
                                    r"|".join([re.escape(_) for _ in emoticon_list]), re.VERBOSE)
         self.space_emoticon = re.compile(r'([:;])[ ]+([()])')
