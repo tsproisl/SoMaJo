@@ -201,7 +201,7 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 | Corpus | Precision | Recall | F₁    |
 |--------|-----------|--------|-------|
 | CMC    | 99.62     | 99.56  | 99.59 |
-| Web    | 99.83     | 99.92  | 99.87 |
+| Web    | 99.84     | 99.92  | 99.88 |
 
 
 ## References ##
