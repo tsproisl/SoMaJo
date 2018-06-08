@@ -612,8 +612,9 @@ mod.
 Mod.
 Monum.
 Morphol.
-M.Sc.
+Mr.
 MS.
+M.Sc.
 MSS.
 Mt.
 Mtg.
