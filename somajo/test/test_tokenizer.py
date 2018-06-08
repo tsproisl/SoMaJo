@@ -981,3 +981,6 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_16(self):
         self._equal("bla 50,000th visitor", "bla 50,000th visitor")
+
+    def test_english_17(self):
+        self._equal("Mr. ARCHIBALD: Hello", "Mr. ARCHIBALD : Hello")
