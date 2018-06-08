@@ -266,7 +266,8 @@ class Tokenizer(object):
         self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
         self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
         # quotation marks
-        self.french_omitted_vocals = re.compile(r"\b([dl]['’][[:alpha:]]+)\b", re.IGNORECASE)
+        # L'Enfer, d'accord, O'Connor
+        self.letter_apostrophe_word = re.compile(r"\b([dlo]['’][[:alpha:]]+)\b", re.IGNORECASE)
         self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
@@ -629,8 +630,8 @@ class Tokenizer(object):
             paragraph = self._replace_regex(paragraph, self.en_slash_words, "regular")
         # paragraph = self.slash.sub(r' \1 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.slash, "symbol")
-        # French omitted vocals: L'Enfer, d'accord
-        paragraph = self._replace_regex(paragraph, self.french_omitted_vocals, "regular")
+        # O'Connor and French omitted vocals: L'Enfer, d'accord
+        paragraph = self._replace_regex(paragraph, self.letter_apostrophe_word, "regular")
         # LaTeX-style quotation marks
         paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
