@@ -200,7 +200,7 @@ class Tokenizer(object):
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
         self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|qm|g|kg|min|h|s|sek|cent|eur|bit|ghz)(?!\w)', re.IGNORECASE)
         # auch Web2.0
-        self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[[:alpha:]@]+ | [[:alpha:]@]+-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
+        self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[[:alpha:]@][[:alpha:]@-]* | [[:alpha:]@][[:alpha:]@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
         self.number = re.compile(r"""(?<!\w)
                                      (?:[−+-]?              # optional sign
                                        \d*                  # optional digits before decimal point
