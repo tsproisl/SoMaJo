@@ -84,7 +84,7 @@ class Tokenizer(object):
         # regex for email addresses taken from:
         # http://www.regular-expressions.info/email.html
         # self.email = re.compile(r"\b[[:alnum:].%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}\b")
-        self.email = re.compile(r"\b[[:alnum:].%+-]+(?:@| \[?at\]? )[[:alnum:].-]+(?:\.| \[?dot\]? )[[:alpha:]]{2,}\b")
+        self.email = re.compile(r"\b[[:alnum:].%+-]+(?:@| \[at\] )[[:alnum:].-]+(?:\.| \[?dot\]? )[[:alpha:]]{2,}\b")
         # simple regex for urls that start with http or www
         # TODO: schließende Klammer am Ende erlauben, wenn nach http etc. eine öffnende kam
         self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+?\(\S*?\)\S*(?=$|[\'. "!?,;\n\t])', re.IGNORECASE)
