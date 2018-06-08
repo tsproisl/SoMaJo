@@ -92,7 +92,7 @@ class Tokenizer(object):
         self.doi = re.compile(r'\bdoi:10\.\d+/\S+', re.IGNORECASE)
         self.doi_with_space = re.compile(r'(?<=\bdoi: )10\.\d+/\S+', re.IGNORECASE)
         # we also allow things like tagesschau.de-App
-        self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|org|net|edu|info|jpg|png|gif|log|txt)(?:-\w+)?\b', re.IGNORECASE)
+        self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|org|net|edu|info|gov|jpg|png|gif|log|txt|xlsx?|docx?|pptx?)(?:-\w+)?\b', re.IGNORECASE)
 
         # XML entities
         self.entity_name = re.compile(r'&(?:quot|amp|apos|lt|gt);', re.IGNORECASE)
@@ -239,7 +239,7 @@ class Tokenizer(object):
         self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
         self.slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         # English possessive and contracted forms
-        self.en_trailing_apos = re.compile(r"(?<!')(['’])(?!\w)")
+        self.en_trailing_apos = re.compile(r"(?<!..in|')(['’])(?!\w)")
         self.en_dms = re.compile(r"(?<=\w)(['’][dms])\b", re.IGNORECASE)
         self.en_llreve = re.compile(r"(?<=\w)(['’](?:ll|re|ve))\b", re.IGNORECASE)
         self.en_not = re.compile(r"(?<=\w)(n['’]t)\b", re.IGNORECASE)
@@ -254,8 +254,11 @@ class Tokenizer(object):
                                    r"\b(he)(s)\b", r"\b(she)(s)\b", r"\b(you)(re)\b",
                                    r"\b(ca)(nt)\b", r"\b(out)(ta)\b", r"\b(you)(ll)\b",
                                    r"\b(i)(ve)\b", r"\b(there)(s)\b", r"\b(c'm)(on)\b",
-                                   r"\b(are)(nt)\b", r"\b(is)(nt)\b", r"\b(wo)(nt)\b"]
+                                   r"\b(are)(nt)\b", r"\b(is)(nt)\b", r"\b(wo)(nt)\b",
+                                   r"\b(let)(s)\b"]
         en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
+        # w/o, w/out, b/t, l/c
+        # word--word
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
         self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
