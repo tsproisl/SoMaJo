@@ -164,7 +164,7 @@ class Tokenizer(object):
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])[[:alpha:]]\.(?![[:alpha:]]{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
-        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations%s.txt" % self.language)
+        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language)
         self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?![[:alpha:]]{1,3}\.)')
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:[[:alpha:]]+\.){2,}')
@@ -196,6 +196,7 @@ class Tokenizer(object):
         self.time = re.compile(r'(?<!\w)\d{1,2}(?::\d{2}){1,2}(?![\d:])')
         self.ordinal = re.compile(r'(?<![\w.])(?:\d{1,3}|\d{5,}|[3-9]\d{3})\.(?!\d)')
         self.english_ordinal = re.compile(r'\b(?:\d+(?:,\d+)*)?(?:1st|2nd|3rd|\dth)\b')
+        self.english_decades = re.compile(r'\b(?:[12]\d)?\d0s\b')
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
@@ -590,6 +591,7 @@ class Tokenizer(object):
             paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
         elif self.language == "en":
             paragraph = self._replace_regex(paragraph, self.english_ordinal, "ordinal")
+            paragraph = self._replace_regex(paragraph, self.english_decades, "number_compound")
         # fractions
         paragraph = self._replace_regex(paragraph, self.fraction, "number")
         # amounts (1.000,-)
