@@ -984,3 +984,6 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_17(self):
         self._equal("Mr. ARCHIBALD: Hello", "Mr. ARCHIBALD : Hello")
+
+    def test_english_18(self):
+        self._equal("Give me all your lovin' please", "Give me all your lovin' please")
