@@ -174,7 +174,7 @@ class TestPunctuation(TestTokenizer):
         self._equal('Das ist ein "Zitat", gell?', 'Das ist ein " Zitat " , gell ?')
 
     def test_punctuation_44(self):
-        self._equal("==========", "==========")
+        self._equal("foo ========== bar", "foo ========== bar")
 
     def test_punctuation_45(self):
         self._equal("----------", "----------")
@@ -970,8 +970,8 @@ class TestEnglish(TestEnglishTokenizer):
     def test_english_09(self):
         self._equal("Blah'twas", "Blah'twas")
 
-    def test_english_10(self):
-        self._equal("the center-north of the country", "the center - north of the country")
+    # def test_english_10(self):
+    #     self._equal("the center-north of the country", "the center - north of the country")
 
     def test_english_11(self):
         self._equal("1970s", "1970s")
