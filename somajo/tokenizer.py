@@ -164,12 +164,12 @@ class Tokenizer(object):
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])[[:alpha:]]\.(?![[:alpha:]]{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
-        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations.txt")
+        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations%s.txt" % self.language)
         self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?![[:alpha:]]{1,3}\.)')
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:[[:alpha:]]+\.){2,}')
         # only abbreviations that are not matched by (?:[[:alpha:]]\.)+
-        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % language)
+        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language)
         # abbrev_simple = [(a, re.search(r"^[[:alpha:]]{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])[[:alpha:]]{2,}\.(?![[:alpha:]]{1,3}\.)")
@@ -195,6 +195,7 @@ class Tokenizer(object):
         self.two_part_date = re.compile(r'(?<![\d.]) (?P<a_day_or_month>\d{1,2}([./-])) (?P<b_day_or_month>\d{1,2}\2) (?![\d.])', re.VERBOSE)
         self.time = re.compile(r'(?<!\w)\d{1,2}(?::\d{2}){1,2}(?![\d:])')
         self.ordinal = re.compile(r'(?<![\w.])(?:\d{1,3}|\d{5,}|[3-9]\d{3})\.(?!\d)')
+        self.english_ordinal = re.compile(r'\b(?:\d+(?:,\d+)*)?(?:1st|2nd|3rd|\dth)\b')
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
@@ -258,6 +259,7 @@ class Tokenizer(object):
         self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
         self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
         # quotation marks
+        self.french_omitted_vocals = re.compile(r"\b([dl]['’][[:alpha:]]+)\b", re.IGNORECASE)
         self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
@@ -584,7 +586,10 @@ class Tokenizer(object):
         # time
         paragraph = self._replace_regex(paragraph, self.time, "time")
         # ordinals
-        paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
+        if self.language == "de":
+            paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
+        elif self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.english_ordinal, "ordinal")
         # fractions
         paragraph = self._replace_regex(paragraph, self.fraction, "number")
         # amounts (1.000,-)
@@ -612,6 +617,8 @@ class Tokenizer(object):
         # slash
         # paragraph = self.slash.sub(r' \1 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.slash, "symbol")
+        # French omitted vocals: L'Enfer, d'accord
+        paragraph = self._replace_regex(paragraph, self.french_omitted_vocals, "regular")
         # LaTeX-style quotation marks
         paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
