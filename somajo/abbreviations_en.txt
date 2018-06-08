@@ -4,6 +4,15 @@
 #
 # Lines starting with “#” are treated as comments and will be ignored.
 
+# days
+Mon.
+Tue.
+Wed.
+Thur.
+Fri.
+Sat.
+# Sun. could also mean the sun
+
 # months
 Jan.
 Feb.
@@ -185,6 +194,7 @@ Cl.
 Classif.
 Climatol.
 Clin.
+Co.
 Col.
 Coll.
 colloq.
@@ -244,6 +254,7 @@ Convoc.
 Cor.
 Cornw.
 Coron.
+Corp.
 Corr.
 corresp.
 Corresp.
