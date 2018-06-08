@@ -227,7 +227,6 @@ Confl.
 Confut.
 Congr.
 Congreg.
-Congress.
 conj.
 Conn.
 cons.
@@ -244,11 +243,9 @@ contempt.
 Contend.
 Contin.
 contr.
-Contradict.
 Contrib.
 Controv.
 Conv.
-Convent.
 Conversat.
 Convoc.
 Cor.
@@ -300,7 +297,6 @@ Dict.
 Diffic.
 dim.
 Dis.
-Disc.
 Discipl.
 Discov.
 Discrim.
