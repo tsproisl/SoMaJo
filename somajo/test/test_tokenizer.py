@@ -824,6 +824,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_94(self):
         self._equal("The book 'Algorithm Design', too", "The book ' Algorithm Design ' , too")
 
+    def test_own_95(self):
+        self._equal("Mir gefällt La Porte de l'Enfer besser als L'Éternelle idole", "Mir gefällt La Porte de l'Enfer besser als L'Éternelle idole")
+
 
 class TestSuffixes(TestTokenizer):
     """"""
@@ -966,3 +969,15 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_13(self):
         self._equal("The book 'Algorithm Design', too", "The book ' Algorithm Design ' , too")
+
+    def test_english_14(self):
+        self._equal("People were encouraged to submit their designs online at www.flag.govt.nz and suggest what the flag should mean on www.standfor.co.nz.", "People were encouraged to submit their designs online at www.flag.govt.nz and suggest what the flag should mean on www.standfor.co.nz .")
+
+    def test_english_14(self):
+        self._equal("I prefer La Porte de l'Enfer to L'Éternelle idole", "I prefer La Porte de l'Enfer to L'Éternelle idole")
+
+    def test_english_15(self):
+        self._equal("bla 21st century", "bla 21st century")
+
+    def test_english_16(self):
+        self._equal("bla 50,000th visitor", "bla 50,000th visitor")
