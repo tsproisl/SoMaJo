@@ -395,6 +395,18 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_08(self):
         self._equal("In den Nachrichten (bspw. http://www.sueddeutsche.de) stand", "In den Nachrichten ( bspw. http://www.sueddeutsche.de ) stand")
 
+    def test_emails_urls_09(self):
+        self._equal("http://www.sueddeutsche.de/bla/test_(geheim).html", "http://www.sueddeutsche.de/bla/test_(geheim).html")
+
+    def test_emails_urls_10(self):
+        self._equal("http://www.sueddeutsche.de/bla/test_(geheim)", "http://www.sueddeutsche.de/bla/test_(geheim)")
+
+    def test_emails_urls_11(self):
+        self._fail_means_improvement("bla (http://www.sueddeutsche.de/bla/test_(geheim).html) foo", "bla ( http://www.sueddeutsche.de/bla/test_(geheim).html ) foo")
+
+    def test_emails_urls_12(self):
+        self._fail_means_improvement("bla (http://www.sueddeutsche.de/bla/test_(geheim)) foo", "bla ( http://www.sueddeutsche.de/bla/test_(geheim) ) foo")
+
 
 class TestEmoticons(TestTokenizer):
     """"""
