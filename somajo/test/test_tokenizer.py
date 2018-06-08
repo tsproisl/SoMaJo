@@ -389,6 +389,12 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_06(self):
         self._equal("Auf shortnews.de, der besten Seite.", "Auf shortnews.de , der besten Seite .")
 
+    def test_emails_urls_07(self):
+        self._equal("In der Zeitung (http://www.sueddeutsche.de) stand", "In der Zeitung ( http://www.sueddeutsche.de ) stand")
+
+    def test_emails_urls_08(self):
+        self._equal("In den Nachrichten (bspw. http://www.sueddeutsche.de) stand", "In den Nachrichten ( bspw. http://www.sueddeutsche.de ) stand")
+
 
 class TestEmoticons(TestTokenizer):
     """"""
