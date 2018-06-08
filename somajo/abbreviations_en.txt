@@ -70,6 +70,7 @@ Aff.
 Afr.
 Agric.
 agst.
+al.
 Alch.
 Alg.
 Alleg.
@@ -231,7 +232,6 @@ Contemp.
 Contempl.
 contempt.
 Contend.
-Content.
 Contin.
 contr.
 Contradict.
@@ -307,7 +307,6 @@ Domest.
 Dr.
 Durh.
 dyslog.
-east.
 Eccl.
 Eccles.
 Ecclus.
@@ -613,6 +612,7 @@ mod.
 Mod.
 Monum.
 Morphol.
+M.Sc.
 MS.
 MSS.
 Mt.
@@ -719,6 +719,7 @@ pf.
 Pharm.
 Pharmaceut.
 Pharmacol.
+Ph.D.
 Phil.
 Philad.
 Philem.
@@ -774,6 +775,7 @@ Probab.
 Probl.
 Proc.
 Prod.
+Prof.
 Prol.
 pron.
 pronunc.
@@ -875,7 +877,6 @@ Soc.
 Sociol.
 Som.
 Sonn.
-south.
 sp.
 spec.
 Spec.
@@ -994,7 +995,6 @@ Vulg.
 Warwicksh.
 wd.
 Wd.
-west.
 Westm.
 Westmld.
 Westmorld.
