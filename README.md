@@ -6,8 +6,9 @@
       * [Using the somajo-tokenizer executable](#using-the-somajo-tokenizer-executable)
       * [Using the module](#using-the-module)
   * [Evaluation](#evaluation)
-  <!-- * [Tokenizing English text](#tokenizing-english-text) -->
   * [References](#references)
+
+  <!-- * [Tokenizing English text](#tokenizing-english-text) -->
 
 
 ## Introduction ##
