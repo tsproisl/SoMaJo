@@ -255,7 +255,7 @@ class Tokenizer(object):
                                    r"\b(ca)(nt)\b", r"\b(out)(ta)\b", r"\b(you)(ll)\b",
                                    r"\b(i)(ve)\b", r"\b(there)(s)\b", r"\b(c'm)(on)\b",
                                    r"\b(are)(nt)\b", r"\b(is)(nt)\b", r"\b(wo)(nt)\b",
-                                   r"\b(let)(s)\b", r"\b(ai)(nt)\b",]
+                                   r"\b(let)(s)\b", r"\b(ai)(nt)\b"]
         en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
         # w/o, w/out, b/c, b/t, l/c, w/
         self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c)\b|\bw/(?!\w)", re.IGNORECASE)
