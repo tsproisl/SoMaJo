@@ -6,6 +6,7 @@
       * [Using the somajo-tokenizer executable](#using-the-somajo-tokenizer-executable)
       * [Using the module](#using-the-module)
   * [Evaluation](#evaluation)
+  <!-- * [Tokenizing English text](#tokenizing-english-text) -->
   * [References](#references)
 
 
@@ -202,6 +203,16 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 |--------|-----------|--------|-------|
 | CMC    | 99.62     | 99.56  | 99.59 |
 | Web    | 99.84     | 99.92  | 99.88 |
+
+
+<!-- ## Tokenizing English text ## -->
+
+<!-- Starting with version 1.8.0, SoMaJo can also tokenize English text. In -->
+<!-- general, we follow Penn Treebank conventions (*can't* is tokenized as -->
+<!-- *ca n't* and *Peter's* as *Peter 's*, hyphenated compounds are left -->
+<!-- intact), but in some cases we deviate, most prominently in our -->
+<!-- treatment of multi-dot abbreviations that represent multiple tokens -->
+<!-- (we tokenize *U.S.* as *U. S.*, but *T.V.* as *T.V.*). -->
 
 
 ## References ##
