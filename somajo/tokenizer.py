@@ -104,7 +104,7 @@ class Tokenizer(object):
         emoticon_set = set(["(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
                             "(-:", ")=", ")o:", ")x", ":'C", ":/",
                             ":<", ":C", ":[", "=(", "=)", "=D", "=P",
-                            ">:", "\:", "]:", "x(", "^^", "o.O", "oO",
+                            ">:", "\:", "]:", "x(", "^^", "o.O",
                             "\O/", "\m/", ":;))", "_))", "*_*", "._.",
                             ":wink:", ">_<", "*<:-)", ":!:", ":;-))"])
         emoticon_list = sorted(emoticon_set, key=len, reverse=True)
@@ -115,7 +115,7 @@ class Tokenizer(object):
                                    r"|" +
                                    r"(?:\b[Xx]D+\b)" +
                                    r"|" +
-                                   r"(?:\bD'?:\b)" +
+                                   r"(?:\b(?:D'?:|oO)\b)" +
                                    r"|" +
                                    r"|".join([re.escape(_) for _ in emoticon_list]), re.VERBOSE)
         self.space_emoticon = re.compile(r'([:;])[ ]+([()])')
