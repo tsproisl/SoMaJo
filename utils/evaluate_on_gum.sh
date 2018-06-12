@@ -9,5 +9,5 @@ do
     filename=$(basename $f)
     ../bin/somajo-tokenizer -l en $f > tmp/$filename
 done
-perl ../data/empirist_gold_standard/tools/compare_tokenization.perl -e errors_ewt.txt tmp ../data/GUM/tokenized
+perl ../data/empirist_gold_standard/tools/compare_tokenization.perl -e errors_gum.txt tmp ../data/GUM/tokenized
 rm -r tmp/
