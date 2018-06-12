@@ -1,0 +1,1609 @@
+__________________________________________________________________________________________________
+tmp/en_gum-ud-test.txt                            ../data/GUM/tokenized/en_gum-ud-test.txt        
+
+False Negative (linebreak inserted right):
+   893:   an                                         893:   an                                    
+   894:   F                                          894:   F                                     
+   895: * statisticwith                              895: * statistic                             
+   896:   noninteger                                 896: * with                                  
+   897:   degrees                                    897:   noninteger                            
+   898:   of                                         898:   degrees                               
+
+False Positive (linebreak inserted left):
+  1752:   in                                        1752:   in                                    
+  1753:   the                                       1753:   the                                   
+  1754: * U.                                        1754: * U.S.                                  
+  1755: * S.                                        1755:   ,                                     
+  1756:   ,                                         1756:   he                                    
+  1757:   he                                        1757:   took                                  
+
+False Positive (linebreak inserted left):
+  2020:   on                                        2018:   on                                    
+  2021:   the                                       2019:   the                                   
+  2022: * 236th                                     2020: * 236th-level                           
+  2023: * -level                                    2021:   Kaiserstrasse                         
+  2024:   Kaiserstrasse                             2022:   moving                                
+  2025:   moving                                    2023:   sidewalk                              
+
+False Positive (linebreak inserted left):
+  2471:   Then                                      2468:   Then                                  
+  2472:   she                                       2469:   she                                   
+  2473: * let                                       2470: * lets                                  
+  2474: * s                                         2471:   go                                    
+  2475:   go                                        2472:   and                                   
+  2476:   and                                       2473:   falls                                 
+
+False Positive (linebreak inserted left):
+  2565:   -                                         2561:   -                                     
+  2566:   it                                        2562:   it                                    
+  2567: * let                                       2563: * lets                                  
+  2568: * s                                         2564:   them                                  
+  2569:   them                                      2565:   hack                                  
+  2570:   hack                                      2566:   the                                   
+
+False Positive (linebreak inserted left):
+  3012:   Hill                                      3006:   Hill                                  
+  3013:   ,                                         3007:   ,                                     
+  3014: * U.                                        3008: * U.S.                                  
+  3015: * S.                                        3009:   Republican                            
+  3016:   Republican                                3010:   Party                                 
+  3017:   Party                                     3011:   presidential                          
+
+False Positive (linebreak inserted left):
+  4590:   previous                                  4582:   previous                              
+  4591:   Virginia                                  4583:   Virginia                              
+  4592: * Governor                                  4584: * Governor(s)                           
+  4593: * (                                         4585:   do                                    
+  4594:   s                                         4586:   you                                   
+  4595:   )                                         4587:   most                                  
+
+False Positive (linebreak inserted left):
+  4591:   Virginia                                  4582:   previous                              
+  4592:   Governor                                  4583:   Virginia                              
+  4593: * (                                         4584: * Governor(s)                           
+  4594: * s                                         4585:   do                                    
+  4595:   )                                         4586:   you                                   
+  4596:   do                                        4587:   most                                  
+
+False Positive (linebreak inserted left):
+  4592:   Governor                                  4582:   previous                              
+  4593:   (                                         4583:   Virginia                              
+  4594: * s                                         4584: * Governor(s)                           
+  4595: * )                                         4585:   do                                    
+  4596:   do                                        4586:   you                                   
+  4597:   you                                       4587:   most                                  
+
+False Negative (linebreak inserted right):
+  5246:   domain                                    5234:   domain                                
+  5247:   means                                     5235:   means                                 
+  5248: * its                                       5236: * it                                    
+  5249:   as                                        5237: * s                                     
+  5250:   simple                                    5238:   as                                    
+  5251:   as                                        5239:   simple                                
+
+False Positive (linebreak inserted left):
+  6791:   access                                    6778:   access                                
+  6792:   to                                        6779:   to                                    
+  6793: * U.                                        6780: * U.S.                                  
+  6794: * S.                                        6781:   and                                   
+  6795:   and                                       6782:   international                         
+  6796:   international                             6783:   visitors                              
+
+False Positive (linebreak inserted left):
+  6885:   locations                                 6871:   locations                             
+  6886:   .                                         6872:   .                                     
+  6887: * U.                                        6873: * U.S.                                  
+  6888: * S.                                        6874:   Senator                               
+  6889:   Senator                                   6875:   John                                  
+  6890:   John                                      6876:   Cornyn                                
+
+False Positive (linebreak inserted left):
+  7361:   Cornyn                                    7346:   Cornyn                                
+  7362:   ,                                         7347:   ,                                     
+  7363: * U.                                        7348: * U.S.                                  
+  7364: * S.                                        7349:   Senator                               
+  7365:   Senator                                   7350:   (                                     
+  7366:   (                                         7351:   R-Texas                               
+
+False Positive (linebreak inserted left):
+  7419:   of                                        7403:   of                                    
+  7420:   the                                       7404:   the                                   
+  7421: * U.                                        7405: * U.S.                                  
+  7422: * S.                                        7406:   Air                                   
+  7423:   Air                                       7407:   Force                                 
+  7424:   Force                                     7408:   at                                    
+
+False Positive (linebreak inserted left):
+  7437:   for                                       7420:   for                                   
+  7438:   the                                       7421:   the                                   
+  7439: * U.                                        7422: * U.S.                                  
+  7440: * S.                                        7423:   Space                                 
+  7441:   Space                                     7424:   and                                   
+  7442:   and                                       7425:   Rocket                                
+
+False Negative (linebreak inserted right):
+  7727:   findings                                  7708:   findings                              
+  7728:   that                                      7709:   that                                  
+  7729: * don`t                                     7710: * do                                    
+  7730:   have                                      7711: * n`t                                   
+  7731:   any                                       7712:   have                                  
+  7732:   conclusion                                7713:   any                                   
+
+False Negative (linebreak inserted right):
+  7741:   minutes                                   7723:   minutes                               
+  7742:   that                                      7724:   that                                  
+  7743: * don`t                                     7725: * do                                    
+  7744:   deal                                      7726: * n`t                                   
+  7745:   with                                      7727:   deal                                  
+  7746:   subjects                                  7728:   with                                  
+
+False Negative (linebreak inserted right):
+  7902:   that                                      7885:   that                                  
+  7903:   they                                      7886:   they                                  
+  7904: * can`t                                     7887: * ca                                    
+  7905:   share                                     7888: * n`t                                   
+  7906:   the                                       7889:   share                                 
+  7907:   information                               7890:   the                                   
+
+False Positive (linebreak inserted left):
+  8054:   "                                         8038:   "                                     
+  8055:   —                                         8039:   —                                     
+  8056: * CBC                                       8040: * CBC.ca                                
+  8057: * .                                         8041:   ,                                     
+  8058:   ca                                        8042:   August                                
+  8059:   ,                                         8043:   15                                    
+
+False Positive (linebreak inserted left):
+  8055:   —                                         8038:   "                                     
+  8056:   CBC                                       8039:   —                                     
+  8057: * .                                         8040: * CBC.ca                                
+  8058: * ca                                        8041:   ,                                     
+  8059:   ,                                         8042:   August                                
+  8060:   August                                    8043:   15                                    
+
+False Positive (linebreak inserted left):
+  9392:   reciprocate                               9372:   reciprocate                           
+  9393:   when                                      9373:   when                                  
+  9394: * wai                                       9374: * wai'd                                 
+  9395: * 'd                                        9375:   to                                    
+  9396:   to                                        9376:   ;                                     
+  9397:   ;                                         9377:   while                                 
+
+False Positive (linebreak inserted left):
+ 10120:   .                                        10098:   fakes                                 
+ 10121:                                            10099:   .                                     
+ 10122: * Vava                                     10100: * Vava’u                                
+ 10123: * ’                                        10101:   is                                    
+ 10124:   u                                        10102:   a                                     
+ 10125:   is                                       10103:   group                                 
+
+False Positive (linebreak inserted left):
+ 10121:                                            10098:   fakes                                 
+ 10122:   Vava                                     10099:   .                                     
+ 10123: * ’                                        10100: * Vava’u                                
+ 10124: * u                                        10101:   is                                    
+ 10125:   is                                       10102:   a                                     
+ 10126:   a                                        10103:   group                                 
+
+False Positive (linebreak inserted left):
+ 10313:   coming                                   10289:   coming                                
+ 10314:   to                                       10290:   to                                    
+ 10315: * Vava                                     10291: * Vava'u                                
+ 10316: * '                                        10292:   ,                                     
+ 10317:   u                                        10293:   which                                 
+ 10318:   ,                                        10294:   attracts                              
+
+False Positive (linebreak inserted left):
+ 10314:   to                                       10289:   coming                                
+ 10315:   Vava                                     10290:   to                                    
+ 10316: * '                                        10291: * Vava'u                                
+ 10317: * u                                        10292:   ,                                     
+ 10318:   ,                                        10293:   which                                 
+ 10319:   which                                    10294:   attracts                              
+
+False Positive (linebreak inserted left):
+ 10409:   of                                       10383:   of                                    
+ 10410:   Utu                                      10384:   Utu                                   
+ 10411: * Vava                                     10385: * Vava'u                                
+ 10412: * '                                        10386:   and                                   
+ 10413:   u                                        10387:   has                                   
+ 10414:   and                                      10388:   an                                    
+
+False Positive (linebreak inserted left):
+ 10410:   Utu                                      10383:   of                                    
+ 10411:   Vava                                     10384:   Utu                                   
+ 10412: * '                                        10385: * Vava'u                                
+ 10413: * u                                        10386:   and                                   
+ 10414:   and                                      10387:   has                                   
+ 10415:   has                                      10388:   an                                    
+
+False Positive (linebreak inserted left):
+ 10479:   .                                        10451:   .                                     
+ 10480:   Climate                                  10452:   Climate                               
+ 10481: * Vava                                     10453: * Vava'u                                
+ 10482: * '                                        10454:   has                                   
+ 10483:   u                                        10455:   a                                     
+ 10484:   has                                      10456:   tropical                              
+
+False Positive (linebreak inserted left):
+ 10480:   Climate                                  10451:   .                                     
+ 10481:   Vava                                     10452:   Climate                               
+ 10482: * '                                        10453: * Vava'u                                
+ 10483: * u                                        10454:   has                                   
+ 10484:   has                                      10455:   a                                     
+ 10485:   a                                        10456:   tropical                              
+
+False Positive (linebreak inserted left):
+ 10560:   :                                        10530:   :                                     
+ 10561:   Utu                                      10531:   Utu                                   
+ 10562: * Vava'                                    10532: * Vava'u                                
+ 10563: * u.                                       10533:   .                                     
+ 10564:   This                                     10534:   This                                  
+ 10565:   is                                       10535:   is                                    
+
+False Negative (linebreak inserted right):
+ 10561:   Utu                                      10530:   :                                     
+ 10562:   Vava'                                    10531:   Utu                                   
+ 10563: * u.                                       10532: * Vava'u                                
+ 10564:   This                                     10533: * .                                     
+ 10565:   is                                       10534:   This                                  
+ 10566:   the                                      10535:   is                                    
+
+False Negative (linebreak inserted right):
+ 10571:   Neiafu                                   10541:   Neiafu                                
+ 10572:   is                                       10542:   is                                    
+ 10573: * found.                                   10543: * found                                 
+ 10574:   It                                       10544: * .                                     
+ 10575:   is                                       10545:   It                                    
+ 10576:   a                                        10546:   is                                    
+
+False Positive (linebreak inserted left):
+ 11019:   (                                        10989:   (                                     
+ 11020:   2.5                                      10990:   2.5                                   
+ 11021: * cm                                       10991: * cm.                                   
+ 11022: * .                                        10992:   )                                     
+ 11023:   )                                        10993:   deep                                  
+ 11024:   deep                                     10994:   .                                     
+
+False Negative (linebreak inserted right):
+ 12074:   ,                                        12042:   ,                                     
+ 12075:   peach                                    12043:   peach                                 
+ 12076: * etc.                                     12044: * etc                                   
+ 12077:   The                                      12045: * .                                     
+ 12078:   cupcakes                                 12046:   The                                   
+ 12079:   will                                     12047:   cupcakes                              
+
+False Negative (linebreak inserted right):
+ 12528:   vents                                    12496:   vents                                 
+ 12529:   ,                                        12497:   ,                                     
+ 12530: * etc.                                     12498: * etc                                   
+ 12531:   Peppermint                               12499: * .                                     
+ 12532:   oil                                      12500:   Peppermint                            
+ 12533:   cotton                                   12501:   oil                                   
+
+__________________________________________________________________________________________________
+tmp/en_gum-ud-train.txt                           ../data/GUM/tokenized/en_gum-ud-train.txt       
+
+False Negative (linebreak inserted right):
+  1117:   and                                       1116:   and                                   
+  1118:   can                                       1117:   can                                   
+  1119: * notbe                                     1118: * not                                   
+  1120:   done                                      1119: * be                                    
+  1121:   ,                                         1120:   done                                  
+  1122:   and                                       1121:   ,                                     
+
+False Positive (linebreak inserted left):
+  1668:   .                                         1667:   attention                             
+  1669:                                             1668:   .                                     
+  1670: * 4                                         1669: * 4.                                    
+  1671: * .                                         1670:   Discussion                            
+  1672:   Discussion                                1671:   .                                     
+  1673:   .                                         1672:   We                                    
+
+False Positive (linebreak inserted left):
+  1845:   some                                      1843:   some                                  
+  1846:   .                                         1844:   .                                     
+  1847: * 4.                                        1845: * 4.1.                                  
+  1848: * 1.                                        1846:   LIMITATIONS                           
+  1849:   LIMITATIONS                               1847:   AND                                   
+  1850:   AND                                       1848:   FUTURE                                
+
+False Positive (linebreak inserted left):
+  2385:   research                                  2382:   research                              
+  2386:   .                                         2383:   .                                     
+  2387: * 5                                         2384: * 5.                                    
+  2388: * .                                         2385:   Conclusion                            
+  2389:   Conclusion                                2386:   .                                     
+  2390:   .                                         2387:   Albeit                                
+
+False Positive (linebreak inserted left):
+  2479:   .                                         2474:   differences                           
+  2480:                                             2475:   .                                     
+  2481: * Re                                        2476: * Re(a)d                                
+  2482: * (                                         2477:   Wedding                               
+  2483:   a                                         2478:   :                                     
+  2484:   )                                         2479:   A                                     
+
+False Positive (linebreak inserted left):
+  2480:                                             2474:   differences                           
+  2481:   Re                                        2475:   .                                     
+  2482: * (                                         2476: * Re(a)d                                
+  2483: * a                                         2477:   Wedding                               
+  2484:   )                                         2478:   :                                     
+  2485:   d                                         2479:   A                                     
+
+False Positive (linebreak inserted left):
+  2481:   Re                                        2474:   differences                           
+  2482:   (                                         2475:   .                                     
+  2483: * a                                         2476: * Re(a)d                                
+  2484: * )                                         2477:   Wedding                               
+  2485:   d                                         2478:   :                                     
+  2486:   Wedding                                   2479:   A                                     
+
+False Positive (linebreak inserted left):
+  2482:   (                                         2474:   differences                           
+  2483:   a                                         2475:   .                                     
+  2484: * )                                         2476: * Re(a)d                                
+  2485: * d                                         2477:   Wedding                               
+  2486:   Wedding                                   2478:   :                                     
+  2487:   :                                         2479:   A                                     
+
+False Positive (linebreak inserted left):
+  3435:   Washington                                3425:   Washington                            
+  3436:   ,                                         3426:   ,                                     
+  3437: * D.                                        3427: * D.C.                                  
+  3438: * C.                                        3428:   (                                     
+  3439:   (                                         3429:   capital                               
+  3440:   capital                                   3430:   city                                  
+
+False Positive (linebreak inserted left):
+  3442:   of                                        3431:   of                                    
+  3443:   the                                       3432:   the                                   
+  3444: * U.                                        3433: * U.S.                                  
+  3445: * S.                                        3434:   )                                     
+  3446:   )                                         3435:   known                                 
+  3447:   known                                     3436:   today                                 
+
+False Positive (linebreak inserted left):
+  3887:   .                                         3875:   .                                     
+  3888:   Career                                    3876:   Career                                
+  3889: * Post                                      3877: * Post–Revolutionary                    
+  3890: * –                                         3878:   War                                   
+  3891:   Revolutionary                             3879:   Following                             
+  3892:   War                                       3880:   the                                   
+
+False Positive (linebreak inserted left):
+  3888:   Career                                    3875:   .                                     
+  3889:   Post                                      3876:   Career                                
+  3890: * –                                         3877: * Post–Revolutionary                    
+  3891: * Revolutionary                             3878:   War                                   
+  3892:   War                                       3879:   Following                             
+  3893:   Following                                 3880:   the                                   
+
+False Positive (linebreak inserted left):
+  5311:   ,                                         5295:   ,                                     
+  5312:   a                                         5296:   a                                     
+  5313: * 17th                                      5297: * 17th-century                          
+  5314: * -century                                  5298:   writer                                
+  5315:   writer                                    5299:   ,                                     
+  5316:   ,                                         5300:   whose                                 
+
+False Positive (linebreak inserted left):
+  5797:   received                                  5779:   received                              
+  5798:   his                                       5780:   his                                   
+  5799: * Ph.                                       5781: * Ph.D.                                 
+  5800: * D.                                        5782:   in                                    
+  5801:   in                                        5783:   Linguistics                           
+  5802:   Linguistics                               5784:   from                                  
+
+False Positive (linebreak inserted left):
+  5906:   .                                         5887:   .                                     
+  5907:   His                                       5888:   His                                   
+  5908: * Ph.                                       5889: * Ph.D.                                 
+  5909: * D.                                        5890:   dissertation                          
+  5910:   dissertation                              5891:   ,                                     
+  5911:   ,                                         5892:   A                                     
+
+False Negative (linebreak inserted right):
+  7791:   she                                       7769:   she                                   
+  7792:   and                                       7770:   and                                   
+  7793: * I.                                        7771: * I                                     
+  7794:   So                                        7772: * .                                     
+  7795:   that                                      7773:   So                                    
+  7796:   ’s                                        7774:   that                                  
+
+False Positive (linebreak inserted left):
+ 10805:   for                                      10780:   for                                   
+ 10806:   my                                       10781:   my                                    
+ 10807: * M.                                       10782: * M.Sc.                                 
+ 10808: * Sc.                                      10783:   studies                               
+ 10809:   studies                                  10784:   ,                                     
+ 10810:   ,                                        10785:   and                                   
+
+False Positive (linebreak inserted left):
+ 12278:   and                                      12250:   and                                   
+ 12279:   the                                      12251:   the                                   
+ 12280: * U.                                       12252: * U.S                                   
+ 12281: * S                                        12253:   government                            
+ 12282:   government                               12254:   and                                   
+ 12283:   and                                      12255:   the                                   
+
+False Positive (linebreak inserted left):
+ 12434:   but                                      12405:   but                                   
+ 12435:   the                                      12406:   the                                   
+ 12436: * U.                                       12407: * U.S                                   
+ 12437: * S                                        12408:   would                                 
+ 12438:   would                                    12409:   n’t                                   
+ 12439:   n’t                                      12410:   consider                              
+
+False Positive (linebreak inserted left):
+ 12630:   discussed                                12600:   discussed                             
+ 12631:   in                                       12601:   in                                    
+ 12632: * U.                                       12602: * U.S                                   
+ 12633: * S                                        12603:   arms                                  
+ 12634:   arms                                     12604:   control                               
+ 12635:   control                                  12605:   journals                              
+
+False Positive (linebreak inserted left):
+ 12983:   in                                       12952:   in                                    
+ 12984:   the                                      12953:   the                                   
+ 12985: * 1930                                     12954: * 1930’s                                
+ 12986: * ’s                                       12955:   were                                  
+ 12987:   were                                     12956:   very                                  
+ 12988:   very                                     12957:   threatening                           
+
+False Positive (linebreak inserted left):
+ 13542:   ,                                        13509:   ,                                     
+ 13543:   and                                      13510:   and                                   
+ 13544: * Yahoo                                    13511: * Yahoo!                                
+ 13545: * !                                        13512:   .                                     
+ 13546:   .                                        13513:   Rick                                  
+ 13547:   Rick                                     13514:   Santorum                              
+
+False Positive (linebreak inserted left):
+ 13925:   are                                      13891:   are                                   
+ 13926:   shaken                                   13892:   shaken                                
+ 13927: * and                                      13893: * and/or                                
+ 13928: * /                                        13894:   poured                                
+ 13929:   or                                       13895:   into                                  
+ 13930:   poured                                   13896:   a                                     
+
+False Positive (linebreak inserted left):
+ 13926:   shaken                                   13891:   are                                   
+ 13927:   and                                      13892:   shaken                                
+ 13928: * /                                        13893: * and/or                                
+ 13929: * or                                       13894:   poured                                
+ 13930:   poured                                   13895:   into                                  
+ 13931:   into                                     13896:   a                                     
+
+False Positive (linebreak inserted left):
+ 13962:   Jezebel                                  13926:   Jezebel                               
+ 13963:   ,                                        13927:   ,                                     
+ 13964: * Metro                                    13928: * Metro.us                              
+ 13965: * .                                        13929:   ,                                     
+ 13966:   us                                       13930:   EDGE                                  
+ 13967:   ,                                        13931:   on                                    
+
+False Positive (linebreak inserted left):
+ 13963:   ,                                        13926:   Jezebel                               
+ 13964:   Metro                                    13927:   ,                                     
+ 13965: * .                                        13928: * Metro.us                              
+ 13966: * us                                       13929:   ,                                     
+ 13967:   ,                                        13930:   EDGE                                  
+ 13968:   EDGE                                     13931:   on                                    
+
+False Positive (linebreak inserted left):
+ 14605:   )                                        14566:   )                                     
+ 14606:   that                                     14567:   that                                  
+ 14607: * let                                      14568: * lets                                  
+ 14608: * s                                        14569:   them                                  
+ 14609:   them                                     14570:   live                                  
+ 14610:   live                                     14571:   where                                 
+
+False Positive (linebreak inserted left):
+ 16222:   ,                                        16181:   ,                                     
+ 16223:   the                                      16182:   the                                   
+ 16224: * O.                                       16183: * O.J.                                  
+ 16225: * J.                                       16184:   Simpson                               
+ 16226:   Simpson                                  16185:   ….                                    
+ 16227:   …                                        16186:   Yeah                                  
+
+False Positive (linebreak inserted left):
+ 16225:   J.                                       16183:   O.J.                                  
+ 16226:   Simpson                                  16184:   Simpson                               
+ 16227: * …                                        16185: * ….                                    
+ 16228: * .                                        16186:   Yeah                                  
+ 16229:   Yeah                                     16187:   ,                                     
+ 16230:   ,                                        16188:   I                                     
+
+False Positive (linebreak inserted left):
+ 16231:   I                                        16188:   I                                     
+ 16232:   see                                      16189:   see                                   
+ 16233: * O.                                       16190: * O.J.                                  
+ 16234: * J.                                       16191:   Simpson                               
+ 16235:   Simpson                                  16192:   .                                     
+ 16236:   .                                        16193:   What                                  
+
+False Positive (linebreak inserted left):
+ 18111:   the                                      18065:   the                                   
+ 18112:   morning                                  18066:   morning                               
+ 18113: * U.                                       18067: * U.S.                                  
+ 18114: * S.                                       18068:   time                                  
+ 18115:   time                                     18069:   .                                     
+ 18116:   .                                        18070:   So                                    
+
+False Positive (linebreak inserted left):
+ 19312:   wrote                                    19263:   wrote                                 
+ 19313:   my                                       19264:   my                                    
+ 19314: * 9/11                                     19265: * 9/11-related                          
+ 19315: * -related                                 19266:   poems                                 
+ 19316:   poems                                    19267:   ,                                     
+ 19317:   ,                                        19268:   that                                  
+
+False Negative (linebreak inserted right):
+ 19421:   As                                       19371:   As                                    
+ 19422:   one                                      19372:   one                                   
+ 19423: * thats                                    19373: * that                                  
+ 19424:   battled                                  19374: * s                                     
+ 19425:   hard                                     19375:   battled                               
+ 19426:   through                                  19376:   hard                                  
+
+False Positive (linebreak inserted left):
+ 19464:   shall                                    19415:   shall                                 
+ 19465:   be                                       19416:   be                                    
+ 19466: * it                                       19417: * it's                                  
+ 19467: * 's                                       19418:   reward                                
+ 19468:   reward                                   19419:   !                                     
+ 19469:   !                                        19420:   Do                                    
+
+False Negative (linebreak inserted right):
+ 19504:   team                                     19454:   team                                  
+ 19505:   today                                    19455:   today                                 
+ 19506: * ;(                                       19456: * ;                                     
+ 19507:   your                                     19457: * (                                     
+ 19508:   boys                                     19458:   your                                  
+ 19509:   in                                       19459:   boys                                  
+
+False Negative (linebreak inserted right):
+ 21642:   they                                     21591:   they                                  
+ 21643:   can                                      21592:   can                                   
+ 21644: * notformulate                             21593: * not                                   
+ 21645:   them                                     21594: * formulate                             
+ 21646:   in                                       21595:   them                                  
+ 21647:   the                                      21596:   in                                    
+
+False Positive (linebreak inserted left):
+ 22348:   from                                     22297:   from                                  
+ 22349:   comet                                    22298:   comet                                 
+ 22350: * 81P                                      22299: * 81P/Wild                              
+ 22351: * /                                        22300:   (                                     
+ 22352:   Wild                                     22301:   also                                  
+ 22353:   (                                        22302:   known                                 
+
+False Positive (linebreak inserted left):
+ 22349:   comet                                    22297:   from                                  
+ 22350:   81P                                      22298:   comet                                 
+ 22351: * /                                        22299: * 81P/Wild                              
+ 22352: * Wild                                     22300:   (                                     
+ 22353:   (                                        22301:   also                                  
+ 22354:   also                                     22302:   known                                 
+
+False Positive (linebreak inserted left):
+ 24109:   to                                       24054:   to                                    
+ 24110:   the                                      24055:   the                                   
+ 24111: * U.                                       24056: * U.N.                                  
+ 24112: * N.                                       24057:   headquarters                          
+ 24113:   headquarters                             24058:   in                                    
+ 24114:   in                                       24059:   New                                   
+
+False Positive (linebreak inserted left):
+ 26379:   such                                     26319:   such                                  
+ 26380:   as                                       26320:   as                                    
+ 26381: * alt.                                     26321: * alt.religion.scientology              
+ 26382: * religion                                 26322:   ,                                     
+ 26383:   .                                        26323:   which                                 
+ 26384:   scientology                              26324:   posted                                
+
+False Positive (linebreak inserted left):
+ 26380:   as                                       26319:   such                                  
+ 26381:   alt.                                     26320:   as                                    
+ 26382: * religion                                 26321: * alt.religion.scientology              
+ 26383: * .                                        26322:   ,                                     
+ 26384:   scientology                              26323:   which                                 
+ 26385:   ,                                        26324:   posted                                
+
+False Positive (linebreak inserted left):
+ 26381:   alt.                                     26319:   such                                  
+ 26382:   religion                                 26320:   as                                    
+ 26383: * .                                        26321: * alt.religion.scientology              
+ 26384: * scientology                              26322:   ,                                     
+ 26385:   ,                                        26323:   which                                 
+ 26386:   which                                    26324:   posted                                
+
+False Positive (linebreak inserted left):
+ 26585:   created                                  26522:   created                               
+ 26586:   to                                       26523:   to                                    
+ 26587: * overload                                 26524: * overload/create                       
+ 26588: * /                                        26525:   malformed                             
+ 26589:   create                                   26526:   strings                               
+ 26590:   malformed                                26527:   and                                   
+
+False Positive (linebreak inserted left):
+ 26586:   to                                       26522:   created                               
+ 26587:   overload                                 26523:   to                                    
+ 26588: * /                                        26524: * overload/create                       
+ 26589: * create                                   26525:   malformed                             
+ 26590:   malformed                                26526:   strings                               
+ 26591:   strings                                  26527:   and                                   
+
+False Positive (linebreak inserted left):
+ 26731:   Internet                                 26666:   Internet                              
+ 26732:   newsgroup                                26667:   newsgroup                             
+ 26733: * alt.                                     26668: * alt.religion.scientology              
+ 26734: * religion                                 26669:   were                                  
+ 26735:   .                                        26670:   critical                              
+ 26736:   scientology                              26671:   of                                    
+
+False Positive (linebreak inserted left):
+ 26732:   newsgroup                                26666:   Internet                              
+ 26733:   alt.                                     26667:   newsgroup                             
+ 26734: * religion                                 26668: * alt.religion.scientology              
+ 26735: * .                                        26669:   were                                  
+ 26736:   scientology                              26670:   critical                              
+ 26737:   were                                     26671:   of                                    
+
+False Positive (linebreak inserted left):
+ 26733:   alt.                                     26666:   Internet                              
+ 26734:   religion                                 26667:   newsgroup                             
+ 26735: * .                                        26668: * alt.religion.scientology              
+ 26736: * scientology                              26669:   were                                  
+ 26737:   were                                     26670:   critical                              
+ 26738:   critical                                 26671:   of                                    
+
+False Negative (linebreak inserted right):
+ 27072:   30                                       27003:   30                                    
+ 27073:   days                                     27004:   days                                  
+ 27074: * its                                      27005: * it                                    
+ 27075:   been                                     27006: * s                                     
+ 27076:   #                                        27007:   been                                  
+ 27077:   3                                        27008:   #                                     
+
+False Positive (linebreak inserted left):
+ 27589:   working                                  27520:   working                               
+ 27590:   from                                     27521:   from                                  
+ 27591: * 6:00                                     27522: * 6:00am                                
+ 27592: * am                                       27523:   to                                    
+ 27593:   to                                       27524:   midnight                              
+ 27594:   midnight                                 27525:   and                                   
+
+False Positive (linebreak inserted left):
+ 30128:   donation                                 30053:   donation                              
+ 30129:   .                                        30054:   .                                     
+ 30130: * K.                                       30055: * K.C.                                  
+ 30131: * C.                                       30056:   Maurer                                
+ 30132:   Maurer                                   30057:   ,                                     
+ 30133:   ,                                        30058:   chief                                 
+
+False Positive (linebreak inserted left):
+ 31665:   quite                                    31588:   quite                                 
+ 31666:   consistent                               31589:   consistent                            
+ 31667: * [                                        31590: * [...]                                 
+ 31668: * ...                                      31591:   the                                   
+ 31669:   ]                                        31592:   future                                
+ 31670:   the                                      31593:   of                                    
+
+False Positive (linebreak inserted left):
+ 31666:   consistent                               31588:   quite                                 
+ 31667:   [                                        31589:   consistent                            
+ 31668: * ...                                      31590: * [...]                                 
+ 31669: * ]                                        31591:   the                                   
+ 31670:   the                                      31592:   future                                
+ 31671:   future                                   31593:   of                                    
+
+False Positive (linebreak inserted left):
+ 31676:   very                                     31597:   very                                  
+ 31677:   different                                31598:   different                             
+ 31678: * [                                        31599: * [...]                                 
+ 31679: * ...                                      31600:   leading                               
+ 31680:   ]                                        31601:   to                                    
+ 31681:   leading                                  31602:   either                                
+
+False Positive (linebreak inserted left):
+ 31677:   different                                31597:   very                                  
+ 31678:   [                                        31598:   different                             
+ 31679: * ...                                      31599: * [...]                                 
+ 31680: * ]                                        31600:   leading                               
+ 31681:   leading                                  31601:   to                                    
+ 31682:   to                                       31602:   either                                
+
+False Positive (linebreak inserted left):
+ 31799:   .                                        31718:   .                                     
+ 31800:   The                                      31719:   The                                   
+ 31801: * U.                                       31720: * U.S.                                  
+ 31802: * S.                                       31721:   Department                            
+ 31803:   Department                               31722:   of                                    
+ 31804:   of                                       31723:   Agriculture                           
+
+False Positive (linebreak inserted left):
+ 31922:   .                                        31840:   .                                     
+ 31923:   The                                      31841:   The                                   
+ 31924: * U.                                       31842: * U.S.                                  
+ 31925: * S.                                       31843:   Environmental                         
+ 31926:   Environmental                            31844:   Protection                            
+ 31927:   Protection                               31845:   Agency                                
+
+False Positive (linebreak inserted left):
+ 31994:   crop                                     31911:   crop                                  
+ 31995:   yields                                   31912:   yields                                
+ 31996: * [                                        31913: * [...]                                 
+ 31997: * ...                                      31914:   Ozone                                 
+ 31998:   ]                                        31915:   is                                    
+ 31999:   Ozone                                    31916:   something                             
+
+False Positive (linebreak inserted left):
+ 31995:   yields                                   31911:   crop                                  
+ 31996:   [                                        31912:   yields                                
+ 31997: * ...                                      31913: * [...]                                 
+ 31998: * ]                                        31914:   Ozone                                 
+ 31999:   Ozone                                    31915:   is                                    
+ 32000:   is                                       31916:   something                             
+
+False Positive (linebreak inserted left):
+ 32064:   across                                   31979:   across                                
+ 32065:   the                                      31980:   the                                   
+ 32066: * U.                                       31981: * U.S.                                  
+ 32067: * S.                                       31982:   from                                  
+ 32068:   from                                     31983:   1980                                  
+ 32069:   1980                                     31984:   to                                    
+
+False Positive (linebreak inserted left):
+ 32070:   to                                       31984:   to                                    
+ 32071:   2012                                     31985:   2012                                  
+ 32072: * [                                        31986: * [...]                                 
+ 32073: * ...                                      31987:   However                               
+ 32074:   ]                                        31988:   ,                                     
+ 32075:   However                                  31989:   the                                   
+
+False Positive (linebreak inserted left):
+ 32071:   2012                                     31984:   to                                    
+ 32072:   [                                        31985:   2012                                  
+ 32073: * ...                                      31986: * [...]                                 
+ 32074: * ]                                        31987:   However                               
+ 32075:   However                                  31988:   ,                                     
+ 32076:   ,                                        31989:   the                                   
+
+False Positive (linebreak inserted left):
+ 32083:   in                                       31995:   in                                    
+ 32084:   the                                      31996:   the                                   
+ 32085: * U.                                       31997: * U.S.                                  
+ 32086: * S.                                       31998:   and                                   
+ 32087:   and                                      31999:   around                                
+ 32088:   around                                   32000:   the                                   
+
+False Positive (linebreak inserted left):
+ 33555:   in                                       33463:   in                                    
+ 33556:   the                                      33464:   the                                   
+ 33557: * U.                                       33465: * U.S.                                  
+ 33558: * S.                                       33466:   (                                     
+ 33559:   (                                        33467:   from                                  
+ 33560:   from                                     33468:   1890                                  
+
+False Positive (linebreak inserted left):
+ 33571:   Like                                     33478:   Like                                  
+ 33572:   most                                     33479:   most                                  
+ 33573: * U.                                       33480: * U.S.                                  
+ 33574: * S.                                       33481:   cities                                
+ 33575:   cities                                   33482:   ,                                     
+ 33576:   ,                                        33483:   Cleveland                             
+
+False Positive (linebreak inserted left):
+ 33594:   in                                       33500:   in                                    
+ 33595:   the                                      33501:   the                                   
+ 33596: * mid-                                     33502: * mid-1980s                             
+ 33597: * 1980s                                    33503:   ,                                     
+ 33598:   ,                                        33504:   Cleveland                             
+ 33599:   Cleveland                                33505:   earned                                
+
+False Positive (linebreak inserted left):
+ 33752:   building                                 33657:   building                              
+ 33753:   the                                      33658:   the                                   
+ 33754: * U.                                       33659: * U.S.                                  
+ 33755: * S.                                       33660:   industrial                            
+ 33756:   industrial                               33661:   base                                  
+ 33757:   base                                     33662:   ,                                     
+
+False Positive (linebreak inserted left):
+ 33885:   in                                       33789:   in                                    
+ 33886:   the                                      33790:   the                                   
+ 33887: * U.                                       33791: * U.S.                                  
+ 33888: * S.                                       33792:   (                                     
+ 33889:   (                                        33793:   Playhouse                             
+ 33890:   Playhouse                                33794:   Square                                
+
+False Positive (linebreak inserted left):
+ 34055:   specific                                 33957:   specific                              
+ 34056:   to                                       33958:   to                                    
+ 34057: * U.                                       33959: * U.S.                                  
+ 34058: * S.                                       33960:   citizens                              
+ 34059:   citizens                                 33961:   see                                   
+ 34060:   see                                      33962:   Americans                             
+
+False Positive (linebreak inserted left):
+ 34432:   If                                       34333:   If                                    
+ 34433:   you                                      34334:   you                                   
+ 34434: * can                                      34335: * cannot                                
+ 34435: * not                                      34336:   go                                    
+ 34436:   go                                       34337:   to                                    
+ 34437:   to                                       34338:   the                                   
+
+False Positive (linebreak inserted left):
+ 35205:   St.                                      35104:   St.                                   
+ 35206:   whether                                  35105:   whether                               
+ 35207: * s                                        35106: * s/he                                  
+ 35208: * /                                        35107:   can                                   
+ 35209:   he                                       35108:   let                                   
+ 35210:   can                                      35109:   you                                   
+
+False Positive (linebreak inserted left):
+ 35206:   whether                                  35104:   St.                                   
+ 35207:   s                                        35105:   whether                               
+ 35208: * /                                        35106: * s/he                                  
+ 35209: * he                                       35107:   can                                   
+ 35210:   can                                      35108:   let                                   
+ 35211:   let                                      35109:   you                                   
+
+False Positive (linebreak inserted left):
+ 35462:   transportation                           35359:   transportation                        
+ 35463:   or                                       35360:   or                                    
+ 35464: * air-port                                 35361: * air-port/train                        
+ 35465: * /                                        35362:   station                               
+ 35466:   train                                    35363:   services                              
+ 35467:   station                                  35364:   ,                                     
+
+False Positive (linebreak inserted left):
+ 35463:   or                                       35359:   transportation                        
+ 35464:   air-port                                 35360:   or                                    
+ 35465: * /                                        35361: * air-port/train                        
+ 35466: * train                                    35362:   station                               
+ 35467:   station                                  35363:   services                              
+ 35468:   services                                 35364:   ,                                     
+
+False Positive (linebreak inserted left):
+ 35487:   1                                        35382:   1                                     
+ 35488:   201                                      35383:   201                                   
+ 35489: * 944                                      35384: * 944-3737                              
+ 35490: * -                                        35385:   .                                     
+ 35491:   3737                                     35386:   Babe                                  
+ 35492:   .                                        35387:   's                                    
+
+False Positive (linebreak inserted left):
+ 35488:   201                                      35382:   1                                     
+ 35489:   944                                      35383:   201                                   
+ 35490: * -                                        35384: * 944-3737                              
+ 35491: * 3737                                     35385:   .                                     
+ 35492:   .                                        35386:   Babe                                  
+ 35493:   Babe                                     35387:   's                                    
+
+False Positive (linebreak inserted left):
+ 35502:   1                                        35395:   1                                     
+ 35503:   201                                      35396:   201                                   
+ 35504: * 944                                      35397: * 944-6800                              
+ 35505: * -                                        35398:   .                                     
+ 35506:   6800                                     35399:   G                                     
+ 35507:   .                                        35400:   W                                     
+
+False Positive (linebreak inserted left):
+ 35503:   201                                      35395:   1                                     
+ 35504:   944                                      35396:   201                                   
+ 35505: * -                                        35397: * 944-6800                              
+ 35506: * 6800                                     35398:   .                                     
+ 35507:   .                                        35399:   G                                     
+ 35508:   G                                        35400:   W                                     
+
+False Positive (linebreak inserted left):
+ 35517:   1                                        35408:   1                                     
+ 35518:   201                                      35409:   201                                   
+ 35519: * 363                                      35410: * 363-0555                              
+ 35520: * -                                        35411:   .                                     
+ 35521:   0555                                     35412:   See                                   
+ 35522:   .                                        35413:   Fort                                  
+
+False Positive (linebreak inserted left):
+ 35518:   201                                      35408:   1                                     
+ 35519:   363                                      35409:   201                                   
+ 35520: * -                                        35410: * 363-0555                              
+ 35521: * 0555                                     35411:   .                                     
+ 35522:   .                                        35412:   See                                   
+ 35523:   See                                      35413:   Fort                                  
+
+False Positive (linebreak inserted left):
+ 35577:   winter                                   35466:   winter                                
+ 35578:   of                                       35467:   of                                    
+ 35579: * 1776                                     35468: * 1776-77                               
+ 35580: * -                                        35469:   in                                    
+ 35581:   77                                       35470:   the                                   
+ 35582:   in                                       35471:   protection                            
+
+False Positive (linebreak inserted left):
+ 35578:   of                                       35466:   winter                                
+ 35579:   1776                                     35467:   of                                    
+ 35580: * -                                        35468: * 1776-77                               
+ 35581: * 77                                       35469:   in                                    
+ 35582:   in                                       35470:   the                                   
+ 35583:   the                                      35471:   protection                            
+
+False Positive (linebreak inserted left):
+ 35636:   1                                        35523:   1                                     
+ 35637:   201                                      35524:   201                                   
+ 35638: * 461                                      35525: * 461-1776                              
+ 35639: * -                                        35526:   .                                     
+ 35640:   1776                                     35527:   Revolutionary                         
+ 35641:   .                                        35528:   re-enactments                         
+
+False Positive (linebreak inserted left):
+ 35637:   201                                      35523:   1                                     
+ 35638:   461                                      35524:   201                                   
+ 35639: * -                                        35525: * 461-1776                              
+ 35640: * 1776                                     35526:   .                                     
+ 35641:   .                                        35527:   Revolutionary                         
+ 35642:   Revolutionary                            35528:   re-enactments                         
+
+False Positive (linebreak inserted left):
+ 35798:   :                                        35683:   :                                     
+ 35799:   1                                        35684:   1                                     
+ 35800: * 201                                      35685: * 201-592-4699                          
+ 35801: * -                                        35686:   ,                                     
+ 35802:   592                                      35687:   contact                               
+ 35803:   -                                        35688:   for                                   
+
+False Positive (linebreak inserted left):
+ 35799:   1                                        35683:   :                                     
+ 35800:   201                                      35684:   1                                     
+ 35801: * -                                        35685: * 201-592-4699                          
+ 35802: * 592                                      35686:   ,                                     
+ 35803:   -                                        35687:   contact                               
+ 35804:   4699                                     35688:   for                                   
+
+False Positive (linebreak inserted left):
+ 35800:   201                                      35683:   :                                     
+ 35801:   -                                        35684:   1                                     
+ 35802: * 592                                      35685: * 201-592-4699                          
+ 35803: * -                                        35686:   ,                                     
+ 35804:   4699                                     35687:   contact                               
+ 35805:   ,                                        35688:   for                                   
+
+False Positive (linebreak inserted left):
+ 35801:   -                                        35683:   :                                     
+ 35802:   592                                      35684:   1                                     
+ 35803: * -                                        35685: * 201-592-4699                          
+ 35804: * 4699                                     35686:   ,                                     
+ 35805:   ,                                        35687:   contact                               
+ 35806:   contact                                  35688:   for                                   
+
+False Positive (linebreak inserted left):
+ 35859:   ,                                        35740:   ,                                     
+ 35860:   1                                        35741:   1                                     
+ 35861: * 201                                      35742: * 201-224-7900                          
+ 35862: * -                                        35743:   .                                     
+ 35863:   224                                      35744:   Store                                 
+ 35864:   -                                        35745:   hours                                 
+
+False Positive (linebreak inserted left):
+ 35860:   1                                        35740:   ,                                     
+ 35861:   201                                      35741:   1                                     
+ 35862: * -                                        35742: * 201-224-7900                          
+ 35863: * 224                                      35743:   .                                     
+ 35864:   -                                        35744:   Store                                 
+ 35865:   7900                                     35745:   hours                                 
+
+False Positive (linebreak inserted left):
+ 35861:   201                                      35740:   ,                                     
+ 35862:   -                                        35741:   1                                     
+ 35863: * 224                                      35742: * 201-224-7900                          
+ 35864: * -                                        35743:   .                                     
+ 35865:   7900                                     35744:   Store                                 
+ 35866:   .                                        35745:   hours                                 
+
+False Positive (linebreak inserted left):
+ 35862:   -                                        35740:   ,                                     
+ 35863:   224                                      35741:   1                                     
+ 35864: * -                                        35742: * 201-224-7900                          
+ 35865: * 7900                                     35743:   .                                     
+ 35866:   .                                        35744:   Store                                 
+ 35867:   Store                                    35745:   hours                                 
+
+False Positive (linebreak inserted left):
+ 36930:   and                                      36805:   and                                   
+ 36931:   industrial                               36806:   industrial                            
+ 36932: * 19th                                     36807: * 19th-century                          
+ 36933: * -century                                 36808:   architecture                          
+ 36934:   architecture                             36809:   including                             
+ 36935:   including                                36810:   some                                  
+
+False Positive (linebreak inserted left):
+ 38985:   PHX                                      38857:   PHX                                   
+ 38986:   )                                        38858:   )                                     
+ 38987: * +1602275                                 38859: * +1602275-4958                         
+ 38988: * -                                        38860:   is                                    
+ 38989:   4958                                     38861:   the                                   
+ 38990:   is                                       38862:   main                                  
+
+False Positive (linebreak inserted left):
+ 38986:   )                                        38857:   PHX                                   
+ 38987:   +1602275                                 38858:   )                                     
+ 38988: * -                                        38859: * +1602275-4958                         
+ 38989: * 4958                                     38860:   is                                    
+ 38990:   is                                       38861:   the                                   
+ 38991:   the                                      38862:   main                                  
+
+False Negative (linebreak inserted right):
+ 40035:   blooming                                 39904:   blooming                              
+ 40036:   elephant                                 39905:   elephant                              
+ 40037: * leg.                                     39906: * leg                                   
+ 40038:   Also                                     39907: * .                                     
+ 40039:   found                                    39908:   Also                                  
+ 40040:   in                                       39909:   found                                 
+
+False Negative (linebreak inserted right):
+ 40390:   trove                                    40259:   trove                                 
+ 40391:   of                                       40260:   of                                    
+ 40392: * art.                                     40261: * art                                   
+ 40393:   Get                                      40262: * .                                     
+ 40394:   in                                       40263:   Get                                   
+ 40395:   By                                       40264:   in                                    
+
+False Positive (linebreak inserted left):
+ 40422:   in                                       40292:   in                                    
+ 40423:   the                                      40293:   the                                   
+ 40424: * U.                                       40294: * U.S.                                  
+ 40425: * S.                                       40295:   It                                    
+ 40426:   It                                       40296:   is                                    
+ 40427:   is                                       40297:   a                                     
+
+False Positive (linebreak inserted left):
+ 40470:   Jones                                    40339:   Jones                                 
+ 40471:   ,                                        40340:   ,                                     
+ 40472: * Jr                                       40341: * Jr.                                   
+ 40473: * .                                        40342:   Airport                               
+ 40474:   Airport                                  40343:   (                                     
+ 40475:   (                                        40344:   IATA                                  
+
+False Positive (linebreak inserted left):
+ 40680:   Bus                                      40548:   Bus                                   
+ 40681:   Lines                                    40549:   Lines                                 
+ 40682: * +1918584                                 40550: * +1918584-4428                         
+ 40683: * -                                        40551:   ,                                     
+ 40684:   4428                                     40552:   317                                   
+ 40685:   ,                                        40553:   S                                     
+
+False Positive (linebreak inserted left):
+ 40681:   Lines                                    40548:   Bus                                   
+ 40682:   +1918584                                 40549:   Lines                                 
+ 40683: * -                                        40550: * +1918584-4428                         
+ 40684: * 4428                                     40551:   ,                                     
+ 40685:   ,                                        40552:   317                                   
+ 40686:   317                                      40553:   S                                     
+
+False Positive (linebreak inserted left):
+ 40687:   S                                        40553:   S                                     
+ 40688:   Detroit                                  40554:   Detroit                               
+ 40689: * Ave                                      40555: * Ave.                                  
+ 40690: * .                                        40556:   (                                     
+ 40691:   (                                        40557:   downtown                              
+ 40692:   downtown                                 40558:   )                                     
+
+False Positive (linebreak inserted left):
+ 40819:   The                                      40684:   The                                   
+ 40820:   "                                        40685:   "                                     
+ 40821: * B.                                       40686: * B.A.                                  
+ 40822: * A.                                       40687:   "                                     
+ 40823:   "                                        40688:   )                                     
+ 40824:   )                                        40689:   ,                                     
+
+False Positive (linebreak inserted left):
+ 42404:   be                                       42266:   be                                    
+ 42405:   aggressive                               42267:   aggressive                            
+ 42406: * –                                        42268: * ––                                    
+ 42407: * –                                        42269:   just                                  
+ 42408:   just                                     42270:   skeptical                             
+ 42409:   skeptical                                42271:   and                                   
+
+False Positive (linebreak inserted left):
+ 42848:   serious                                  42709:   serious                               
+ 42849:   '                                        42710:   '                                     
+ 42850: * my-way                                   42711: * my-way's-the-only-way                 
+ 42851: * 's                                       42712:   '                                     
+ 42852:   -the-only-way                            42713:   attitude                              
+ 42853:   '                                        42714:   .                                     
+
+False Positive (linebreak inserted left):
+ 42849:   '                                        42709:   serious                               
+ 42850:   my-way                                   42710:   '                                     
+ 42851: * 's                                       42711: * my-way's-the-only-way                 
+ 42852: * -the-only-way                            42712:   '                                     
+ 42853:   '                                        42713:   attitude                              
+ 42854:   attitude                                 42714:   .                                     
+
+False Positive (linebreak inserted left):
+ 43235:   the                                      43093:   the                                   
+ 43236:   early                                    43094:   early                                 
+ 43237: * 1600                                     43095: * 1600's                                
+ 43238: * 's                                       43096:   ,                                     
+ 43239:   ,                                        43097:   and                                   
+ 43240:   and                                      43098:   early                                 
+
+False Negative (linebreak inserted right):
+ 43968:   the                                      43824:   the                                   
+ 43969:   same                                     43825:   same                                  
+ 43970: * herb.                                    43826: * herb                                  
+ 43971:   This                                     43827: * .                                     
+ 43972:   article                                  43828:   This                                  
+ 43973:   outlines                                 43829:   article                               
+
+False Positive (linebreak inserted left):
+ 46646:   comes                                    46500:   comes                                 
+ 46647:   to                                       46501:   to                                    
+ 46648: * I                                        46502: * IM                                    
+ 46649: * M                                        46503:   flirting                              
+ 46650:   flirting                                 46504:   —                                     
+ 46651:   —                                        46505:   if                                    
+
+False Positive (linebreak inserted left):
+ 46666:   you                                      46519:   you                                   
+ 46667:   ,                                        46520:   ,                                     
+ 46668: * s                                        46521: * s/he                                  
+ 46669: * /                                        46522:   always                                
+ 46670:   he                                       46523:   has                                   
+ 46671:   always                                   46524:   the                                   
+
+False Positive (linebreak inserted left):
+ 46667:   ,                                        46519:   you                                   
+ 46668:   s                                        46520:   ,                                     
+ 46669: * /                                        46521: * s/he                                  
+ 46670: * he                                       46522:   always                                
+ 46671:   always                                   46523:   has                                   
+ 46672:   has                                      46524:   the                                   
+
+False Positive (linebreak inserted left):
+ 46868:   .                                        46719:   .                                     
+ 46869:   When                                     46720:   When                                  
+ 46870: * s                                        46721: * s/he                                  
+ 46871: * /                                        46722:   responds                              
+ 46872:   he                                       46723:   ,                                     
+ 46873:   responds                                 46724:   add                                   
+
+False Positive (linebreak inserted left):
+ 46869:   When                                     46719:   .                                     
+ 46870:   s                                        46720:   When                                  
+ 46871: * /                                        46721: * s/he                                  
+ 46872: * he                                       46722:   responds                              
+ 46873:   responds                                 46723:   ,                                     
+ 46874:   ,                                        46724:   add                                   
+
+False Positive (linebreak inserted left):
+ 47295:   world                                    47144:   world                                 
+ 47296:   of                                       47145:   of                                    
+ 47297: * I                                        47146: * IM                                    
+ 47298: * M                                        47147:   flirting                              
+ 47299:   flirting                                 47148:   as                                    
+ 47300:   as                                       47149:   well                                  
+
+False Positive (linebreak inserted left):
+ 47620:   you                                      47467:   you                                   
+ 47621:   've                                      47468:   've                                   
+ 47622: * got                                      47469: * gotta                                 
+ 47623: * ta                                       47470:   let                                   
+ 47624:   let                                      47471:   your                                  
+ 47625:   your                                     47472:   inner                                 
+
+False Positive (linebreak inserted left):
+ 48952:   and                                      48797:   and                                   
+ 48953:   your                                     48798:   your                                  
+ 48954: * friend                                   48799: * friend(s)                             
+ 48955: * (                                        48800:   all                                   
+ 48956:   s                                        48801:   follow                                
+ 48957:   )                                        48802:   a                                     
+
+False Positive (linebreak inserted left):
+ 48953:   your                                     48797:   and                                   
+ 48954:   friend                                   48798:   your                                  
+ 48955: * (                                        48799: * friend(s)                             
+ 48956: * s                                        48800:   all                                   
+ 48957:   )                                        48801:   follow                                
+ 48958:   all                                      48802:   a                                     
+
+False Positive (linebreak inserted left):
+ 48954:   friend                                   48797:   and                                   
+ 48955:   (                                        48798:   your                                  
+ 48956: * s                                        48799: * friend(s)                             
+ 48957: * )                                        48800:   all                                   
+ 48958:   all                                      48801:   follow                                
+ 48959:   follow                                   48802:   a                                     
+
+False Negative (linebreak inserted right):
+ 49059:   may                                      48901:   may                                   
+ 49060:   ,                                        48902:   ,                                     
+ 49061: * etc.                                     48903: * etc                                   
+ 49062:   When                                     48904: * .                                     
+ 49063:   starting                                 48905:   When                                  
+ 49064:   off                                      48906:   starting                              
+
+False Negative (linebreak inserted right):
+ 50043:   it                                       49885:   it                                    
+ 50044:   again                                    49886:   again                                 
+ 50045: * !!!                                      49887: * !                                     
+ 50046:   Set                                      49888: * !                                     
+ 50047:   aside                                    49889:   !                                     
+ 50048:   an                                       49890:   Set                                   
+
+False Negative (linebreak inserted right):
+ 50043:   it                                       49886:   again                                 
+ 50044:   again                                    49887:   !                                     
+ 50045: * !!!                                      49888: * !                                     
+ 50046:   Set                                      49889: * !                                     
+ 50047:   aside                                    49890:   Set                                   
+ 50048:   an                                       49891:   aside                                 
+
+False Positive (linebreak inserted left):
+ 50513:   that                                     50356:   that                                  
+ 50514:   you                                      50357:   you                                   
+ 50515: * can                                      50358: * cannot                                
+ 50516: * not                                      50359:   open                                  
+ 50517:   open                                     50360:   either                                
+ 50518:   either                                   50361:   of                                    
+
+False Negative (linebreak inserted right):
+ 52990:   ball                                     52830:   ball                                  
+ 52991:   ,                                        52831:   ,                                     
+ 52992: * etc.                                     52832: * etc                                   
+ 52993:   )                                        52833: * .                                     
+ 52994:   1                                        52834:   )                                     
+ 52995:   Snitch                                   52835:   1                                     
+
+False Positive (linebreak inserted left):
+ 53767:   to                                       53607:   to                                    
+ 53768:   a                                        53608:   a                                     
+ 53769: * 8-by                                     53609: * 8-by-8-inch                           
+ 53770: * -                                        53610:   baking                                
+ 53771:   8-inch                                   53611:   dish                                  
+ 53772:   baking                                   53612:   .                                     
+
+False Positive (linebreak inserted left):
+ 53768:   a                                        53607:   to                                    
+ 53769:   8-by                                     53608:   a                                     
+ 53770: * -                                        53609: * 8-by-8-inch                           
+ 53771: * 8-inch                                   53610:   baking                                
+ 53772:   baking                                   53611:   dish                                  
+ 53773:   dish                                     53612:   .                                     
+
+__________________________________________________________________________________________________
+tmp/en_gum-ud-dev.txt                             ../data/GUM/tokenized/en_gum-ud-dev.txt         
+
+False Positive (linebreak inserted left):
+    41:   Dutch                                       41:   Dutch                                 
+    42:   speaking                                    42:   speaking                              
+    43: * DH                                          43: * DH+Lib                                
+    44: * +                                           44:   community                             
+    45:   Lib                                         45:   in                                    
+    46:   community                                   46:   the                                   
+
+False Positive (linebreak inserted left):
+    42:   speaking                                    41:   Dutch                                 
+    43:   DH                                          42:   speaking                              
+    44: * +                                           43: * DH+Lib                                
+    45: * Lib                                         44:   community                             
+    46:   community                                   45:   in                                    
+    47:   in                                          46:   the                                   
+
+False Negative (linebreak inserted right):
+   633:   teaching                                   631:   teaching                              
+   634:   /                                          632:   /                                     
+   635: * learningactivities                         633: * learning                              
+   636:   stay                                       634: * activities                            
+   637:   aligned                                    635:   stay                                  
+   638:   .                                          636:   aligned                               
+
+False Positive (linebreak inserted left):
+  1330:   past                                      1328:   past                                  
+  1331:   of                                        1329:   of                                    
+  1332: * S.                                        1330: * S.F.                                  
+  1333: * F.                                        1331:   ,                                     
+  1334:   ,                                         1332:   Cal.                                  
+  1335:   Cal.                                      1333:   ,                                     
+
+False Positive (linebreak inserted left):
+  1342:   of                                        1339:   of                                    
+  1343:   these                                     1340:   these                                 
+  1344: * U.                                        1341: * U.S.                                  
+  1345: * S.                                        1342:   ;                                     
+  1346:   ;                                         1343:   and                                   
+  1347:   and                                       1344:   in                                    
+
+False Positive (linebreak inserted left):
+  1651:   of                                        1647:   of                                    
+  1652:   the                                       1648:   the                                   
+  1653: * U.                                        1649: * U.S.                                  
+  1654: * S.                                        1650:   Congress                              
+  1655:   Congress                                  1651:   :                                     
+  1656:   :                                         1652:   WHEREAS                               
+
+False Positive (linebreak inserted left):
+  3318:   high                                      3311:   high                                  
+  3319:   as                                        3312:   as                                    
+  3320: * US                                        3313: * US$                                   
+  3321: * $                                         3314:   10                                    
+  3322:   10                                        3315:   billion                               
+  3323:   billion                                   3316:   .                                     
+
+False Positive (linebreak inserted left):
+  3542:   .                                         3534:   .                                     
+  3543:   I                                         3535:   I                                     
+  3544: * can                                       3536: * cannot                                
+  3545: * not                                       3537:   comment                               
+  3546:   comment                                   3538:   directly                              
+  3547:   directly                                  3539:   on                                    
+
+False Positive (linebreak inserted left):
+  4555:   ?                                         4544:   ?                                     
+  4556:   Armies                                    4545:   Armies                                
+  4557: * can                                       4546: * cannot                                
+  4558: * not                                       4547:   conquer                               
+  4559:   conquer                                   4548:   science                               
+  4560:   science                                   4549:   .                                     
+
+False Positive (linebreak inserted left):
+  4561:   .                                         4549:   .                                     
+  4562:   Customs                                   4550:   Customs                               
+  4563: * can                                       4551: * cannot                                
+  4564: * not                                       4552:   check                                 
+  4565:   check                                     4553:   what                                  
+  4566:   what                                      4554:   a                                     
+
+False Positive (linebreak inserted left):
+  4734:   ?                                         4721:   ?                                     
+  4735:   They                                      4722:   They                                  
+  4736: * can                                       4723: * cannot                                
+  4737: * not                                       4724:   .                                     
+  4738:   .                                         4725:   Sooner                                
+  4739:   Sooner                                    4726:   or                                    
+
+False Positive (linebreak inserted left):
+  5193:   But                                       5179:   But                                   
+  5194:   you                                       5180:   you                                   
+  5195: * can                                       5181: * cannot                                
+  5196: * not                                       5182:   repeat                                
+  5197:   repeat                                    5183:   mistakes                              
+  5198:   mistakes                                  5184:   because                               
+
+False Negative (linebreak inserted right):
+  5463:   the                                       5447:   the                                   
+  5464:   Sea                                       5448:   Sea                                   
+  5465: * Org.                                      5449: * Org                                   
+  5466:   Montalvo                                  5450: * .                                     
+  5467:   is                                        5451:   Montalvo                              
+  5468:   holding                                   5452:   is                                    
+
+False Negative (linebreak inserted right):
+  5511:   the                                       5496:   the                                   
+  5512:   Sea                                       5497:   Sea                                   
+  5513: * Org.                                      5498: * Org                                   
+  5514:   He                                        5499: * .                                     
+  5515:   was                                       5500:   He                                    
+  5516:   released                                  5501:   was                                   
+
+False Positive (linebreak inserted left):
+  5516:   released                                  5502:   released                              
+  5517:   on                                        5503:   on                                    
+  5518: * US                                        5504: * US$                                   
+  5519: * $                                         5505:   20,000                                
+  5520:   20,000                                    5506:   bail                                  
+  5521:   bail                                      5507:   on                                    
+
+False Negative (linebreak inserted right):
+  5739:   the                                       5724:   the                                   
+  5740:   Sea                                       5725:   Sea                                   
+  5741: * Org.                                      5726: * Org                                   
+  5742:   Scientology                               5727: * .                                     
+  5743:   officials                                 5728:   Scientology                           
+  5744:   have                                      5729:   officials                             
+
+False Positive (linebreak inserted left):
+  6130:   the                                       6116:   the                                   
+  6131:   East                                      6117:   East                                  
+  6132: * L.                                        6118: * L.A.                                  
+  6133: * A.                                        6119:   station                               
+  6134:   station                                   6120:   and                                   
+  6135:   and                                       6121:   turned                                
+
+False Positive (linebreak inserted left):
+  6229:   sins                                      6214:   sins                                  
+  6230:   :                                         6215:   :                                     
+  6231: * a                                         6216: * a)                                    
+  6232: * )                                         6217:   Leaving                               
+  6233:   Leaving                                   6218:   a                                     
+  6234:   a                                         6219:   lifehood                              
+
+False Positive (linebreak inserted left):
+  6246:   world                                     6230:   world                                 
+  6247:   .                                         6231:   .                                     
+  6248: * b                                         6232: * b)                                    
+  6249: * )                                         6233:   Refusing                              
+  6250:   Refusing                                  6234:   -                                     
+  6251:   -                                         6235:   despite                               
+
+False Negative (linebreak inserted right):
+  7703:   what                                      7684:   what                                  
+  7704:   they                                      7685:   they                                  
+  7705: * found.                                    7686: * found                                 
+  7706:   "                                         7687: * .                                     
+  7707:   Pregnant                                  7688:   "                                     
+  7708:   women                                     7689:   Pregnant                              
+
+False Negative (linebreak inserted right):
+  9293:   population                                9273:   population                            
+  9294:   of                                        9274:   of                                    
+  9295: * Coron.                                    9275: * Coron                                 
+  9296:   In                                        9276: * .                                     
+  9297:   1902                                      9277:   In                                    
+  9298:   that                                      9278:   1902                                  
+
+False Negative (linebreak inserted right):
+  9317:   Coron                                     9298:   Coron                                 
+  9318:   to                                        9299:   to                                    
+  9319: * Coron.                                    9300: * Coron                                 
+  9320:   From                                      9301: * .                                     
+  9321:   1939                                      9302:   From                                  
+  9322:   to                                        9303:   1939                                  
+
+False Negative (linebreak inserted right):
+  9720:   is                                        9701:   is                                    
+  9721:   430                                       9702:   430                                   
+  9722: * kmsouth                                   9703: * km                                    
+  9723:   of                                        9704: * south                                 
+  9724:   Tehran                                    9705:   of                                    
+  9725:   at                                        9706:   Tehran                                
+
+False Positive (linebreak inserted left):
+  9909:   c.                                        9891:   c.                                    
+  9910:   IRR                                       9892:   IRR                                   
+  9911: * 200                                       9893: * 200,000                               
+  9912: * ,                                         9894:   to                                    
+  9913:   000to                                     9895:   the                                   
+  9914:   the                                       9896:   city                                  
+
+False Positive (linebreak inserted left):
+  9910:   IRR                                       9891:   c.                                    
+  9911:   200                                       9892:   IRR                                   
+  9912: * ,                                         9893: * 200,000                               
+  9913: * 000to                                     9894:   to                                    
+  9914:   the                                       9895:   the                                   
+  9915:   city                                      9896:   city                                  
+
+False Negative (linebreak inserted right):
+  9911:   200                                       9891:   c.                                    
+  9912:   ,                                         9892:   IRR                                   
+  9913: * 000to                                     9893: * 200,000                               
+  9914:   the                                       9894: * to                                    
+  9915:   city                                      9895:   the                                   
+  9916:   centre                                    9896:   city                                  
+
+False Positive (linebreak inserted left):
+ 10196:   Shah                                     10177:   Shah                                  
+ 10197:   Abbas                                    10178:   Abbas                                 
+ 10198: * I.                                       10179: * I.=                                   
+ 10199: * =                                        10180:   and                                   
+ 10200:   and                                      10181:   designed                              
+ 10201:   designed                                 10182:   by                                    
+
+False Positive (linebreak inserted left):
+ 10560:   guests                                   10540:   guests                                
+ 10561:   .                                        10541:   .                                     
+ 10562: * It                                       10542: * It's                                  
+ 10563: * 's                                       10543:   Persian                               
+ 10564:   Persian                                  10544:   Gardens                               
+ 10565:   Gardens                                  10545:   is                                    
+
+False Positive (linebreak inserted left):
+ 11377:   is                                       11355:   is                                    
+ 11378:   your                                     11356:   your                                  
+ 11379: * friend                                   11357: * friend(s)                             
+ 11380: * (                                        11358:   .                                     
+ 11381:   s                                        11359:   [                                     
+ 11382:   )                                        11360:   6                                     
+
+False Positive (linebreak inserted left):
+ 11378:   your                                     11355:   is                                    
+ 11379:   friend                                   11356:   your                                  
+ 11380: * (                                        11357: * friend(s)                             
+ 11381: * s                                        11358:   .                                     
+ 11382:   )                                        11359:   [                                     
+ 11383:   .                                        11360:   6                                     
+
+False Positive (linebreak inserted left):
+ 11379:   friend                                   11355:   is                                    
+ 11380:   (                                        11356:   your                                  
+ 11381: * s                                        11357: * friend(s)                             
+ 11382: * )                                        11358:   .                                     
+ 11383:   .                                        11359:   [                                     
+ 11384:   [                                        11360:   6                                     
+
+False Positive (linebreak inserted left):
+ 11551:   pauses                                   11526:   pauses                                
+ 11552:   or                                       11527:   or                                    
+ 11553: * “                                        11528: * “ah”s                                 
+ 11554: * ah                                       11529:   or                                    
+ 11555:   ”                                        11530:   “um”s                                 
+ 11556:   s                                        11531:   ,                                     
+
+False Positive (linebreak inserted left):
+ 11552:   or                                       11526:   pauses                                
+ 11553:   “                                        11527:   or                                    
+ 11554: * ah                                       11528: * “ah”s                                 
+ 11555: * ”                                        11529:   or                                    
+ 11556:   s                                        11530:   “um”s                                 
+ 11557:   or                                       11531:   ,                                     
+
+False Positive (linebreak inserted left):
+ 11553:   “                                        11526:   pauses                                
+ 11554:   ah                                       11527:   or                                    
+ 11555: * ”                                        11528: * “ah”s                                 
+ 11556: * s                                        11529:   or                                    
+ 11557:   or                                       11530:   “um”s                                 
+ 11558:   “                                        11531:   ,                                     
+
+False Positive (linebreak inserted left):
+ 11556:   s                                        11528:   “ah”s                                 
+ 11557:   or                                       11529:   or                                    
+ 11558: * “                                        11530: * “um”s                                 
+ 11559: * um                                       11531:   ,                                     
+ 11560:   ”                                        11532:   your                                  
+ 11561:   s                                        11533:   joke                                  
+
+False Positive (linebreak inserted left):
+ 11557:   or                                       11528:   “ah”s                                 
+ 11558:   “                                        11529:   or                                    
+ 11559: * um                                       11530: * “um”s                                 
+ 11560: * ”                                        11531:   ,                                     
+ 11561:   s                                        11532:   your                                  
+ 11562:   ,                                        11533:   joke                                  
+
+False Positive (linebreak inserted left):
+ 11558:   “                                        11528:   “ah”s                                 
+ 11559:   um                                       11529:   or                                    
+ 11560: * ”                                        11530: * “um”s                                 
+ 11561: * s                                        11531:   ,                                     
+ 11562:   ,                                        11532:   your                                  
+ 11563:   your                                     11533:   joke                                  
+
+False Positive (linebreak inserted left):
+ 12554:   decide                                   12521:   decide                                
+ 12555:   which                                    12522:   which                                 
+ 12556: * flavor                                   12523: * flavor(s)                             
+ 12557: * (                                        12524:   you                                   
+ 12558:   s                                        12525:   like                                  
+ 12559:   )                                        12526:   best                                  
+
+False Positive (linebreak inserted left):
+ 12555:   which                                    12521:   decide                                
+ 12556:   flavor                                   12522:   which                                 
+ 12557: * (                                        12523: * flavor(s)                             
+ 12558: * s                                        12524:   you                                   
+ 12559:   )                                        12525:   like                                  
+ 12560:   you                                      12526:   best                                  
+
+False Positive (linebreak inserted left):
+ 12556:   flavor                                   12521:   decide                                
+ 12557:   (                                        12522:   which                                 
+ 12558: * s                                        12523: * flavor(s)                             
+ 12559: * )                                        12524:   you                                   
+ 12560:   you                                      12525:   like                                  
+ 12561:   like                                     12526:   best                                  
+
+False Positive (linebreak inserted left):
+ 13082:   it                                       13046:   it                                    
+ 13083:   ,                                        13047:   ,                                     
+ 13084: * let                                      13048: * lets                                  
+ 13085: * s                                        13049:   you                                   
+ 13086:   you                                      13050:   get                                   
+ 13087:   get                                      13051:   some                                  
+
