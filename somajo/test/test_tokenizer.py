@@ -1002,3 +1002,9 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_19(self):
         self._equal("foo bar--my favourite---gave me", "foo bar -- my favourite --- gave me")
+
+    def test_english_20(self):
+        self._equal("this is anti-foobar baz", "this is anti-foobar baz")
+
+    def test_english_21(self):
+        self._equal("this is anty-foobar baz", "this is anty - foobar baz")
