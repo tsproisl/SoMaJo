@@ -1,0 +1,10 @@
+# Hyphenated words in the following list are not split into multiple tokens.
+
+mm-hm
+mm-mm
+o-kay
+uh-huh
+uh-oh
+x-ray
+x-rayed
+x-rays
