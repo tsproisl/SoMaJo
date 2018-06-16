@@ -257,12 +257,20 @@ class Tokenizer(object):
                                    r"\b(are)(nt)\b", r"\b(is)(nt)\b", r"\b(wo)(nt)\b",
                                    r"\b(let)(s)\b", r"\b(ai)(nt)\b"]
         en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
-        # w/o, w/out, b/c, b/t, l/c, w/
-        self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c)\b|\bw/(?!\w)", re.IGNORECASE)
+        # w/o, w/out, b/c, b/t, l/c, w/, d/c, u/s
+        self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c|d/c|u/s)\b|\bw/(?!\w)", re.IGNORECASE)
         # word--word
         self.en_double_hyphen = re.compile(r"(?<=\w)--+(?=\w)")
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
+        # English hyphenated words
+        if self.language == "en":
+            nonbreaking_prefixes = utils.read_abbreviation_file("non-breaking_prefixes_%s.txt" % self.language)
+            nonbreaking_suffixes = utils.read_abbreviation_file("non-breaking_suffixes_%s.txt" % self.language)
+            nonbreaking_words = utils.read_abbreviation_file("non-breaking_hyphenated_words_%s.txt" % self.language)
+            self.en_nonbreaking_prefixes = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_prefixes]) + r")-\w+", re.IGNORECASE)
+            self.en_nonbreaking_suffixes = re.compile(r"\b\w+-(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_suffixes]) + r")\b", re.IGNORECASE)
+            self.en_nonbreaking_words = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_words]) + r")\b", re.IGNORECASE)
         self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
         self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
         # quotation marks
@@ -581,7 +589,10 @@ class Tokenizer(object):
             for contraction in self.en_threepart_contractions:
                 paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
             paragraph = self._replace_regex(paragraph, self.en_no, "regular")
-            # paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
+            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_words, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_prefixes, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_suffixes, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
             paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
 
         # remove known abbreviations
