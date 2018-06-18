@@ -209,11 +209,17 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 <!-- ## Tokenizing English text ## -->
 
 <!-- Starting with version 1.8.0, SoMaJo can also tokenize English text. In -->
-<!-- general, we follow Penn Treebank conventions (*can't* is tokenized as -->
-<!-- *ca n't* and *Peter's* as *Peter 's*, hyphenated compounds are left -->
-<!-- intact), but in some cases we deviate, most prominently in our -->
-<!-- treatment of multi-dot abbreviations that represent multiple tokens -->
-<!-- (we tokenize *U.S.* as *U. S.*, but *T.V.* as *T.V.*). -->
+<!-- general, we follow the “new” Penn Treebank conventions described, for -->
+<!-- example, in the guidelines for ETTB 2.0 [(Mott et al., -->
+<!-- 2009)](https://web.archive.org/web/20110727133755/http://projects.ldc.upenn.edu/gale/task_specifications/ettb_guidelines.pdf) -->
+<!-- and CLEAR [(Warner et al., -->
+<!-- 2012)](https://clear.colorado.edu/compsem/documents/treebank_guidelines.pdf). -->
+
+<!-- Performance of English tokenizer: -->
+
+<!-- | Corpus               | Precision | Recall | F₁    | -->
+<!-- |----------------------|-----------|--------|-------| -->
+<!-- | English Web Treebank | 99.63     | 99.63  | 99.63 | -->
 
 
 ## References ##
