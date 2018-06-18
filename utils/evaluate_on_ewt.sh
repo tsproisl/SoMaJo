@@ -11,7 +11,7 @@ do
 done
 echo "GOLD"
 perl ../data/empirist_gold_standard/tools/compare_tokenization.perl -e errors_ewt.txt tmp ../data/English_Web_Treebank/gold
-echo ""
-echo "SEMIGOLD"
-perl ../data/empirist_gold_standard/tools/compare_tokenization.perl -e errors_ewt_semi.txt tmp ../data/English_Web_Treebank/semigold
+# echo ""
+# echo "SEMIGOLD"
+# perl ../data/empirist_gold_standard/tools/compare_tokenization.perl -e errors_ewt_semi.txt tmp ../data/English_Web_Treebank/semigold
 rm -r tmp/

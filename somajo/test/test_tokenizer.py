@@ -173,18 +173,6 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_43(self):
         self._equal('Das ist ein "Zitat", gell?', 'Das ist ein " Zitat " , gell ?')
 
-    def test_punctuation_44(self):
-        self._equal("foo ========== bar", "foo ========== bar")
-
-    def test_punctuation_45(self):
-        self._equal("----------", "----------")
-
-    def test_punctuation_46(self):
-        self._equal("##########", "##########")
-
-    def test_punctuation_47(self):
-        self._equal("~~~~~~~~~~", "~~~~~~~~~~")
-
 
 class TestTimeDate(TestTokenizer):
     """"""
@@ -1008,3 +996,30 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_21(self):
         self._equal("this is anty-foobar baz", "this is anty - foobar baz")
+
+    def test_english_22(self):
+        self._equal("bla 3°C foo", "bla 3 °C foo")
+
+    def test_english_23(self):
+        self._equal("foo the U.S., L.A., 1750 A.D., e.g. J.F.K., etc.", "foo the U.S. , L.A. , 1750 A.D. , e.g. J.F.K. , etc.")
+
+    def test_english_24(self):
+        self._equal("!!!!!!!!!!???????? *************", "!!!!!!!!!!???????? *************")
+
+    def test_english_25(self):
+        self._equal("It's not 17:30 or 5:30p.m. but 5.30am", "It 's not 17:30 or 5:30 p.m. but 5.30 am")
+
+    def test_english_26(self):
+        self._equal("bla approval/decline bar", "bla approval / decline bar")
+
+    def test_english_27(self):
+        self._equal("bar on 01/24/2001 11:16:25 AM foo", "bar on 01/24/2001 11:16:25 AM foo")
+
+    def test_english_28(self):
+        self._equal('"Well," said Mr. Blue.', '" Well , " said Mr. Blue .')
+
+    def test_english_29(self):
+        self._equal("a duper-e-stimator, a super-e-stimator", "a duper - e - stimator , a super-e-stimator")
+
+    def test_english_30(self):
+        self._equal("my number:456-123-7654!", "my number : 456-123-7654 !")

@@ -117,7 +117,7 @@ Argt.
 Arith.
 Arithm.
 Arrangem.
-art.
+arrv.
 Artic.
 Artific.
 Artill.
@@ -135,6 +135,7 @@ Austral.
 Auth.
 Autobiog.
 Autobiogr.
+Ave.
 Ayrsh.
 Bacteriol.
 Bedfordsh.
@@ -152,6 +153,7 @@ Biogr.
 Biol.
 Bk.
 Bks.
+Blvd.
 Bord.
 Bp.
 Braz.
@@ -312,6 +314,7 @@ Doc.
 Doct.
 Domest.
 Dr.
+Drs.
 Durh.
 dyslog.
 Eccl.
@@ -386,6 +389,7 @@ Explan.
 Explic.
 Explor.
 Expos.
+ext.
 Ezek.
 Fab.
 fam.
@@ -408,7 +412,6 @@ Fratern.
 freq.
 Friendsh.
 ft.
-Fund.
 Furnit.
 fut.
 Gal.
@@ -527,6 +530,7 @@ Jas.
 Jer.
 joc.
 Josh.
+Jr.
 Jrnl.
 Jrnls.
 Jud.
@@ -540,7 +544,6 @@ Kgs.
 Kingd.
 Knowl.
 Kpr.
-Lab.
 Lam.
 Lanc.
 Lancash.
@@ -548,11 +551,11 @@ Lancs.
 Lang.
 Langs.
 Lat.
+lb.
 Ld.
 Lds.
 Lect.
 Leechd.
-Leg.
 Leicest.
 Leicestersh.
 Leics.
@@ -574,6 +577,7 @@ Liturg.
 ll.
 Lond.
 Lt.
+Ltd.
 Macc.
 Mach.
 Mag.
@@ -615,11 +619,10 @@ Mineral.
 Misc.
 Miscell.
 mispr.
-mod.
-Mod.
 Monum.
 Morphol.
 Mr.
+Mrs.
 MS.
 M.Sc.
 MSS.
@@ -631,7 +634,6 @@ Munif.
 Munim.
 Mus.
 Myst.
-Myth.
 Mythol.
 Nah.
 Narr.
@@ -700,6 +702,7 @@ Outl.
 Oxf.
 Oxfordsh.
 Oxon.
+oz.
 pa.
 Pa.
 Palaeobot.
@@ -751,14 +754,12 @@ Pol.
 Polit.
 Polytechn.
 Porc.
-Port.
 poss.
 Posth.
 Postm.
 ppl.
 pple.
 pples.
-pr.
 Pract.
 prec.
 pred.
@@ -776,7 +777,6 @@ Presb.
 Preserv.
 Prim.
 Princ.
-Print.
 priv.
 prob.
 Probab.
@@ -840,6 +840,7 @@ Renfrewsh.
 Rep.
 repr.
 Reprod.
+Reps.
 Rept.
 Repub.
 Res.
@@ -851,7 +852,6 @@ Revol.
 rhet.
 Rhet.
 Rich.
-Rom.
 Ross-sh.
 Roxb.
 Roy.
@@ -871,6 +871,7 @@ Script.
 Sculpt.
 Seismol.
 Sel.
+Sen.
 Ser.
 Serm.
 Sess.
@@ -892,15 +893,18 @@ Specif.
 Specim.
 Spectrosc.
 Sq.
+Sr.
 SS.
 St.
 Staffordsh.
 Staffs.
 Stat.
 Statist.
+Ste.
 str.
 Stratigr.
 Struct.
+Sts.
 Stud.
 subj.
 Subj.
@@ -954,7 +958,6 @@ Transl.
 Transubstant.
 Trav.
 Treas.
-Treat.
 Treatm.
 Trib.
 Trig.

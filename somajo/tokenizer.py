@@ -92,7 +92,7 @@ class Tokenizer(object):
         self.doi = re.compile(r'\bdoi:10\.\d+/\S+', re.IGNORECASE)
         self.doi_with_space = re.compile(r'(?<=\bdoi: )10\.\d+/\S+', re.IGNORECASE)
         # we also allow things like tagesschau.de-App
-        self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|org|net|edu|info|gov|jpg|png|gif|log|txt|xlsx?|docx?|pptx?)(?:-\w+)?\b', re.IGNORECASE)
+        self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|org|net|edu|info|gov|jpg|png|gif|log|txt|xlsx?|docx?|pptx?|pdf)(?:-\w+)?\b', re.IGNORECASE)
 
         # XML entities
         self.entity_name = re.compile(r'&(?:quot|amp|apos|lt|gt);', re.IGNORECASE)
@@ -175,7 +175,7 @@ class Tokenizer(object):
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])[[:alpha:]]{2,}\.(?![[:alpha:]]{1,3}\.)")
         # abbreviation_list = [a[0] for a in abbrev_simple if not a[1]]
-        self.abbreviation = re.compile(r"(?<![\w.])(?:" +
+        self.abbreviation = re.compile(r"(?<![[:alpha:].])(?:" +
                                        r"(?:(?:[[:alpha:]]\.){2,})" +
                                        r"|" +
                                        # r"(?i:" +    # this part should be case insensitive
@@ -194,14 +194,18 @@ class Tokenizer(object):
         self.three_part_date_dmy = re.compile(r'(?<![\d.]) (?P<a_day>(?:0?[1-9]|1[0-9]|2[0-9]|3[01])([./-])) (?P<b_month>(?:0?[1-9]|1[0-2])\2) (?P<c_year>(?:\d\d){1,2}) (?![\d.])', re.VERBOSE)
         self.three_part_date_mdy = re.compile(r'(?<![\d.]) (?P<a_month>(?:0?[1-9]|1[0-2])([./-])) (?P<b_day>(?:0?[1-9]|1[0-9]|2[0-9]|3[01])\2) (?P<c_year>(?:\d\d){1,2}) (?![\d.])', re.VERBOSE)
         self.two_part_date = re.compile(r'(?<![\d.]) (?P<a_day_or_month>\d{1,2}([./-])) (?P<b_day_or_month>\d{1,2}\2) (?![\d.])', re.VERBOSE)
-        self.time = re.compile(r'(?<!\w)\d{1,2}(?::\d{2}){1,2}(?![\d:])')
+        self.time = re.compile(r'(?<!\w)\d{1,2}(?:(?::\d{2}){1,2}){1,2}(?![\d:])')
+        self.en_time = re.compile(r'(?<![\w])(?P<a_time>\d{1,2}(?:(?:[.:]\d{2})){0,2}) ?(?P<b_am_pm>(?:[ap]m\b|[ap]\.m\.(?!\w)))', re.IGNORECASE)
+        self.en_us_phone_number = re.compile(r"(?<![\d-])(?:[2-9]\d{2}[/-])?\d{3}-\d{4}(?![\d-])")
+        self.en_numerical_identifiers = re.compile(r"(?<![\d-])\d+-(?:\d+-)+\d+(?![\d-])|(?<![\d/])\d+/(?:\d+/)+\d+(?![\d/])")
+        self.en_us_zip_code = re.compile(r"(?<![\d-])\d{5}-\d{4}(?![\d-])")
         self.ordinal = re.compile(r'(?<![\w.])(?:\d{1,3}|\d{5,}|[3-9]\d{3})\.(?!\d)')
         self.english_ordinal = re.compile(r'\b(?:\d+(?:,\d+)*)?(?:1st|2nd|3rd|\dth)\b')
-        self.english_decades = re.compile(r'\b(?:[12]\d)?\d0s\b')
+        self.english_decades = re.compile(r"\b(?:[12]\d)?\d0['’]?s\b")
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
-        self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|qm|g|kg|min|h|s|sek|cent|eur|bit|ghz)(?!\w)', re.IGNORECASE)
+        self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|ghz|h|hz|kg|l|lb|min|ml|qm|s|sek)(?!\w)', re.IGNORECASE)
         # auch Web2.0
         self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[[:alpha:]@][[:alpha:]@-]* | [[:alpha:]@][[:alpha:]@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
         self.number = re.compile(r"""(?<!\w)
@@ -237,26 +241,24 @@ class Tokenizer(object):
                                        (?=\w)))   # alphanumeric character
                                  """, re.VERBOSE)
         self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
-        self.slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
+        self.de_slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         # English possessive and contracted forms
         self.en_trailing_apos = re.compile(r"(?<!..in|')(['’])(?!\w)")
         self.en_dms = re.compile(r"(?<=\w)(['’][dms])\b", re.IGNORECASE)
         self.en_llreve = re.compile(r"(?<=\w)(['’](?:ll|re|ve))\b", re.IGNORECASE)
         self.en_not = re.compile(r"(?<=\w)(n['’]t)\b", re.IGNORECASE)
-        en_twopart_contractions = [r"\b(can)(not)\b", r"\b(d['’])(ye)\b",
-                                   r"\b(gim)(me)\b", r"\b(gon)(na)\b",
-                                   r"\b(got)(ta)\b", r"\b(lem)(me)\b",
-                                   r"\b(more)(['’]n)\b", r"(?<!\w)(['’]t)(is)\b",
-                                   r"(?<!\w)(['’]t)(was)\b", r"\b(wan)(na)\b",
-                                   r"\b(do)(nt)\b", r"\b(could)(nt)\b",
-                                   r"\b(would)(nt)\b", r"\b(does)(nt)\b",
-                                   r"\b(i)(m)\b", r"\b(u)(r)\b", r"\b(did)(nt)\b",
-                                   r"\b(he)(s)\b", r"\b(she)(s)\b", r"\b(you)(re)\b",
-                                   r"\b(ca)(nt)\b", r"\b(out)(ta)\b", r"\b(you)(ll)\b",
-                                   r"\b(i)(ve)\b", r"\b(there)(s)\b", r"\b(c'm)(on)\b",
-                                   r"\b(are)(nt)\b", r"\b(is)(nt)\b", r"\b(wo)(nt)\b",
-                                   r"\b(let)(s)\b", r"\b(ai)(nt)\b"]
-        en_threepart_contractions = [r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
+        en_twopart_contractions = [r"\b(a)(lot)\b", r"\b(gon)(na)\b", r"\b(got)(ta)\b", r"\b(lem)(me)\b",
+                                   r"\b(out)(ta)\b", r"\b(wan)(na)\b", r"\b(c'm)(on)\b",
+                                   r"\b(more)(['’]n)\b", r"\b(d['’])(ye)\b", r"(?<!\w)(['’]t)(is)\b",
+                                   r"(?<!\w)(['’]t)(was)\b", r"\b(there)(s)\b", r"\b(i)(m)\b",
+                                   r"\b(you)(re)\b", r"\b(he)(s)\b", r"\b(she)(s)\b",
+                                   r"\b(ai)(nt)\b", r"\b(are)(nt)\b", r"\b(is)(nt)\b",
+                                   r"\b(do)(nt)\b", r"\b(does)(nt)\b", r"\b(did)(nt)\b",
+                                   r"\b(i)(ve)\b", r"\b(you)(ve)\b", r"\b(they)(ve)\b",
+                                   r"\b(have)(nt)\b", r"\b(has)(nt)\b", r"\b(can)(not)\b",
+                                   r"\b(ca)(nt)\b", r"\b(could)(nt)\b", r"\b(wo)(nt)\b",
+                                   r"\b(would)(nt)\b", r"\b(you)(ll)\b", r"\b(let)(s)\b"]
+        en_threepart_contractions = [r"\b(du)(n)(no)\b", r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
         # w/o, w/out, b/c, b/t, l/c, w/, d/c, u/s
         self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c|d/c|u/s)\b|\bw/(?!\w)", re.IGNORECASE)
         # word--word
@@ -268,11 +270,12 @@ class Tokenizer(object):
             nonbreaking_prefixes = utils.read_abbreviation_file("non-breaking_prefixes_%s.txt" % self.language)
             nonbreaking_suffixes = utils.read_abbreviation_file("non-breaking_suffixes_%s.txt" % self.language)
             nonbreaking_words = utils.read_abbreviation_file("non-breaking_hyphenated_words_%s.txt" % self.language)
-            self.en_nonbreaking_prefixes = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_prefixes]) + r")-\w+", re.IGNORECASE)
-            self.en_nonbreaking_suffixes = re.compile(r"\b\w+-(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_suffixes]) + r")\b", re.IGNORECASE)
+            self.en_nonbreaking_prefixes = re.compile(r"(?<![\w-])(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_prefixes]) + r")-[\w-]+", re.IGNORECASE)
+            self.en_nonbreaking_suffixes = re.compile(r"\b[\w-]+-(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_suffixes]) + r")(?![\w-])", re.IGNORECASE)
             self.en_nonbreaking_words = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_words]) + r")\b", re.IGNORECASE)
         self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
         self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
+        self.en_degree = re.compile(r"(?<=\d) ?°(?:F|C|Oe)\b", re.IGNORECASE)
         # quotation marks
         # L'Enfer, d'accord, O'Connor
         self.letter_apostrophe_word = re.compile(r"\b([dlo]['’][[:alpha:]]+)\b", re.IGNORECASE)
@@ -280,8 +283,9 @@ class Tokenizer(object):
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
         self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
-        self.dividing_line = re.compile(r"(?<=\s|^)(?:~{5,}|={5,}|\*{5,})(?=\s|$)")
-        self.other_punctuation = re.compile(r'([<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+=&–])')
+        self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')
+        self.en_quotation_marks = re.compile(r'([„“”‚‘’"»«›‹])')
+        self.en_ot_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*,;:+×÷±≤≥=&/–—-]+)')
         self.ellipsis = re.compile(r'\.{2,}|…+(?:\.{2,})?')
         self.dot_without_space = re.compile(r'(?<=[[:lower:]]{2})(\.)(?=[[:upper:]][[:lower:]]{2})')
         # self.dot = re.compile(r'(?<=[\w)])(\.)(?![\w])')
@@ -315,7 +319,7 @@ class Tokenizer(object):
         """Return a string that is not a substring of text."""
         return self.unique_prefix + self._get_unique_suffix()
 
-    def _replace_regex(self, text, regex, token_class="regular"):
+    def _replace_regex(self, text, regex, token_class="regular", split_named_subgroups=True):
         """Replace instances of regex with unique strings and store
         replacements in mapping.
 
@@ -326,7 +330,7 @@ class Tokenizer(object):
             instance = match.group(0)
             if instance not in replacements:
                 # check if there are named subgroups
-                if len(match.groupdict()) > 0:
+                if split_named_subgroups and len(match.groupdict()) > 0:
                     parts = [v for k, v in sorted(match.groupdict().items())]
                     replacements[instance] = self._multipart_replace(instance, parts, token_class)
                 else:
@@ -350,7 +354,7 @@ class Tokenizer(object):
         tokens = [self.mapping.get(t, Token(t, "regular")) for t in tokens]
         return tokens
 
-    def _replace_abbreviations(self, text):
+    def _replace_abbreviations(self, text, split_multipart_abbrevs=True):
         """Replace instances of abbreviations with unique strings and store
         replacements in self.mapping.
 
@@ -369,7 +373,7 @@ class Tokenizer(object):
             instance = match.group(0)
             if instance not in replacements:
                 # check if it is a multipart abbreviation
-                if self.multipart_abbreviation.fullmatch(instance):
+                if split_multipart_abbrevs and self.multipart_abbreviation.fullmatch(instance):
                     parts = [p.strip() + "." for p in instance.strip(".").split(".")]
                     replacements[instance] = self._multipart_replace(instance, parts, "abbreviation")
                 else:
@@ -580,6 +584,7 @@ class Tokenizer(object):
 
         # English possessive and contracted forms
         if self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.english_decades, "number_compound")
             paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
             paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
             paragraph = self._replace_regex(paragraph, self.en_not, "regular")
@@ -589,29 +594,36 @@ class Tokenizer(object):
             for contraction in self.en_threepart_contractions:
                 paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
             paragraph = self._replace_regex(paragraph, self.en_no, "regular")
+            paragraph = self._replace_regex(paragraph, self.en_degree, "regular")
             paragraph = self._replace_regex(paragraph, self.en_nonbreaking_words, "regular")
             paragraph = self._replace_regex(paragraph, self.en_nonbreaking_prefixes, "regular")
             paragraph = self._replace_regex(paragraph, self.en_nonbreaking_suffixes, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
 
         # remove known abbreviations
-        paragraph = self._replace_abbreviations(paragraph)
+        split_abbreviations = False if self.language == "en" else True
+        paragraph = self._replace_abbreviations(paragraph, split_multipart_abbrevs=split_abbreviations)
 
         # DATES AND NUMBERS
         # dates
-        paragraph = self._replace_regex(paragraph, self.three_part_date_year_first, "date")
-        paragraph = self._replace_regex(paragraph, self.three_part_date_dmy, "date")
-        paragraph = self._replace_regex(paragraph, self.three_part_date_mdy, "date")
-        paragraph = self._replace_regex(paragraph, self.two_part_date, "date")
+        split_dates = False if self.language == "en" else True
+        paragraph = self._replace_regex(paragraph, self.three_part_date_year_first, "date", split_named_subgroups=split_dates)
+        paragraph = self._replace_regex(paragraph, self.three_part_date_dmy, "date", split_named_subgroups=split_dates)
+        paragraph = self._replace_regex(paragraph, self.three_part_date_mdy, "date", split_named_subgroups=split_dates)
+        paragraph = self._replace_regex(paragraph, self.two_part_date, "date", split_named_subgroups=split_dates)
         # time
+        if self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.en_time, "time")
         paragraph = self._replace_regex(paragraph, self.time, "time")
+        # US phone numbers and ZIP codes
+        if self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.en_us_phone_number, "number")
+            paragraph = self._replace_regex(paragraph, self.en_us_zip_code, "number")
+            paragraph = self._replace_regex(paragraph, self.en_numerical_identifiers, "number")
         # ordinals
         if self.language == "de":
             paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
         elif self.language == "en":
             paragraph = self._replace_regex(paragraph, self.english_ordinal, "ordinal")
-            paragraph = self._replace_regex(paragraph, self.english_decades, "number_compound")
         # fractions
         paragraph = self._replace_regex(paragraph, self.fraction, "number")
         # amounts (1.000,-)
@@ -639,8 +651,8 @@ class Tokenizer(object):
         # slash
         if self.language == "en":
             paragraph = self._replace_regex(paragraph, self.en_slash_words, "regular")
-        # paragraph = self.slash.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.slash, "symbol")
+        if self.language == "de":
+            paragraph = self._replace_regex(paragraph, self.de_slash, "symbol")
         # O'Connor and French omitted vocals: L'Enfer, d'accord
         paragraph = self._replace_regex(paragraph, self.letter_apostrophe_word, "regular")
         # LaTeX-style quotation marks
@@ -650,9 +662,14 @@ class Tokenizer(object):
         paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
         paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
         # other punctuation symbols
-        paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
-        # paragraph = self.other_punctuation.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
+        # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
+        if self.language == "en":
+            paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
+            paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
+            paragraph = self._replace_regex(paragraph, self.en_quotation_marks, "symbol")
+            paragraph = self._replace_regex(paragraph, self.en_ot_punctuation, "symbol")
+        else:
+            paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
         # ellipsis
         paragraph = self._replace_regex(paragraph, self.ellipsis, "symbol")
         # dots
