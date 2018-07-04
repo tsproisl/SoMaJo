@@ -1,5 +1,12 @@
 # CHANGELOG #
 
+## Version 1.8.0, 2018-07-04 ##
+
+- New language: SoMaJo can tokenize English texts (using the new
+  option -l/--language).
+- Small improvements to tokenization (URLs, emoticons, number
+  compounds, …).
+
 ## Version 1.7.0, 2018-03-22 ##
 
 SoMaJo has now full XML support. To tokenize an XML file, use the
@@ -84,7 +91,7 @@ SoMaJo can now output additional information about the original
 spelling of the tokens, i.e. if a token was followed by whitespace or
 if a token contained internal whitespace (according to the
 tokenization guidelines, things like “: )” get normalized to “:)”). To
-use this feature, provide the tokenizer script with the ``-e`` option.
+use this feature, provide the tokenizer script with the -e option.
 
 ## Version 1.0.3, 2016-08-18 ##
 
