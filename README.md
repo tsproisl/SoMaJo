@@ -6,9 +6,8 @@
       * [Using the somajo-tokenizer executable](#using-the-somajo-tokenizer-executable)
       * [Using the module](#using-the-module)
   * [Evaluation](#evaluation)
+  * [Tokenizing English text](#tokenizing-english-text)
   * [References](#references)
-
-  <!-- * [Tokenizing English text](#tokenizing-english-text) -->
 
 
 ## Introduction ##
@@ -206,20 +205,31 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 | Web    | 99.84     | 99.92  | 99.88 |
 
 
-<!-- ## Tokenizing English text ## -->
+## Tokenizing English text ##
 
-<!-- Starting with version 1.8.0, SoMaJo can also tokenize English text. In -->
-<!-- general, we follow the “new” Penn Treebank conventions described, for -->
-<!-- example, in the guidelines for ETTB 2.0 [(Mott et al., -->
-<!-- 2009)](https://web.archive.org/web/20110727133755/http://projects.ldc.upenn.edu/gale/task_specifications/ettb_guidelines.pdf) -->
-<!-- and CLEAR [(Warner et al., -->
-<!-- 2012)](https://clear.colorado.edu/compsem/documents/treebank_guidelines.pdf). -->
+Starting with version 1.8.0, SoMaJo can also tokenize English text. In
+general, we follow the “new” Penn Treebank conventions described, for
+example, in the guidelines for ETTB 2.0 [(Mott et al.,
+2009)](https://web.archive.org/web/20110727133755/http://projects.ldc.upenn.edu/gale/task_specifications/ettb_guidelines.pdf)
+and CLEAR [(Warner et al.,
+2012)](https://clear.colorado.edu/compsem/documents/treebank_guidelines.pdf).
 
-<!-- Performance of English tokenizer: -->
+For tokenizing English text on the command line, specify the language
+via the `-l` or `--language` option:
 
-<!-- | Corpus               | Precision | Recall | F₁    | -->
-<!-- |----------------------|-----------|--------|-------| -->
-<!-- | English Web Treebank | 99.63     | 99.63  | 99.63 | -->
+    somajo-tokenizer -l en <file>
+
+From Python, you can pass `language="en"` to the `Tokenizer` and
+`SentenceSplitter` constructors, e.g.:
+
+    tokenizer = Tokenizer(language="en")
+    tokens = tokenizer.tokenize("That aint bad!:D")
+
+Performance of the English tokenizer:
+
+| Corpus               | Precision | Recall | F₁    |
+|----------------------|-----------|--------|-------|
+| English Web Treebank | 99.63     | 99.63  | 99.63 |
 
 
 ## References ##
