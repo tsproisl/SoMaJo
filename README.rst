@@ -1,8 +1,8 @@
 SoMaJo
 ======
 
-SoMaJo is a state-of-the-art tokenizer for German web and social media
-texts that won the `EmpiriST 2015 shared task
+SoMaJo is a state-of-the-art tokenizer for German and English web and
+social media texts. It won the `EmpiriST 2015 shared task
 <https://sites.google.com/site/empirist2015/>`_ on automatic
 linguistic annotation of computer-mediated communication / social
 media. As such, it is particularly well-suited to perform tokenization
