@@ -13,13 +13,13 @@
 ## Introduction ##
 
 SoMaJo is a state-of-the-art tokenizer and sentence splitter for
-German web and social media texts that won the [EmpiriST 2015 shared
-task](https://sites.google.com/site/empirist2015/) on automatic
-linguistic annotation of computer-mediated communication / social
-media. As such, it is particularly well-suited to perform tokenization
-on all kinds of written discourse, for example chats, forums, wiki
-talk pages, tweets, blog comments, social networks, SMS and WhatsApp
-dialogues.
+German and English web and social media texts. It won the [EmpiriST
+2015 shared task](https://sites.google.com/site/empirist2015/) on
+automatic linguistic annotation of computer-mediated communication /
+social media. As such, it is particularly well-suited to perform
+tokenization on all kinds of written discourse, for example chats,
+forums, wiki talk pages, tweets, blog comments, social networks, SMS
+and WhatsApp dialogues.
 
 In addition to tokenizing the input text, SoMaJo can also output token
 class information for each token, i.e. if it is a number, an emoticon,
