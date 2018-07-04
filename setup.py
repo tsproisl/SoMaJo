@@ -14,7 +14,7 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst')) as fh:
     long_description = fh.read()
 
-version = "1.7.0"
+version = "1.8.0"
 
 setup(
     name='SoMaJo',
@@ -30,15 +30,21 @@ setup(
         'bin/tokenizer',
     ],
     package_data={
-        'somajo': ["abbreviations.txt",
+        'somajo': ["abbreviations_de.txt",
+                   "abbreviations_en.txt",
                    "camel_case_tokens.txt",
-                   "single_token_abbreviations.txt",
+                   "eos_abbreviations.txt",
+                   "non-breaking_hyphenated_words_en.txt",
+                   "non-breaking_prefixes_en.txt",
+                   "non-breaking_suffixes_en.txt",
+                   "single_token_abbreviations_de.txt",
+                   "single_token_abbreviations_en.txt",
                    "tokens_with_plus_or_ampersand.txt"]
     },
     url="https://github.com/tsproisl/SoMaJo",
     download_url='https://github.com/tsproisl/SoMaJo/archive/v%s.tar.gz' % version,
     license='GNU General Public License v3 or later (GPLv3+)',
-    description='A tokenizer and sentence splitter for German web and social media texts.',
+    description='A tokenizer and sentence splitter for German and English web and social media texts.',
     long_description=long_description,
     install_requires=[
         "regex",
@@ -50,6 +56,7 @@ setup(
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Natural Language :: German',
+        'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
         'Topic :: Text Processing :: Linguistic',
