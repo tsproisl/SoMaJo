@@ -874,6 +874,10 @@ class TestJunk(TestTokenizer):
         # left-to-right and right-to-left mark
         self._equal("foo‏bar‎baz", "foobarbaz")
 
+    def test_junk_07(self):
+        # More left-to-right and right-to-left stuff
+        self._equal("foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta", "foobarbazquxalphabeta")
+
 
 class TestXML(TestTokenizer):
     """"""
