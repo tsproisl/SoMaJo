@@ -535,6 +535,9 @@ class Tokenizer(object):
         paragraph = self.controls.sub("", paragraph)
         paragraph = self.other_nasties.sub("", paragraph)
 
+        # normalize whitespace
+        paragraph = self.spaces.sub(" ", paragraph)
+
         # Some tokens are allowed to contain whitespace. Get those out
         # of the way first. We replace them with unique strings and
         # undo that later on.

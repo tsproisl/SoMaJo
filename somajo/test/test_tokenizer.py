@@ -859,7 +859,7 @@ class TestJunk(TestTokenizer):
         self._equal("foo­bar", "foobar")
 
     def test_junk_03(self):
-        # soft hyphen
+        # newline
         self._equal("foo\nbar", "foo bar")
 
     def test_junk_04(self):
