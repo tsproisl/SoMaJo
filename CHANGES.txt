@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version ?.?.? ##
+
+- Fixed the following bug: When using option -e, “nasty” characters
+  between whitespace within tokens that are allowed to contain
+  whitespace (e.g. XML tags) caused SoMaJo to hang.
+
 ## Version 1.8.0, 2018-07-04 ##
 
 - New language: SoMaJo can tokenize English texts (using the new
