@@ -1,10 +1,11 @@
 # CHANGELOG #
 
-## Version ?.?.? ##
+## Version 1.8.1, 2018-07-30 ##
 
 - Fixed the following bug: When using option -e, “nasty” characters
   between whitespace within tokens that are allowed to contain
   whitespace (e.g. XML tags) caused SoMaJo to hang.
+- Added zero-width no-break space (FEFF) to “nasty” characters.
 
 ## Version 1.8.0, 2018-07-04 ##
 
