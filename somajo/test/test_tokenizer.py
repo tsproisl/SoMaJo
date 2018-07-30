@@ -878,6 +878,10 @@ class TestJunk(TestTokenizer):
         # More left-to-right and right-to-left stuff
         self._equal("foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta", "foobarbazquxalphabeta")
 
+    def test_junk_08(self):
+        # zero-width no-break space (FEFF)
+        self._equal("foo\ufeffbar", "foobar")
+
 
 class TestXML(TestTokenizer):
     """"""
