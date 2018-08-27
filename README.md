@@ -125,9 +125,9 @@ option:
     somajo-tokenizer --paragraph_separator single_newlines <file>
 
 To speed up tokenization, you can specify the number of worker
-processes used via the `--processes` option:
+processes used via the `--parallel` option:
 
-    somajo-tokenizer --processes <number> <file>
+    somajo-tokenizer --parallel <number> <file>
 
 SoMaJo can also split the input paragraphs into sentences:
 
