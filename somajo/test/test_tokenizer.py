@@ -37,6 +37,18 @@ class TestWhitespace(TestTokenizer):
         # self.assertEqual(self.tokenizer.tokenize("Petra und Simone gehen ins Kino"), "Petra und Simone gehen ins Kino".split())
         self._equal("Petra und Simone gehen ins Kino", "Petra und Simone gehen ins Kino")
 
+    def test_whitespace_02(self):
+        # newline
+        self._equal("foo\nbar", "foo bar")
+
+    def test_whitespace_03(self):
+        # Unicode line separator (2028)
+        self._equal("foo\u2028bar", "foo bar")
+
+    def test_whitespace_04(self):
+        # Unicode paragraph separator (2029)
+        self._equal("foo\u2029bar", "foo bar")
+
 
 class TestPunctuation(TestTokenizer):
     """"""
@@ -859,8 +871,8 @@ class TestJunk(TestTokenizer):
         self._equal("foo­bar", "foobar")
 
     def test_junk_03(self):
-        # newline
-        self._equal("foo\nbar", "foo bar")
+        # zero-width no-break space (FEFF)
+        self._equal("foo\ufeffbar", "foobar")
 
     def test_junk_04(self):
         # control characters
@@ -877,10 +889,6 @@ class TestJunk(TestTokenizer):
     def test_junk_07(self):
         # More left-to-right and right-to-left stuff
         self._equal("foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta", "foobarbazquxalphabeta")
-
-    def test_junk_08(self):
-        # zero-width no-break space (FEFF)
-        self._equal("foo\ufeffbar", "foobar")
 
 
 class TestXML(TestTokenizer):
