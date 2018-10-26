@@ -473,7 +473,7 @@ class Tokenizer(object):
                 if normalized.startswith(token):
                     normalized = normalized[len(token):]
                 elif token.startswith(normalized):
-                    agenda.append(Token(token[len(normalized):], t.token_class))
+                    agenda.append(Token(token[len(normalized):].lstrip(), t.token_class))
                     token = normalized
                     normalized = ""
                 else:
