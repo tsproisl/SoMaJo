@@ -233,8 +233,11 @@ class TestTimeDate(TestTokenizer):
     def test_time_14(self):
         self._equal("30-50kg", "30 - 50 kg")
 
-    def test_time_15(self):
+    def test_time_15a(self):
         self._equal("ca. 20°C", "ca. 20 ° C")
+
+    def test_time_15b(self):
+        self._equal("ca. 20 °C", "ca. 20 ° C")
 
     def test_time_16(self):
         self._equal("ca. 20 GHz", "ca. 20 GHz")
@@ -1013,8 +1016,11 @@ class TestEnglish(TestEnglishTokenizer):
     def test_english_21(self):
         self._equal("this is anty-foobar baz", "this is anty - foobar baz")
 
-    def test_english_22(self):
+    def test_english_22a(self):
         self._equal("bla 3°C foo", "bla 3 °C foo")
+
+    def test_english_22b(self):
+        self._equal("bla 3 °C foo", "bla 3 °C foo")
 
     def test_english_23(self):
         self._equal("foo the U.S., L.A., 1750 A.D., e.g. J.F.K., etc.", "foo the U.S. , L.A. , 1750 A.D. , e.g. J.F.K. , etc.")
