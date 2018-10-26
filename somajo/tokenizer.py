@@ -279,7 +279,7 @@ class Tokenizer(object):
             self.en_nonbreaking_words = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_words]) + r")\b", re.IGNORECASE)
         self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
         self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
-        self.en_degree = re.compile(r"(?<=\d) ?°(?:F|C|Oe)\b", re.IGNORECASE)
+        self.en_degree = re.compile(r"(?<=\d ?)°(?:F|C|Oe)\b", re.IGNORECASE)
         # quotation marks
         # L'Enfer, d'accord, O'Connor
         self.letter_apostrophe_word = re.compile(r"\b([dlo]['’][[:alpha:]]+)\b", re.IGNORECASE)
