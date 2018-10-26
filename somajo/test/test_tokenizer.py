@@ -905,6 +905,9 @@ class TestXML(TestTokenizer):
     def test_xml_03(self):
         self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! <x>:</x>)</foo>", "<foo> der beste Betreuer ? -&gt; Prof Smith ! <x> : </x> ) </foo>")
 
+    def test_xml_04(self):
+        self.assertEqual(self.tokenizer.tokenize_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", is_file=False), ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
+
 
 class TestTokenizerExtra(unittest.TestCase):
     """"""
