@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version 1.8.2, 2018-10-26 ##
+
+- Fixed a bug with degree measurements in English (°F, etc.).
+- Fixed a bug that caused SoMaJo to hang when an XML tag occured
+  within a token that is allowed to contain whitespace.
+
 ## Version 1.8.1, 2018-07-30 ##
 
 - Fixed the following bug: When using option -e, “nasty” characters
