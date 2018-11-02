@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version 1.8.3, 2018-11-02 ##
+
+- Fixed a bug that caused abbreviations with internal dots but without
+  final dot to be split up erroneously (e.g. E.ON).
+
 ## Version 1.8.2, 2018-10-26 ##
 
 - Fixed a bug with degree measurements in English (°F, etc.).
