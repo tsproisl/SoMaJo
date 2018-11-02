@@ -842,6 +842,12 @@ class OwnAdditions(TestTokenizer):
     def test_own_95(self):
         self._equal("Mir gefällt La Porte de l'Enfer besser als L'Éternelle idole", "Mir gefällt La Porte de l'Enfer besser als L'Éternelle idole")
 
+    def test_own_96(self):
+        self._equal("E.ON ist ein Stromanbieter.", "E.ON ist ein Stromanbieter .")
+
+    def test_own_97(self):
+        self._equal("Ich bin Kunde bei E.ON.", "Ich bin Kunde bei E.ON .")
+
 
 class TestSuffixes(TestTokenizer):
     """"""
