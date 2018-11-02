@@ -368,8 +368,8 @@ class Tokenizer(object):
         text = self._replace_regex(text, self.and_cetera, "abbreviation")
         text = self._replace_regex(text, self.str_abbreviations, "abbreviation")
         text = self._replace_regex(text, self.nr_abbreviations, "abbreviation")
-        text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
         text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
+        text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
         text = self.spaces.sub(" ", text)
         text = self._replace_regex(text, self.ps, "abbreviation")
 
