@@ -145,7 +145,7 @@ sentence. Per default, the sentence splitter uses the following list
 of tags: title, h1, h2, h3, h4, h5, h6, p, br, div, ol, ul, dl and
 table.
 
-    somajo-tokenizer --xml --tag h1 --tag p --tag div <xml-file>
+    somajo-tokenizer --xml --split_sentences --tag h1 --tag p --tag div <xml-file>
 
 
 ### Using the module ###
