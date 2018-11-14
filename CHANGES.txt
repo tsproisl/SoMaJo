@@ -1,5 +1,9 @@
 # CHANGELOG #
 
+## Version ? ##
+
+- Added text and emoji variation selectors.
+
 ## Version 1.8.3, 2018-11-02 ##
 
 - Fixed a bug that caused abbreviations with internal dots but without
