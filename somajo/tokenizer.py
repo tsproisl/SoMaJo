@@ -132,12 +132,14 @@ class Tokenizer(object):
         self.heart_emoticon = re.compile(r"(?:^|^\D|(?<=\D[ ])|(?<=.[^\d ]))\^3")
         # U+2600..U+26FF	Miscellaneous Symbols
         # U+2700..U+27BF	Dingbats
+        # U+FE0E..U+FE0F        text and emoji variation selectors
         # U+1F300..U+1F5FF	Miscellaneous Symbols and Pictographs
+        # -> U+1F3FB..U+1F3FF   Emoji modifiers (skin tones)
         # U+1F600..U+1F64F	Emoticons
         # U+1F680..U+1F6FF	Transport and Map Symbols
         # U+1F900..U+1F9FF	Supplemental Symbols and Pictographs
         # self.unicode_symbols = re.compile(r"[\u2600-\u27BF]|[\u1F300-\u1F64F]|[\u1F680-\u1F6FF]|[\u1F900-\u1F9FF]")
-        self.unicode_symbols = re.compile(r"[\u2600-\u27BF\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
+        self.unicode_symbols = re.compile(r"[\u2600-\u27BF\uFE0E\uFE0F\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
 
         # special tokens containing + or &
         tokens_with_plus_or_ampersand = utils.read_abbreviation_file("tokens_with_plus_or_ampersand.txt")

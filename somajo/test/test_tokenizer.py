@@ -482,6 +482,9 @@ class TestEmoticons(TestTokenizer):
     def test_emoticons_19(self):
         self._equal("🙄😖✈♨🎧🤒🚗", "🙄 😖 ✈ ♨ 🎧 🤒 🚗")
 
+    def test_emoticons_20(self):
+        self._equal("⚡️", "⚡ ️")
+
 
 class TestActions(TestTokenizer):
     """"""
