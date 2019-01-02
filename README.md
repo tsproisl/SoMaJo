@@ -240,17 +240,14 @@ Performance of the English tokenizer:
     EmpiriST Shared Task. Berlin: Association for Computational
     Linguistics (ACL), 57–62.
     [PDF](http://aclweb.org/anthology/W16-2607).
-
-## Citation ##
-
-	@InProceedings{proisl2016somajo,
-	  author    = {Thomas Proisl, Peter Uhrig},
-	  title     = {SoMaJo: State-of-the-art tokenization for German web and social media texts},
-	  booktitle = {In: Proceedings of the 10th Web as Corpus Workshop (WAC-X) and the EmpiriST Shared Task},
-	  month     = {8},
-	  year      = {2016},
-	  address   = {Berlin},
-	  publisher = {Association for Computational Linguistics (ACL)},
-	  pages     = {57–62},
-	  url       = {http://aclweb.org/anthology/W16-2607}
-	}
+    
+        @InProceedings{Proisl_Uhrig_EmpiriST:2016,
+          author    = {Proisl, Thomas and Uhrig, Peter},
+          title     = {{SoMaJo}: {S}tate-of-the-art tokenization for {G}erman web and social media texts},
+          booktitle = {Proceedings of the 10th {W}eb as {C}orpus Workshop ({WAC-X}) and the {EmpiriST} Shared Task},
+          year      = {2016},
+          address   = {Berlin},
+          publisher = {Association for Computational Linguistics ({ACL})},
+          pages     = {57--62},
+          url       = {http://aclweb.org/anthology/W16-2607},
+        }
