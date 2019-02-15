@@ -107,6 +107,7 @@ Antiq.
 aphet.
 Apoc.
 Apol.
+Appl'n.
 Appl.
 Applic.
 appos.
@@ -1034,6 +1035,3 @@ Zeitschr.
 Zeph.
 Zoogeogr.
 Zool.
-
-Appl'n.
-Ser.
