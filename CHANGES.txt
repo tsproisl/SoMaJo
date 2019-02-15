@@ -3,6 +3,7 @@
 ## Version ? ##
 
 - Added text and emoji variation selectors.
+- Added new English abbreviation (Appl'n.).
 
 ## Version 1.8.3, 2018-11-02 ##
 
