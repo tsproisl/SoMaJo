@@ -108,8 +108,8 @@ class Tokenizer(object):
         emoticon_set = set(["(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
                             "(-:", ")=", ")o:", ")x", ":'C", ":/",
                             ":<", ":C", ":[", "=(", "=)", "=D", "=P",
-                            ">:", "\:", "]:", "x(", "^^", "o.O",
-                            "\O/", "\m/", ":;))", "_))", "*_*", "._.",
+                            ">:", "\\:", "]:", "x(", "^^", "o.O",
+                            "\\O/", "\\m/", ":;))", "_))", "*_*", "._.",
                             ":wink:", ">_<", "*<:-)", ":!:", ":;-))"])
         emoticon_list = sorted(emoticon_set, key=len, reverse=True)
         self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variety of eyes, alt.: [:;8]
