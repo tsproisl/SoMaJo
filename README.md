@@ -153,27 +153,38 @@ table.
 You can easily incorporate both the tokenizer and the sentence
 splitter into your own Python projects. For tokenization, you have to
 import `somajo.Tokenizer`, create a `Tokenizer` object and call its
-`tokenize` method. Sentence splitting operates on tokenized text, i.e.
-on the output of the `tokenize` method. You have to import
-`somajo.SentenceSplitter`, create a `SentenceSplitter` object and call
-its `split` method:
+`tokenize_file` or `tokenize_paragraph` method. Sentence splitting
+operates on paragraphs of tokenized text, i.e. on the output of the
+tokenize methods. You have to import `somajo.SentenceSplitter`,
+create a `SentenceSplitter` object and call its `split` method. Here is an example for tokenizing and splitting a single paragraph:
 
     from somajo import Tokenizer, SentenceSplitter
+
+    tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
+    # set is_tuple=True if token_classes=True or extra_info=True
+    sentence_splitter = SentenceSplitter(is_tuple=False)
 
     # note that paragraphs are allowed to contain newlines
     paragraph = "der beste Betreuer?\n-- ProfSmith! : )"
 
-    tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
-    tokens = tokenizer.tokenize(paragraph)
-
+    tokens = tokenizer.tokenize_paragraph(paragraph)
     print("\n".join(tokens), "\n")
 
-    # set is_tuple=True if token_classes=True or extra_info=True
-    sentence_splitter = SentenceSplitter(is_tuple=False)
     sentences = sentence_splitter.split(tokens)
-    
     for sentence in sentences:
         print("\n".join(sentence), "\n")
+
+And here is an example for tokenizing and sentence splitting a whole
+file. The option `parsep_empty_lines=False` states that paragraphs are
+delimited by newlines instead of empty lines:
+    
+	# If paragraphs are not separated by empty lines, specify parsep_empty_lines=False:
+    tokenized_paragraphs = tokenizer.tokenize_file("Beispieldatei.txt", parsep_empty_lines=False)
+    
+    for paragraph in tokenized_paragraphs:
+        sentences = sentence_splitter.split(paragraph)
+        for sentence in sentences:
+            print("\n".join(sentence), "\n")
 
 For processing XML data, use the `tokenize_xml` and `split_xml` methods:
 
