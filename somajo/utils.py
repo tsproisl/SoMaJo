@@ -6,6 +6,20 @@ import os
 import xml.etree.ElementTree as ET
 
 
+def get_paragraphs(fh):
+    """Generator for the paragraphs in the file."""
+    paragraph = []
+    for line in fh:
+        if line.strip() == "":
+            if len(paragraph) > 0:
+                yield "".join(paragraph)
+                paragraph = []
+        else:
+            paragraph.append(line)
+    if len(paragraph) > 0:
+        yield "".join(paragraph)
+
+
 def read_abbreviation_file(filename):
     """Return the abbreviations from the given filename."""
     abbreviations = set()

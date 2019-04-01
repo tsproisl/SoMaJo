@@ -7,6 +7,7 @@ import time
 
 from somajo import Tokenizer
 from somajo import SentenceSplitter
+from somajo import utils
 
 
 def arguments():
@@ -24,20 +25,6 @@ def arguments():
     parser.add_argument("FILE", type=argparse.FileType("r"), help="The input file")
     args = parser.parse_args()
     return args
-
-
-def get_paragraphs(fh):
-    """Generator for the paragraphs in the file."""
-    paragraph = []
-    for line in fh:
-        if line.strip() == "":
-            if len(paragraph) > 0:
-                yield "".join(paragraph)
-                paragraph = []
-        else:
-            paragraph.append(line)
-    if len(paragraph) > 0:
-        yield "".join(paragraph)
 
 
 def main():
@@ -61,7 +48,7 @@ def main():
             tokenized_paragraphs = list(sentence_splitter.split_xml(tokenized_paragraphs[0], eos_tags))
     else:
         if args.paragraph_separator == "empty_lines":
-            paragraphs = get_paragraphs(args.FILE)
+            paragraphs = utils.get_paragraphs(args.FILE)
         elif args.paragraph_separator == "single_newlines":
             paragraphs = (line for line in args.FILE if line.strip() != "")
         if args.parallel > 1:
