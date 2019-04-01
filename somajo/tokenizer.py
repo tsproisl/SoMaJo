@@ -696,6 +696,10 @@ class Tokenizer(object):
         return tokens
 
     def tokenize(self, paragraph):
+        """An alias for tokenize_paragraph"""
+        return self.tokenize_paragraph(paragraph)
+
+    def tokenize_paragraph(self, paragraph):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
