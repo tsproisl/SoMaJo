@@ -699,6 +699,18 @@ class Tokenizer(object):
         """An alias for tokenize_paragraph"""
         return self.tokenize_paragraph(paragraph)
 
+    def tokenize_file(self, filename, parsep_empty_lines=True):
+        """Tokenize file and yield tokenized paragraphs."""
+        with open(filename) as f:
+            if parsep_empty_lines:
+                paragraphs = utils.get_paragraphs(f)
+            else:
+                paragraphs = (line for line in f if line.strip() != "")
+            tokenized_paragraphs = map(self.tokenize_paragraph, paragraphs)
+            for tp in tokenized_paragraphs:
+                if tp:
+                    yield tp
+
     def tokenize_paragraph(self, paragraph):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
