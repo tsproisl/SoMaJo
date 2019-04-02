@@ -189,11 +189,12 @@ class Tokenizer(object):
                                        # r"))+(?![[:alpha:]]{1,3}\.)", re.V1)
                                        r")+(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
 
-        # MENTIONS, HASHTAGS, ACTION WORDS
+        # MENTIONS, HASHTAGS, ACTION WORDS, UNDERLINE
         self.mention = re.compile(r'[@]\w+(?!\w)')
         self.hashtag = re.compile(r'(?<!\w)[#]\w+(?!\w)')
-        # action words without spaces are to be treated as units
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
+        # a pair of underscores can be used to "underline" some text
+        self.underline = re.compile(r"(?<!\w)(_)([^_]+\w)(_)(?!\w)")
 
         # DATE, TIME, NUMBERS
         self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?![\d.])', re.VERBOSE)
@@ -578,6 +579,8 @@ class Tokenizer(object):
         paragraph = self._replace_regex(paragraph, self.hashtag, "hashtag")
         # action words
         paragraph = self._replace_regex(paragraph, self.action_word, "action_word")
+        # underline
+        paragraph = self.underline.sub(r' \1 \2 \3 ', paragraph)
         # textual representations of emoji
         paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
 
