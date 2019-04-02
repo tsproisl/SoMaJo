@@ -291,7 +291,7 @@ class Tokenizer(object):
         self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
         self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')
         self.en_quotation_marks = re.compile(r'([„“”‚‘’"»«›‹])')
-        self.en_ot_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*,;:+×÷±≤≥=&/–—-]+)')
+        self.en_other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*,;:+×÷±≤≥=&/–—-]+)')
         self.ellipsis = re.compile(r'\.{2,}|…+(?:\.{2,})?')
         self.dot_without_space = re.compile(r'(?<=[[:lower:]]{2})(\.)(?=[[:upper:]][[:lower:]]{2})')
         # self.dot = re.compile(r'(?<=[\w)])(\.)(?![\w])')
@@ -676,7 +676,7 @@ class Tokenizer(object):
             paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
             paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
             paragraph = self._replace_regex(paragraph, self.en_quotation_marks, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_ot_punctuation, "symbol")
+            paragraph = self._replace_regex(paragraph, self.en_other_punctuation, "symbol")
         else:
             paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
         # ellipsis
