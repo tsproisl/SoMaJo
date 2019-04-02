@@ -872,6 +872,24 @@ class TestSuffixes(TestTokenizer):
         self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaabc")
 
 
+class TestUnderline(TestTokenizer):
+    """"""
+    def test_underline_01(self):
+        self._equal("eine _reife_ Leistung", "eine _ reife _ Leistung")
+
+    def test_underline_02(self):
+        self._equal("Wir gehen ins _Sub", "Wir gehen ins _Sub")
+
+    def test_underline_03(self):
+        self._equal("Achtung _sehr wichtig_:", "Achtung _ sehr wichtig _ :")
+
+    def test_underline_04(self):
+        self._equal("Achtung _sehr wichtig _!", "Achtung _sehr wichtig _ !")
+
+    def test_underline_05(self):
+        self._fail_means_improvement("Wir _gehen ins _Sub_", "Wir _ gehen ins _Sub _")
+
+
 class TestJunk(TestTokenizer):
     """"""
     def test_junk_01(self):
