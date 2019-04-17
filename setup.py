@@ -10,15 +10,15 @@
 from os import path
 from setuptools import setup
 
+from somajo import __version__
+
 here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.rst')) as fh:
     long_description = fh.read()
 
-version = "1.9.0"
-
 setup(
     name='SoMaJo',
-    version=version,
+    version=__version__,
     author='Thomas Proisl, Peter Uhrig',
     author_email='thomas.proisl@fau.de',
     packages=[
@@ -42,7 +42,7 @@ setup(
                    "tokens_with_plus_or_ampersand.txt"]
     },
     url="https://github.com/tsproisl/SoMaJo",
-    download_url='https://github.com/tsproisl/SoMaJo/archive/v%s.tar.gz' % version,
+    download_url='https://github.com/tsproisl/SoMaJo/archive/v%s.tar.gz' % __version__,
     license='GNU General Public License v3 or later (GPLv3+)',
     description='A tokenizer and sentence splitter for German and English web and social media texts.',
     long_description=long_description,
