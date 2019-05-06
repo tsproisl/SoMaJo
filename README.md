@@ -70,7 +70,7 @@ media texts:
 
 ## Installation ##
 
-SoMaJo can be easily installed using pip:
+SoMaJo can be easily installed using pip (pip3 in some distributions):
 
     pip install SoMaJo
 
