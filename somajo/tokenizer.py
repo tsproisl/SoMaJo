@@ -39,16 +39,17 @@ class Tokenizer(object):
         self.spaces = re.compile(r"\s+")
         self.controls = re.compile(r"[\u0000-\u001F\u007F-\u009F]")
         # soft hyphen (00AD), zero-width space (200B), zero-width
-        # non-joiner (200C), zero-width joiner (200D), left-to-right
-        # mark (200E), right-to-left mark (200F), left-to-right
-        # isolate (2066), right-to-left isolate (2067), l-t-r/r-t-l
-        # embedding (202A, 202B), l-t-r/r-t-l override (202D, 202E),
-        # pop directional formatting (202C), zero-width no-break space
-        # (FEFF)
-        self.other_nasties = re.compile(r"[\u00AD\u200B-\u200F\u202A-\u202E\u2066\u2067\uFEFF]")
+        # non-joiner (200C), zero-width joiner (200D), Arabic letter
+        # mark (061C), left-to-right mark (200E), right-to-left mark
+        # (200F), word joiner (2060), left-to-right isolate (2066),
+        # right-to-left isolate (2067), first strong isolate (2068),
+        # pop directional isolate (2069), l-t-r/r-t-l embedding (202A,
+        # 202B), l-t-r/r-t-l override (202D, 202E), pop directional
+        # formatting (202C), zero-width no-break space (FEFF)
+        self.other_nasties = re.compile(r"[\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]")
         # combination
-        self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u200B-\u200F\u202A-\u202E\u2066\u2067\uFEFF]+")
-        self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u200B-\u200F\u202A-\u202E\u2066\u2067\uFEFF]+(?:\s+|$)")
+        self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+")
+        self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+(?:\s+|$)")
 
         # TAGS, EMAILS, URLs
         self.xml_declaration = re.compile(r"""<\?xml
