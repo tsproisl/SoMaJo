@@ -3,6 +3,7 @@
 ## Version ???, ??? ##
 
 - Recognize underscores used for "underlining" and split them off.
+- Added a few Unicode formatting characters to the “nasty” characters.
 
 ## Version 1.9.0, 2019-04-01 ##
 
