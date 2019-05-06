@@ -920,6 +920,14 @@ class TestJunk(TestTokenizer):
         # More left-to-right and right-to-left stuff
         self._equal("foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta", "foobarbazquxalphabeta")
 
+    def test_junk_08(self):
+        # line separator and paragraph separator
+        self._equal("foo bar baz", "foo bar baz")
+
+    def test_junk_09(self):
+        # word joiner
+        self._equal("foo⁠bar", "foobar")
+
 
 class TestXML(TestTokenizer):
     """"""
