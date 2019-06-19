@@ -422,6 +422,9 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_12(self):
         self._fail_means_improvement("bla (http://www.sueddeutsche.de/bla/test_(geheim)) foo", "bla ( http://www.sueddeutsche.de/bla/test_(geheim) ) foo")
 
+    def test_emails_urls_13(self):
+        self._equal("vorname_nachname@provider.eu", "vorname_nachname@provider.eu")
+
 
 class TestEmoticons(TestTokenizer):
     """"""
