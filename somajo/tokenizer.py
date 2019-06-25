@@ -88,8 +88,8 @@ class Tokenizer(object):
         """, re.VERBOSE | re.IGNORECASE)
         # regex for email addresses taken from:
         # http://www.regular-expressions.info/email.html
-        # self.email = re.compile(r"\b[[:alnum:].%+-]+@[[:alnum:].-]+\.[[:alpha:]]{2,}\b")
-        self.email = re.compile(r"\b[[:alnum:].%+-]+(?:@| \[at\] )[[:alnum:].-]+(?:\.| \[?dot\]? )[[:alpha:]]{2,}\b")
+        # self.email = re.compile(r"\b[\w.%+-]+@[\w.-]+\.\p{L}{2,}\b")
+        self.email = re.compile(r"\b[\w.%+-]+(?:@| \[at\] )[\w.-]+(?:\.| \[?dot\]? )\p{L}{2,}\b")
         # simple regex for urls that start with http or www
         # TODO: schließende Klammer am Ende erlauben, wenn nach http etc. eine öffnende kam
         self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+?\(\S*?\)\S*(?=$|[\'. "!?,;\n\t])', re.IGNORECASE)
@@ -152,43 +152,43 @@ class Tokenizer(object):
         self.token_with_plus_ampersand = re.compile(r"(?<!\w)(?:" + r"|".join([re.escape(_) for _ in tokens_with_plus_or_ampersand]) + r")(?!\w)", re.IGNORECASE)
 
         # camelCase
-        self.emoji = re.compile(r'\bemojiQ[[:alpha:]]{3,}\b')
+        self.emoji = re.compile(r'\bemojiQ\p{L}{3,}\b')
         camel_case_token_list = utils.read_abbreviation_file("camel_case_tokens.txt")
         cc_alnum = [(cc, re.search(r"^\w+$", cc)) for cc in camel_case_token_list]
         self.simple_camel_case_tokens = set([cc[0] for cc in cc_alnum if cc[1]])
-        self.simple_camel_case_candidates = re.compile(r"\b\w*[[:lower:]][[:upper:]]\w*\b")
+        self.simple_camel_case_candidates = re.compile(r"\b\w*\p{Ll}\p{Lu}\w*\b")
         camel_case_token_list = [cc[0] for cc in cc_alnum if not cc[1]]
         # things like ImmobilienScout24.de are already covered by URL detection
-        # self.camel_case_url = re.compile(r'\b(?:[[:upper:]][[:lower:][:digit:]]+){2,}\.(?:de|com|org|net|edu)\b')
-        self.camel_case_token = re.compile(r"\b(?:" + r"|".join([re.escape(_) for _ in camel_case_token_list]) + r"|:Mac[[:upper:]][[:lower:]]*)\b")
-        # self.camel_case_token = re.compile(r"\b(?:\L<cctokens>|Mac[[:upper:]][[:lower:]]*)\b", cctokens=camel_case_token_set)
-        self.in_and_innen = re.compile(r'\b[[:alpha:]]+[[:lower:]]In(?:nen)?[[:lower:]]*\b')
-        self.camel_case = re.compile(r'(?<=[[:lower:]]{2})([[:upper:]])(?![[:upper:]]|\b)')
+        # self.camel_case_url = re.compile(r'\b(?:\p{Lu}[\p{Ll}\d]+){2,}\.(?:de|com|org|net|edu)\b')
+        self.camel_case_token = re.compile(r"\b(?:" + r"|".join([re.escape(_) for _ in camel_case_token_list]) + r"|:Mac\p{Lu}\p{Ll}*)\b")
+        # self.camel_case_token = re.compile(r"\b(?:\L<cctokens>|Mac\p{Lu}\p{Ll}*)\b", cctokens=camel_case_token_set)
+        self.in_and_innen = re.compile(r'\b\p{L}+\p{Ll}In(?:nen)?\p{Ll}*\b')
+        self.camel_case = re.compile(r'(?<=\p{Ll}{2})(\p{Lu})(?!\p{Lu}|\b)')
 
         # ABBREVIATIONS
-        self.single_letter_ellipsis = re.compile(r"(?<![\w.])(?P<a_letter>[[:alpha:]])(?P<b_ellipsis>\.{3})(?!\.)")
-        self.and_cetera = re.compile(r"(?<![\w.&])&c\.(?![[:alpha:]]{1,3}\.)")
-        self.str_abbreviations = re.compile(r'(?<![\w.])([[:alpha:]-]+-Str\.)(?![[:alpha:]])', re.IGNORECASE)
-        self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
-        self.single_letter_abbreviation = re.compile(r"(?<![\w.])[[:alpha:]]\.(?![[:alpha:]]{1,3}\.)")
+        self.single_letter_ellipsis = re.compile(r"(?<![\w.])(?P<a_letter>\p{L})(?P<b_ellipsis>\.{3})(?!\.)")
+        self.and_cetera = re.compile(r"(?<![\w.&])&c\.(?!\p{L}{1,3}\.)")
+        self.str_abbreviations = re.compile(r'(?<![\w.])([\p{L}-]+-Str\.)(?!\p{L})', re.IGNORECASE)
+        self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?!\p{L}{1,3}\.)", re.IGNORECASE)
+        self.single_letter_abbreviation = re.compile(r"(?<![\w.])\p{L}\.(?!\p{L}{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
         single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language)
-        self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?![[:alpha:]]{1,3}\.)', re.IGNORECASE)
+        self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?!\p{L}{1,3}\.)', re.IGNORECASE)
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
-        self.multipart_abbreviation = re.compile(r'(?:[[:alpha:]]+\.){2,}')
-        # only abbreviations that are not matched by (?:[[:alpha:]]\.)+
+        self.multipart_abbreviation = re.compile(r'(?:\p{L}+\.){2,}')
+        # only abbreviations that are not matched by (?:\p{L}\.)+
         abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language)
-        # abbrev_simple = [(a, re.search(r"^[[:alpha:]]{2,}\.$", a)) for a in abbreviation_list]
+        # abbrev_simple = [(a, re.search(r"^\p{L}{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
-        # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])[[:alpha:]]{2,}\.(?![[:alpha:]]{1,3}\.)")
+        # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])\p{L}{2,}\.(?!\p{L}{1,3}\.)")
         # abbreviation_list = [a[0] for a in abbrev_simple if not a[1]]
-        self.abbreviation = re.compile(r"(?<![[:alpha:].])(?:" +
-                                       r"(?:(?:[[:alpha:]]\.){2,})" +
+        self.abbreviation = re.compile(r"(?<![\p{L}.])(?:" +
+                                       r"(?:(?:\p{L}\.){2,})" +
                                        r"|" +
                                        # r"(?i:" +    # this part should be case insensitive
                                        r'|'.join([re.escape(_) for _ in abbreviation_list]) +
-                                       # r"))+(?![[:alpha:]]{1,3}\.)", re.V1)
-                                       r")+(?![[:alpha:]]{1,3}\.)", re.IGNORECASE)
+                                       # r"))+(?!\p{L}{1,3}\.)", re.V1)
+                                       r")+(?!\p{L}{1,3}\.)", re.IGNORECASE)
 
         # MENTIONS, HASHTAGS, ACTION WORDS, UNDERLINE
         self.mention = re.compile(r'[@]\w+(?!\w)')
@@ -215,7 +215,7 @@ class Tokenizer(object):
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
         self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|ghz|h|hz|kg|l|lb|min|ml|qm|s|sek)(?!\w)', re.IGNORECASE)
         # auch Web2.0
-        self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[[:alpha:]@][[:alpha:]@-]* | [[:alpha:]@][[:alpha:]@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
+        self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[\p{L}@][\p{L}@-]* | [\p{L}@][\p{L}@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
         self.number = re.compile(r"""(?<!\w)
                                      (?:[−+-]?              # optional sign
                                        \d*                  # optional digits before decimal point
@@ -286,7 +286,7 @@ class Tokenizer(object):
         self.en_degree = re.compile(r"(?<=\d ?)°(?:F|C|Oe)\b", re.IGNORECASE)
         # quotation marks
         # L'Enfer, d'accord, O'Connor
-        self.letter_apostrophe_word = re.compile(r"\b([dlo]['’][[:alpha:]]+)\b", re.IGNORECASE)
+        self.letter_apostrophe_word = re.compile(r"\b([dlo]['’]\p{L}+)\b", re.IGNORECASE)
         self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
         self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
@@ -295,7 +295,7 @@ class Tokenizer(object):
         self.en_quotation_marks = re.compile(r'([„“”‚‘’"»«›‹])')
         self.en_other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*,;:+×÷±≤≥=&/–—-]+)')
         self.ellipsis = re.compile(r'\.{2,}|…+(?:\.{2,})?')
-        self.dot_without_space = re.compile(r'(?<=[[:lower:]]{2})(\.)(?=[[:upper:]][[:lower:]]{2})')
+        self.dot_without_space = re.compile(r'(?<=\p{Ll}{2})(\.)(?=\p{Lu}\p{Ll}{2})')
         # self.dot = re.compile(r'(?<=[\w)])(\.)(?![\w])')
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
