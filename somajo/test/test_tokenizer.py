@@ -486,7 +486,34 @@ class TestEmoticons(TestTokenizer):
         self._equal("🙄😖✈♨🎧🤒🚗", "🙄 😖 ✈ ♨ 🎧 🤒 🚗")
 
     def test_emoticons_20(self):
-        self._equal("⚡️", "⚡ ️")
+        self._equal("⚡️", "⚡️")
+
+    def test_emoticons_21(self):
+        self._equal("\u203C\uFE0F", "\u203C\uFE0F")
+
+    def test_emoticons_22(self):
+        self._equal("\u0032\uFE0F\u20E3", "\u0032\uFE0F\u20E3")
+
+    def test_emoticons_23(self):
+        self._equal("\U0001F1E8\U0001F1FD", "\U0001F1E8\U0001F1FD")
+
+    def test_emoticons_24(self):
+        self._equal("\u270C\U0001F3FC", "\u270C\U0001F3FC")
+
+    def test_emoticons_25(self):
+        self._equal("\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466", "\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466")
+
+    def test_emoticons_26(self):
+        self._equal("\U0001F469\U0001F3FE\u200D\U0001F52C", "\U0001F469\U0001F3FE\u200D\U0001F52C")
+
+    def test_emoticons_27(self):
+        self._equal("\U0001F471\U0001F3FB\u200D\u2640\uFE0F", "\U0001F471\U0001F3FB\u200D\u2640\uFE0F")
+
+    def test_emoticons_28(self):
+        self._equal("\U0001F468\U0001F3FF\u200D\U0001F9B3", "\U0001F468\U0001F3FF\u200D\U0001F9B3")
+
+    def test_emoticons_29(self):
+        self._equal("\U0001F3F4\u200D\u2620\uFE0F", "\U0001F3F4\u200D\u2620\uFE0F")
 
 
 class TestActions(TestTokenizer):
