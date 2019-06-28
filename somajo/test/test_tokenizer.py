@@ -515,6 +515,9 @@ class TestEmoticons(TestTokenizer):
     def test_emoticons_29(self):
         self._equal("\U0001F3F4\u200D\u2620\uFE0F", "\U0001F3F4\u200D\u2620\uFE0F")
 
+    def test_emoticons_30(self):
+        self._equal("\U0001F468\U0001F3FF\u200D\U0001F9B3\U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466\U0001F3F4\u200D\u2620\uFE0F", "\U0001F468\U0001F3FF\u200D\U0001F9B3 \U0001F468\u200D\U0001F469\u200D\U0001F467\u200D\U0001F466 \U0001F3F4\u200D\u2620\uFE0F")
+
 
 class TestActions(TestTokenizer):
     """"""
