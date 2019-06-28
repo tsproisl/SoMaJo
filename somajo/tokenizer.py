@@ -105,7 +105,6 @@ class Tokenizer(object):
         self.entity_hex = re.compile(r'&#x[0-9a-f]+;', re.IGNORECASE)
 
         # EMOTICONS
-        # TODO: Peter, SMS von gestern Nacht -> hauptsächlich entities -> hilft nicht so wahnsinnig.
         emoticon_set = set(["(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
                             "(-:", ")=", ")o:", ")x", ":'C", ":/",
                             ":<", ":C", ":[", "=(", "=)", "=D", "=P",
@@ -139,8 +138,8 @@ class Tokenizer(object):
         # U+1F600..U+1F64F	Emoticons
         # U+1F680..U+1F6FF	Transport and Map Symbols
         # U+1F900..U+1F9FF	Supplemental Symbols and Pictographs
-        # self.unicode_symbols = re.compile(r"[\u2600-\u27BF]|[\u1F300-\u1F64F]|[\u1F680-\u1F6FF]|[\u1F900-\u1F9FF]")
-        self.unicode_symbols = re.compile(r"[\u2600-\u27BF\uFE0E\uFE0F\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
+        # self.unicode_symbols = re.compile(r"[\u2600-\u27BF\uFE0E\uFE0F\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
+        self.unicode_flags = re.compile(r"\p{Regional_Indicator}{2}")
 
         # special tokens containing + or &
         tokens_with_plus_or_ampersand = utils.read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
@@ -362,6 +361,24 @@ class Tokenizer(object):
         tokens = [self.mapping.get(t, Token(t, "regular")) for t in tokens]
         return tokens
 
+    def _replace_emojis(self, paragraph, token_class):
+        """Replace all emoji sequences"""
+        replacements = {}
+        emojis = []
+        for m in re.finditer(r"\X", paragraph):
+            if m.end() - m.start() > 1:
+                if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F]", m.group()):
+                    emojis.append(m.span())
+            else:
+                if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}]", m.group()):
+                    emojis.append(m.span())
+        for emoji in reversed(emojis):
+            instance = paragraph[emoji[0]:emoji[1]]
+            replacement = replacements.setdefault(instance, self._get_unique_string())
+            self.mapping[replacement] = Token(instance, token_class)
+            paragraph = paragraph[:emoji[0]] + " " + replacement + " " + paragraph[emoji[1]:]
+        return paragraph
+
     def _replace_abbreviations(self, text, split_multipart_abbrevs=True):
         """Replace instances of abbreviations with unique strings and store
         replacements in self.mapping.
@@ -536,9 +553,8 @@ class Tokenizer(object):
         # normalize whitespace
         paragraph = self.spaces.sub(" ", paragraph)
 
-        # get rid of junk characters
+        # get rid of control characters
         paragraph = self.controls.sub("", paragraph)
-        paragraph = self.other_nasties.sub("", paragraph)
 
         # normalize whitespace
         paragraph = self.spaces.sub(" ", paragraph)
@@ -551,6 +567,17 @@ class Tokenizer(object):
         paragraph = self._replace_regex(paragraph, self.tag, "XML_tag")
         # - email address obfuscation may involve spaces
         paragraph = self._replace_regex(paragraph, self.email, "email_address")
+
+        # Emoji sequences can contain zero-width joiners. Get them out
+        # of the way next
+        paragraph = self._replace_regex(paragraph, self.unicode_flags, "emoticon")
+        paragraph = self._replace_emojis(paragraph, "emoticon")
+
+        # get rid of other junk characters
+        paragraph = self.other_nasties.sub("", paragraph)
+
+        # normalize whitespace
+        paragraph = self.spaces.sub(" ", paragraph)
 
         # Some emoticons contain erroneous spaces. We fix this.
         paragraph = self.space_emoticon.sub(r'\1\2', paragraph)
@@ -573,7 +600,7 @@ class Tokenizer(object):
         paragraph = self.spaces.sub(" ", paragraph)
         paragraph = self._replace_regex(paragraph, self.heart_emoticon, "emoticon")
         paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
-        paragraph = self._replace_regex(paragraph, self.unicode_symbols, "emoticon")
+        # paragraph = self._replace_regex(paragraph, self.unicode_symbols, "emoticon")
 
         # mentions, hashtags
         paragraph = self._replace_regex(paragraph, self.mention, "mention")
