@@ -47,7 +47,7 @@ setup(
     description='A tokenizer and sentence splitter for German and English web and social media texts.',
     long_description=long_description,
     install_requires=[
-        "regex",
+        "regex>=2019.02.18",
     ],
     classifiers=[
         'Development Status :: 4 - Beta',
