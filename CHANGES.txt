@@ -1,7 +1,10 @@
 # CHANGELOG #
 
-## Version ???, ??? ##
+## Version 1.10.0, 2019-06-28 ##
 
+- Treat emoji sequences that render as a single grapheme as a single
+  token. This includes flags and sequences containing modifiers and
+  zero-width joiners.
 - Recognize underscores used for "underlining" and split them off.
 - Added a few Unicode formatting characters to the “nasty” characters.
 - Replaced POSIX character classes with built-ins or Unicode
