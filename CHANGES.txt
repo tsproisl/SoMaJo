@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version 1.10.1, 2019-07-02 ##
+
+- Use semantic versioning to specify minimal required version of
+  regex. This fixes a bug where the dependency was not correctly
+  installed.
+
 ## Version 1.10.0, 2019-06-28 ##
 
 - Treat emoji sequences that render as a single grapheme as a single
