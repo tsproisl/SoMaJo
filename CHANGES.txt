@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version 1.10.2, 2019-07-02 ##
+
+- The error that 1.10.1 tried to fix was not really caused by the
+  version numbers of regex but by specifying our own version number in
+  __init__.py where we also indirectly load required modules.
+
 ## Version 1.10.1, 2019-07-02 ##
 
 - Use semantic versioning to specify minimal required version of
