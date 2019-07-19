@@ -3,6 +3,7 @@
 ## Version ??? ##
 
 - New option -v/--version to output version information.
+- Explicitly specify input encoding as UTF-8.
 
 ## Version 1.10.2, 2019-07-02 ##
 
