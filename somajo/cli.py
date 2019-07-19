@@ -25,7 +25,7 @@ def arguments():
     parser.add_argument("--parallel", type=int, default=1, metavar="N", help="Run N worker processes (up to the number of CPUs) to speed up tokenization.")
     parser.add_argument("--split_sentences", action="store_true", help="Do also split the paragraphs into sentences.")
     parser.add_argument("-v", "--version", action="version", version="SoMaJo %s" % __version__, help="Output version information and exit.")
-    parser.add_argument("FILE", type=argparse.FileType("r"), help="The input file")
+    parser.add_argument("FILE", type=argparse.FileType("r", encoding="utf-8"), help="The input file (UTF-8-encoded)")
     args = parser.parse_args()
     return args
 
