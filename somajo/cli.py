@@ -3,11 +3,13 @@
 import argparse
 import logging
 import multiprocessing
+import sys
 import time
 
 from somajo import Tokenizer
 from somajo import SentenceSplitter
 from somajo import utils
+from somajo.version import __version__
 
 
 def arguments():
@@ -22,6 +24,7 @@ def arguments():
     parser.add_argument("-l", "--language", choices=Tokenizer.supported_languages, default=Tokenizer.default_language, help="Choose a language. Currently supported are German (de) and English (en). (Default: de)")
     parser.add_argument("--parallel", type=int, default=1, metavar="N", help="Run N worker processes (up to the number of CPUs) to speed up tokenization.")
     parser.add_argument("--split_sentences", action="store_true", help="Do also split the paragraphs into sentences.")
+    parser.add_argument("-v", "--version", action="version", version="SoMaJo %s" % __version__, help="Output version information and exit.")
     parser.add_argument("FILE", type=argparse.FileType("r"), help="The input file")
     args = parser.parse_args()
     return args
@@ -29,6 +32,8 @@ def arguments():
 
 def main():
     args = arguments()
+    if args.version:
+        print(somajo.version.__version__)
     n_tokens = 0
     t0 = time.perf_counter()
     is_xml = False
