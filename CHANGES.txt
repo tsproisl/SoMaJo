@@ -1,6 +1,6 @@
 # CHANGELOG #
 
-## Version ??? ##
+## Version 1.10.3 ##
 
 - New option -v/--version to output version information.
 - Explicitly specify input encoding as UTF-8.
