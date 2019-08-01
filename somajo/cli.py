@@ -32,8 +32,6 @@ def arguments():
 
 def main():
     args = arguments()
-    if args.version:
-        print(somajo.version.__version__)
     n_tokens = 0
     t0 = time.perf_counter()
     is_xml = False
