@@ -1,6 +1,10 @@
 # CHANGELOG #
 
-## Version 1.10.3 ##
+## Version 1.10.4, 2019-08-01 ##
+
+- Bugfix related to the --version option.
+
+## Version 1.10.3, 2019-07-19 ##
 
 - New option -v/--version to output version information.
 - Explicitly specify input encoding as UTF-8.
