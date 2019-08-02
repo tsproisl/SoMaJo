@@ -521,6 +521,9 @@ class TestEmoticons(TestTokenizer):
     def test_emoticons_31(self):
         self._equal("+ 🇺🇦️ Wahlen, Wahlen, Wahlen 🇺🇦️ +", "+ 🇺🇦️ Wahlen , Wahlen , Wahlen 🇺🇦️ +")
 
+    def test_emoticons_32(self):
+        self._equal("stage ️ bf0eb1c8cf477518ebdf43469b3246d1 https://t.co/TjNdsPqfr9", "stage bf0eb1c8cf477518ebdf43469b3246d1 https://t.co/TjNdsPqfr9")
+
 
 class TestActions(TestTokenizer):
     """"""
