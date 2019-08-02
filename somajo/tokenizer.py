@@ -139,7 +139,7 @@ class Tokenizer(object):
         # U+1F680..U+1F6FF	Transport and Map Symbols
         # U+1F900..U+1F9FF	Supplemental Symbols and Pictographs
         # self.unicode_symbols = re.compile(r"[\u2600-\u27BF\uFE0E\uFE0F\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
-        self.unicode_flags = re.compile(r"\p{Regional_Indicator}{2}")
+        self.unicode_flags = re.compile(r"\p{Regional_Indicator}{2}\uFE0F?")
 
         # special tokens containing + or &
         tokens_with_plus_or_ampersand = utils.read_abbreviation_file("tokens_with_plus_or_ampersand.txt")
@@ -194,7 +194,7 @@ class Tokenizer(object):
         self.hashtag = re.compile(r'(?<!\w)[#]\w+(?!\w)')
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
         # a pair of underscores can be used to "underline" some text
-        self.underline = re.compile(r"(?<!\w)(_)([^_]+\w)(_)(?!\w)")
+        self.underline = re.compile(r"(?<!\w)(_)(\w[^_]+\w)(_)(?!\w)")
 
         # DATE, TIME, NUMBERS
         self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?![\d.])', re.VERBOSE)
