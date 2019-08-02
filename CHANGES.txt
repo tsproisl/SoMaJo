@@ -3,6 +3,7 @@
 ## Version 1.10.5, 2019-08-02 ##
 
 - Correctly tokenize flags followed by a variation selector.
+- Delete variation selector that occurs on its own.
 
 ## Version 1.10.4, 2019-08-01 ##
 
