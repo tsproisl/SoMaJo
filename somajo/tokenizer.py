@@ -38,6 +38,7 @@ class Tokenizer(object):
 
         self.spaces = re.compile(r"\s+")
         self.controls = re.compile(r"[\u0000-\u001F\u007F-\u009F]")
+        self.stranded_variation_selector = re.compile(r" \uFE0F")
         # soft hyphen (00AD), zero-width space (200B), zero-width
         # non-joiner (200C), zero-width joiner (200D), Arabic letter
         # mark (061C), left-to-right mark (200E), right-to-left mark
@@ -555,6 +556,9 @@ class Tokenizer(object):
 
         # get rid of control characters
         paragraph = self.controls.sub("", paragraph)
+
+        # get rid of isolated variation selectors
+        paragraph = self.stranded_variation_selector.sub("", paragraph)
 
         # normalize whitespace
         paragraph = self.spaces.sub(" ", paragraph)
