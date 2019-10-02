@@ -165,6 +165,9 @@ class Tokenizer(object):
         self.in_and_innen = re.compile(r'\b\p{L}+\p{Ll}In(?:nen)?\p{Ll}*\b')
         self.camel_case = re.compile(r'(?<=\p{Ll}{2})(\p{Lu})(?!\p{Lu}|\b)')
 
+        # GENDER STAR
+        self.gender_star = re.compile(r'\b\p{L}+\*in(?:nen)?\p{Ll}*\b')
+
         # ABBREVIATIONS
         self.single_letter_ellipsis = re.compile(r"(?<![\w.])(?P<a_letter>\p{L})(?P<b_ellipsis>\.{3})(?!\.)")
         self.and_cetera = re.compile(r"(?<![\w.&])&c\.(?!\p{L}{1,3}\.)")
@@ -625,6 +628,9 @@ class Tokenizer(object):
             paragraph = self._replace_set(paragraph, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
             paragraph = self._replace_regex(paragraph, self.in_and_innen)
             paragraph = self.camel_case.sub(r' \1', paragraph)
+
+        # gender star
+        paragraph = self._replace_regex(paragraph, self.gender_star)
 
         # English possessive and contracted forms
         if self.language == "en":

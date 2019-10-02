@@ -890,6 +890,12 @@ class OwnAdditions(TestTokenizer):
     def test_own_97(self):
         self._equal("Ich bin Kunde bei E.ON.", "Ich bin Kunde bei E.ON .")
 
+    def test_own_98(self):
+        self._equal("Problem: Setzer*in macht einen Fehler", "Problem : Setzer*in macht einen Fehler")
+
+    def test_own_99(self):
+        self._equal("Wir suchen Mitarbeiter*innen, die bla", "Wir suchen Mitarbeiter*innen , die bla")
+
 
 class TestSuffixes(TestTokenizer):
     """"""
@@ -984,6 +990,9 @@ class TestXML(TestTokenizer):
 
     def test_xml_04(self):
         self.assertEqual(self.tokenizer.tokenize_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", is_file=False), ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
+
+    def test_xml_05(self):
+        self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
 
 
 class TestTokenizerExtra(unittest.TestCase):
