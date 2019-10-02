@@ -807,7 +807,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("1.1.1 Allgemeines", "1.1.1 Allgemeines")
 
     def test_own_70(self):
-        self._fail_means_improvement("1.1.1. Allgemeines", "1.1.1. Allgemeines")
+        self._equal("1.1.1. Allgemeines", "1.1.1. Allgemeines")
 
     def test_own_71(self):
         self._equal("Google+", "Google+")
@@ -895,6 +895,18 @@ class OwnAdditions(TestTokenizer):
 
     def test_own_99(self):
         self._equal("Wir suchen Mitarbeiter*innen, die bla", "Wir suchen Mitarbeiter*innen , die bla")
+
+    def test_own_100(self):
+        self._equal("Punkte 1,2,3,4,5,6,7 sind bla", "Punkte 1 , 2 , 3 , 4 , 5 , 6 , 7 sind bla")
+
+    def test_own_101(self):
+        self._equal("1.1 Allgemeines", "1.1 Allgemeines")
+
+    def test_own_102(self):
+        self._fail_means_improvement("1.1. Allgemeines", "1.1. Allgemeines")
+
+    def test_own_103(self):
+        self._equal("IP-Adresse des Routers: 192.0.2.42.", "IP-Adresse des Routers : 192.0.2.42 .")
 
 
 class TestSuffixes(TestTokenizer):

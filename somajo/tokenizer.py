@@ -219,15 +219,20 @@ class Tokenizer(object):
         self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|ghz|h|hz|kg|l|lb|min|ml|qm|s|sek)(?!\w)', re.IGNORECASE)
         # auch Web2.0
         self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[\p{L}@][\p{L}@-]* | [\p{L}@][\p{L}@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
-        self.number = re.compile(r"""(?<!\w)
+        self.number = re.compile(r"""(?<!\w|\d[.,]?)
                                      (?:[−+-]?              # optional sign
-                                       \d*                  # optional digits before decimal point
-                                       [.,]?                # optional decimal point
+                                       (?:\d*               # optional digits before decimal point
+                                       [.,])?               # optional decimal point
                                        \d+                  # digits
                                        (?:[eE][−+-]?\d+)?   # optional exponent
                                        |
-                                       \d+[\d.,]*\d+)
+                                       \d{1,3}(?:[.]\d{3})+(?:,\d+)?  # dot for thousands, comma for decimals: 1.999,95
+                                       |
+                                       \d{1,3}(?:,\d{3})+(?:[.]\d+)?  # comma for thousands, dot for decimals: 1,999.95
+                                       )
                                      (?![.,]?\d)""", re.VERBOSE)
+        self.ipv4 = re.compile(r"(?<!\w|\d[.,]?)(?:\d{1,3}[.]){3}\d{1,3}(?![.,]?\d)")
+        self.section_number = re.compile(r"(?<!\w|\d[.,]?)(?:\d+[.])+\d+[.]?(?![.,]?\d)")
 
         # PUNCTUATION
         self.quest_exclam = re.compile(r"([!?]+)")
@@ -686,6 +691,8 @@ class Tokenizer(object):
         paragraph = self._replace_regex(paragraph, self.number_compound, "number_compound")
         # numbers
         paragraph = self._replace_regex(paragraph, self.number, "number")
+        paragraph = self._replace_regex(paragraph, self.ipv4, "number")
+        paragraph = self._replace_regex(paragraph, self.section_number, "number")
 
         # (clusters of) question marks and exclamation marks
         paragraph = self._replace_regex(paragraph, self.quest_exclam, "symbol")
