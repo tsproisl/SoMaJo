@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version 1.10.6, 2019-10-02 ##
+
+- Recognize gender star.
+- Improve recognition of lists of numbers, section numbers and IPv4
+  addresses
+
 ## Version 1.10.5, 2019-08-02 ##
 
 - Correctly tokenize flags followed by a variation selector.
