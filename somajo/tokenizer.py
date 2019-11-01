@@ -167,7 +167,7 @@ class Tokenizer(object):
         self.camel_case = re.compile(r'(?<=\p{Ll}{2})(\p{Lu})(?!\p{Lu}|\b)')
 
         # GENDER STAR
-        self.gender_star = re.compile(r'\b\p{L}+\*in(?:nen)?\p{Ll}*\b')
+        self.gender_star = re.compile(r'\b\p{L}+\*in(?:nen)?\p{Ll}*\b', re.IGNORECASE)
 
         # ABBREVIATIONS
         self.single_letter_ellipsis = re.compile(r"(?<![\w.])(?P<a_letter>\p{L})(?P<b_ellipsis>\.{3})(?!\.)")
