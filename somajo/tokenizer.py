@@ -50,6 +50,7 @@ class Tokenizer(object):
         self.other_nasties = re.compile(r"[\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]")
         # combination
         self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+")
+        self.junk_next_to_space = re.compile(r"(?:^|\s)[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+|[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+(?:\s|$)")
         self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+(?:\s+|$)")
 
         # TAGS, EMAILS, URLs
@@ -444,8 +445,8 @@ class Tokenizer(object):
 
         """
         extra_info = ["" for _ in tokens]
-        normalized = self.spaces.sub(" ", original_text)
-        normalized = self.junk_between_spaces.sub(" ", normalized)
+        normalized = self.junk_next_to_space.sub(" ", original_text)
+        normalized = self.spaces.sub(" ", normalized)
         normalized = normalized.strip()
         for token_index, t in enumerate(tokens):
             original_spelling = None
@@ -491,8 +492,8 @@ class Tokenizer(object):
         agenda = list(reversed(tokens))
         for element in elements:
             original_text = unicodedata.normalize("NFC", element.text)
-            normalized = self.spaces.sub(" ", original_text)
-            normalized = self.junk_between_spaces.sub(" ", normalized)
+            normalized = self.junk_next_to_space.sub(" ", original_text)
+            normalized = self.spaces.sub(" ", normalized)
             normalized = normalized.strip()
             output = []
             while len(normalized) > 0:
