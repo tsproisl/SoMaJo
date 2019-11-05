@@ -449,6 +449,9 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_17(self):
         self._equal("/u/quatschkopf", "/u/quatschkopf")
 
+    def test_emails_urls_18(self):
+        self._equal("/r/foo/bar/", "/r/foo/bar/")
+
 
 class TestEmoticons(TestTokenizer):
     """"""
