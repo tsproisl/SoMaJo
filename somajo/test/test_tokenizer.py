@@ -437,6 +437,18 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_13(self):
         self._equal("vorname_nachname@provider.eu", "vorname_nachname@provider.eu")
 
+    def test_emails_urls_14(self):
+        self._equal("r/foo/bar", "r/foo/bar")
+
+    def test_emails_urls_15(self):
+        self._equal("/r/foo/bar", "/r/foo/bar")
+
+    def test_emails_urls_16(self):
+        self._equal("l/de", "l/de")
+
+    def test_emails_urls_17(self):
+        self._equal("/u/quatschkopf", "/u/quatschkopf")
+
 
 class TestEmoticons(TestTokenizer):
     """"""
