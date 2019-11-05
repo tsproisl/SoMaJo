@@ -17,7 +17,7 @@ def arguments():
     parser = argparse.ArgumentParser(description="Tokenize an input file according to the guidelines of the EmpiriST 2015 shared task on automatic linguistic annotation of computer-mediated communication / social media.")
     parser.add_argument("-s", "--paragraph_separator", choices=["empty_lines", "single_newlines"], default="empty_lines", help="How are paragraphs separated in the input text? Will be ignored if option -x/--xml is used. (Default: empty_lines)")
     parser.add_argument("-x", "--xml", action="store_true", help="The input is an XML file. You can specify tags that always constitute a sentence break (e.g. HTML p tags) via the --tag option.")
-    parser.add_argument("--tag", action="append", help="Start and end tags of this type constitute sentence breaks, i.e. they do not occur in the middle of a sentence. Can be used multiple times to specify multiple tags, e.g. --tag p --tag br. Implies option -x/--xml. (Default: --tag title --tag h1 --tag h2 --tag h3 --tag h4 --tag h5 --tag h6 --tag p --tag br --tag div --tag ol --tag ul --tag dl --tag table)")
+    parser.add_argument("--tag", action="append", help="Start and end tags of this type constitute sentence breaks, i.e. they do not occur in the middle of a sentence. Can be used multiple times to specify multiple tags, e.g. --tag p --tag br. Implies option -x/--xml. (Default: --tag title --tag h1 --tag h2 --tag h3 --tag h4 --tag h5 --tag h6 --tag p --tag br --tag hr --tag div --tag ol --tag ul --tag dl --tag table)")
     parser.add_argument("-c", "--split_camel_case", action="store_true", help="Split items in written in camelCase (excluding several exceptions).")
     parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (number, XML tag, abbreviation, etc.) in addition to the tokens.")
     parser.add_argument("-e", "--extra_info", action="store_true", help='Output additional information for each token: SpaceAfter=No if the token was not followed by a space and OriginalSpelling="…" if the token contained whitespace.')
@@ -44,7 +44,7 @@ def main():
             logging.warning("Parallel tokenization of XML files is currently not supported.")
         eos_tags = args.tag
         if eos_tags is None:
-            eos_tags = "title h1 h2 h3 h4 h5 h6 p br div ol ul dl table".split()
+            eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         eos_tags = set(eos_tags)
         tokenized_paragraphs = [tokenizer.tokenize_xml(args.FILE)]
         if args.split_sentences:
