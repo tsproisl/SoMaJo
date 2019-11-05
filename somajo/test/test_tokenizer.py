@@ -185,6 +185,18 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_43(self):
         self._equal('Das ist ein "Zitat", gell?', 'Das ist ein " Zitat " , gell ?')
 
+    def test_punctuation_44(self):
+        self._equal("Student*innen", "Student*innen")
+
+    def test_punctuation_45(self):
+        self._equal("Student*Innen", "Student*Innen")
+
+    def test_punctuation_46(self):
+        self._equal("Student_innen", "Student_innen")
+
+    def test_punctuation_47(self):
+        self._equal("Student_Innen", "Student_Innen")
+
 
 class TestTimeDate(TestTokenizer):
     """"""
