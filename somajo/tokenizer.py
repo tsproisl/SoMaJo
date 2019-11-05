@@ -100,6 +100,7 @@ class Tokenizer(object):
         self.doi_with_space = re.compile(r'(?<=\bdoi: )10\.\d+/\S+', re.IGNORECASE)
         # we also allow things like tagesschau.de-App
         self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|org|net|edu|info|gov|jpg|png|gif|log|txt|xlsx?|docx?|pptx?|pdf)(?:-\w+)?\b', re.IGNORECASE)
+        self.reddit_links = re.compile(r'(?<!\w)/?[rlu](?:/\w+)+\b', re.IGNORECASE)
 
         # XML entities
         self.entity_name = re.compile(r'&(?:quot|amp|apos|lt|gt);', re.IGNORECASE)
@@ -601,6 +602,7 @@ class Tokenizer(object):
         paragraph = self._replace_regex(paragraph, self.doi, "DOI")
         paragraph = self._replace_regex(paragraph, self.doi_with_space, "DOI")
         paragraph = self._replace_regex(paragraph, self.url_without_protocol, "URL")
+        paragraph = self._replace_regex(paragraph, self.reddit_links, "URL")
         # paragraph = self._replace_regex(paragraph, self.url)
 
         # XML entities
