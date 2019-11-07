@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version 1.10.7, 2019-11-01 ##
+
+- Make recognition of gender star case insensitive
+- Fix problem with “nasty” character as last character of text unit
+
 ## Version 1.10.6, 2019-10-02 ##
 
 - Recognize gender star.
