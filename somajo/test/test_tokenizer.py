@@ -1032,6 +1032,12 @@ class TestXML(TestTokenizer):
 
     def test_xml_05(self):
         self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
+    
+    def test_xml_06(self):
+        self._equal_xml("<foo><bar>na so was -&#x200B;</bar><bar>&gt; bla</bar></foo>", "<foo> <bar> na so was - </bar> <bar> &gt; bla </bar> </foo>")
+
+    def test_xml_07(self):
+        self._equal_xml("<foo><text><p>blendend. 👱‍</p></text><text ><blockquote><p>Foo bar baz</p></blockquote></text></foo>", "<foo> <text> <p> blendend . 👱‍ </p> </text> <text> <blockquote> <p> Foo bar baz </p> </blockquote> </text> </foo>")
 
 
 class TestTokenizerExtra(unittest.TestCase):
