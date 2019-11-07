@@ -385,6 +385,7 @@ class Tokenizer(object):
                     emojis.append(m.span())
         for emoji in reversed(emojis):
             instance = paragraph[emoji[0]:emoji[1]]
+            instance = instance.strip()
             replacement = replacements.setdefault(instance, self._get_unique_string())
             self.mapping[replacement] = Token(instance, token_class)
             paragraph = paragraph[:emoji[0]] + " " + replacement + " " + paragraph[emoji[1]:]
