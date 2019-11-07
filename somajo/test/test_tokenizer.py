@@ -1039,6 +1039,18 @@ class TestXML(TestTokenizer):
     def test_xml_07(self):
         self._equal_xml("<foo><text><p>blendend. 👱‍</p></text><text ><blockquote><p>Foo bar baz</p></blockquote></text></foo>", "<foo> <text> <p> blendend . 👱‍ </p> </text> <text> <blockquote> <p> Foo bar baz </p> </blockquote> </text> </foo>")
 
+    def test_xml_08(self):
+        self._equal_xml("<text><p>Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt.</p><p>So 🙇🙇 manchen Unionspolitikern gestehe ich schon …</p></text>", "<text> <p> Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt . </p> <p> So 🙇 🙇 manchen Unionspolitikern gestehe ich schon … </p> </text>")
+
+    def test_xml_09(self):
+        self._equal_xml("""<text>
+<p>Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt.</p>
+
+<p>So 🙇🙇 manchen Unionspolitikern gestehe ich schon noch irgendwie zu, dass sie durchaus das Bedürfnis haben, ihren Bürgern ein gutes Leben zu ermöglichen. Zwar halte ich ihre Vorstellung von einem "guten Leben" und/oder die ☠☣ Wege, auf denen dieses erreicht werden soll, für grundsätzlich falsch - aber da stecken zumindest teilweise durchaus legitim gute Absichten dahinter.</p>
+
+<p>Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹👹 Anstand. Die Dinge, die er ⤵⤵ erkennbar überzeugt von sich gibt, triefen vor Arroganz und Empathielosigkeit (Hartz IV? Mehr als genug; Gefährlich niedrige Versorgung mit Geburtshilfe? Sollen die 💯🚦 Weiber halt nen Kilometer weiter fahren); die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕👹 konservative Interessengruppen (jüngst beispielsweise Abtreibungsgegner) mittels plumpmöglichster Populismen.</p>
+        </text>""", """<text> <p> Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt . </p> <p> So 🙇 🙇 manchen Unionspolitikern gestehe ich schon noch irgendwie zu , dass sie durchaus das Bedürfnis haben , ihren Bürgern ein gutes Leben zu ermöglichen . Zwar halte ich ihre Vorstellung von einem " guten Leben " und / oder die ☠ ☣ Wege , auf denen dieses erreicht werden soll , für grundsätzlich falsch - aber da stecken zumindest teilweise durchaus legitim gute Absichten dahinter . </p> <p> Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹 👹 Anstand . Die Dinge , die er ⤵ ⤵ erkennbar überzeugt von sich gibt , triefen vor Arroganz und Empathielosigkeit ( Hartz IV ? Mehr als genug ; Gefährlich niedrige Versorgung mit Geburtshilfe ? Sollen die 💯 🚦 Weiber halt nen Kilometer weiter fahren ) ; die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕 👹 konservative Interessengruppen ( jüngst beispielsweise Abtreibungsgegner ) mittels plumpmöglichster Populismen . </p> </text>""")
+
 
 class TestTokenizerExtra(unittest.TestCase):
     """"""
