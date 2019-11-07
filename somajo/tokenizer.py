@@ -446,7 +446,7 @@ class Tokenizer(object):
 
         """
         extra_info = ["" for _ in tokens]
-        normalized = self.junk_next_to_space.sub(" ", original_text)
+        normalized = self.junk_between_spaces.sub(" ", original_text)
         normalized = self.spaces.sub(" ", normalized)
         normalized = normalized.strip()
         for token_index, t in enumerate(tokens):
@@ -465,7 +465,8 @@ class Tokenizer(object):
                             normalized = normalized[1:]
                             orig.append(first_char)
                         except IndexError:
-                            warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
+                            warnings.warn("Error aligning tokens with original text!\nOriginal text: '%s'\nToken: '%s'\nRemaining normalized text: '%s'\nValue of orig: '%s'" % (original_text, token, normalized, "".join(orig)))
+                            break
                 original_spelling = "".join(orig)
             m = self.starts_with_junk.search(normalized)
             if m:
@@ -493,7 +494,7 @@ class Tokenizer(object):
         agenda = list(reversed(tokens))
         for element in elements:
             original_text = unicodedata.normalize("NFC", element.text)
-            normalized = self.junk_next_to_space.sub(" ", original_text)
+            normalized = self.junk_between_spaces.sub(" ", original_text)
             normalized = self.spaces.sub(" ", normalized)
             normalized = normalized.strip()
             output = []
@@ -510,6 +511,7 @@ class Tokenizer(object):
                     normalized = ""
                 else:
                     orig = []
+                    processed = []
                     for char in token:
                         first_char = None
                         while first_char != char:
@@ -518,7 +520,13 @@ class Tokenizer(object):
                                 normalized = normalized[1:]
                                 orig.append(first_char)
                             except IndexError:
-                                warnings.warn("IndexError in this paragraph: '%s'\nTokens: %s" % (original_text, tokens))
+                                warnings.warn("Error aligning tokens with original text!\nOriginal text: '%s'\nToken: '%s'\nRemaining normalized text: '%s'\nValue of orig: '%s'" % (original_text, token, normalized, "".join(orig)))
+                                break
+                        else:
+                            processed.append(char)
+                    if len(processed) != len(token):
+                        agenda.append(Token(token[len(processed):].lstrip(), t.token_class))
+                        token = token[:len(processed)]
                     original_spelling = "".join(orig)
                 m = self.starts_with_junk.search(normalized)
                 if m:
