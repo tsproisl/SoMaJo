@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version 1.11.0, 2019-11-08 ##
+
+- XML sentence splitting: Added hr tag to default sentence breaks
+- Recognize Reddit links in shorthand notation
+- Improved robustness of XML processing
+
 ## Version 1.10.7, 2019-11-01 ##
 
 - Make recognition of gender star case insensitive
