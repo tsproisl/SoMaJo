@@ -1,6 +1,6 @@
 # 1. Upload to PyPI:
 # python3 setup.py sdist
-# python3 setup.py sdist upload
+# twine upload dist/*
 #
 # 2. Check if everything looks all right: https://pypi.python.org/pypi/SoMaJo
 #
