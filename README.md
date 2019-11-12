@@ -158,49 +158,54 @@ operates on paragraphs of tokenized text, i.e. on the output of the
 tokenize methods. You have to import `somajo.SentenceSplitter`,
 create a `SentenceSplitter` object and call its `split` method. Here is an example for tokenizing and splitting a single paragraph:
 
-    from somajo import Tokenizer, SentenceSplitter
+```python
+from somajo import Tokenizer, SentenceSplitter
 
-    tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
-    # set is_tuple=True if token_classes=True or extra_info=True
-    sentence_splitter = SentenceSplitter(is_tuple=False)
+tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
+# set is_tuple=True if token_classes=True or extra_info=True
+sentence_splitter = SentenceSplitter(is_tuple=False)
 
-    # note that paragraphs are allowed to contain newlines
-    paragraph = "der beste Betreuer?\n-- ProfSmith! : )"
+# note that paragraphs are allowed to contain newlines
+paragraph = "der beste Betreuer?\n-- ProfSmith! : )"
 
-    tokens = tokenizer.tokenize_paragraph(paragraph)
-    print("\n".join(tokens), "\n")
+tokens = tokenizer.tokenize_paragraph(paragraph)
+print("\n".join(tokens), "\n")
 
-    sentences = sentence_splitter.split(tokens)
-    for sentence in sentences:
-        print("\n".join(sentence), "\n")
+sentences = sentence_splitter.split(tokens)
+for sentence in sentences:
+    print("\n".join(sentence), "\n")
+```
 
 And here is an example for tokenizing and sentence splitting a whole
 file. The option `parsep_empty_lines=False` states that paragraphs are
 delimited by newlines instead of empty lines:
-    
-	# If paragraphs are not separated by empty lines, specify parsep_empty_lines=False:
-    tokenized_paragraphs = tokenizer.tokenize_file("Beispieldatei.txt", parsep_empty_lines=False)
-    
-    for paragraph in tokenized_paragraphs:
-        sentences = sentence_splitter.split(paragraph)
-        for sentence in sentences:
-            print("\n".join(sentence), "\n")
+
+```python
+# If paragraphs are not separated by empty lines, specify parsep_empty_lines=False:
+tokenized_paragraphs = tokenizer.tokenize_file("Beispieldatei.txt", parsep_empty_lines=False)
+
+for paragraph in tokenized_paragraphs:
+    sentences = sentence_splitter.split(paragraph)
+    for sentence in sentences:
+        print("\n".join(sentence), "\n")
+```
 
 For processing XML data, use the `tokenize_xml` and `split_xml` methods:
 
-    # you can read from an open file object
-    tokens = tokenizer.tokenize_xml(file_object)
-	# or you can pass a string with XML data
-	tokens = tokenizer.tokenize_xml(xml_string, is_file=False)
-	
-	print("\n".join(tokens), "\n")
-	
-	eos_tags = set(["title", "h1", "p"])
-	sentences = sentence_splitter.split_xml(tokens, eos_tags)
-	
-    for sentence in sentences:
-        print("\n".join(sentence), "\n")
-	
+```python
+# you can read from an open file object
+tokens = tokenizer.tokenize_xml(file_object)
+# or you can pass a string with XML data
+tokens = tokenizer.tokenize_xml(xml_string, is_file=False)
+
+print("\n".join(tokens), "\n")
+
+eos_tags = set(["title", "h1", "p"])
+sentences = sentence_splitter.split_xml(tokens, eos_tags)
+
+for sentence in sentences:
+    print("\n".join(sentence), "\n")
+```
 
 ## Evaluation ##
 
@@ -233,8 +238,10 @@ via the `-l` or `--language` option:
 From Python, you can pass `language="en"` to the `Tokenizer` and
 `SentenceSplitter` constructors, e.g.:
 
-    tokenizer = Tokenizer(language="en")
-    tokens = tokenizer.tokenize("That aint bad!:D")
+```python
+tokenizer = Tokenizer(language="en")
+tokens = tokenizer.tokenize("That aint bad!:D")
+```
 
 Performance of the English tokenizer:
 
@@ -251,14 +258,16 @@ Performance of the English tokenizer:
     EmpiriST Shared Task. Berlin: Association for Computational
     Linguistics (ACL), 57–62.
     [PDF](http://aclweb.org/anthology/W16-2607).
-    
-        @InProceedings{Proisl_Uhrig_EmpiriST:2016,
-          author    = {Proisl, Thomas and Uhrig, Peter},
-          title     = {{SoMaJo}: {S}tate-of-the-art tokenization for {G}erman web and social media texts},
-          booktitle = {Proceedings of the 10th {W}eb as {C}orpus Workshop ({WAC-X}) and the {EmpiriST} Shared Task},
-          year      = {2016},
-          address   = {Berlin},
-          publisher = {Association for Computational Linguistics ({ACL})},
-          pages     = {57--62},
-          url       = {http://aclweb.org/anthology/W16-2607},
-        }
+
+	```bibtex
+    @InProceedings{Proisl_Uhrig_EmpiriST:2016,
+      author    = {Proisl, Thomas and Uhrig, Peter},
+      title     = {{SoMaJo}: {S}tate-of-the-art tokenization for {G}erman web and social media texts},
+      booktitle = {Proceedings of the 10th {W}eb as {C}orpus Workshop ({WAC-X}) and the {EmpiriST} Shared Task},
+      year      = {2016},
+      address   = {Berlin},
+      publisher = {Association for Computational Linguistics ({ACL})},
+      pages     = {57--62},
+      url       = {http://aclweb.org/anthology/W16-2607},
+    }
+	```
