@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import collections
 import random
 import unicodedata
 import warnings
-import xml.etree.ElementTree as ET
 
 import regex as re
 
+from somajo import doubly_linked_list
 from somajo import utils
 from somajo.token import Token
 
@@ -777,28 +776,30 @@ class Tokenizer(object):
         social media.
 
         """
-        # convert paragraph to Unicode normal form C (NFC)
-        paragraph = unicodedata.normalize("NFC", paragraph)
+        token_dll = doubly_linked_list.DLL([paragraph])
+        return token_dll.to_list()
+        # # convert paragraph to Unicode normal form C (NFC)
+        # paragraph = unicodedata.normalize("NFC", paragraph)
 
-        tokens = self._tokenize(paragraph)
+        # tokens = self._tokenize(paragraph)
 
-        if len(tokens) == 0:
-            return []
+        # if len(tokens) == 0:
+        #     return []
 
-        if self.extra_info:
-            extra_info = self._check_spaces(tokens, paragraph)
+        # if self.extra_info:
+        #     extra_info = self._check_spaces(tokens, paragraph)
 
-        tokens, token_classes = zip(*tokens)
-        if self.token_classes:
-            if self.extra_info:
-                return list(zip(tokens, token_classes, extra_info))
-            else:
-                return list(zip(tokens, token_classes))
-        else:
-            if self.extra_info:
-                return list(zip(tokens, extra_info))
-            else:
-                return list(tokens)
+        # tokens, token_classes = zip(*tokens)
+        # if self.token_classes:
+        #     if self.extra_info:
+        #         return list(zip(tokens, token_classes, extra_info))
+        #     else:
+        #         return list(zip(tokens, token_classes))
+        # else:
+        #     if self.extra_info:
+        #         return list(zip(tokens, extra_info))
+        #     else:
+        #         return list(tokens)
 
     def tokenize_xml(self, xml, is_file=True):
         """Tokenize XML file or XML string according to the guidelines of the
@@ -806,25 +807,26 @@ class Tokenizer(object):
         of computer-mediated communication / social media.
 
         """
-        elements = utils.parse_xml(xml, is_file)
-        whole_text = " ".join((e.text for e in elements))
+        token_dll = utils.parse_xml_to_token_dll(xml, is_file)
+        return token_dll.to_list()
+        # whole_text = " ".join((e.text for e in elements))
 
-        # convert paragraph to Unicode normal form C (NFC)
-        whole_text = unicodedata.normalize("NFC", whole_text)
+        # # convert paragraph to Unicode normal form C (NFC)
+        # whole_text = unicodedata.normalize("NFC", whole_text)
 
-        tokens = self._tokenize(whole_text)
+        # tokens = self._tokenize(whole_text)
 
-        tokenized_elements = self._match_xml(tokens, elements)
-        xml = ET.tostring(tokenized_elements[0].element, encoding="unicode").rstrip()
+        # tokenized_elements = self._match_xml(tokens, elements)
+        # xml = ET.tostring(tokenized_elements[0].element, encoding="unicode").rstrip()
 
-        tokens = [l.split("\t") for l in xml.split("\n")]
-        if self.token_classes:
-            if self.extra_info:
-                return [t if len(t) == 3 else (t[0], None, None) for t in tokens]
-            else:
-                return [(t[0], t[1]) if len(t) == 3 else (t[0], None) for t in tokens]
-        else:
-            if self.extra_info:
-                return [(t[0], t[2]) if len(t) == 3 else (t[0], None) for t in tokens]
-            else:
-                return [t[0] for t in tokens]
+        # tokens = [l.split("\t") for l in xml.split("\n")]
+        # if self.token_classes:
+        #     if self.extra_info:
+        #         return [t if len(t) == 3 else (t[0], None, None) for t in tokens]
+        #     else:
+        #         return [(t[0], t[1]) if len(t) == 3 else (t[0], None) for t in tokens]
+        # else:
+        #     if self.extra_info:
+        #         return [(t[0], t[2]) if len(t) == 3 else (t[0], None) for t in tokens]
+        #     else:
+        #         return [t[0] for t in tokens]
