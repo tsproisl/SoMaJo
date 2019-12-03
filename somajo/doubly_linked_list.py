@@ -4,7 +4,7 @@
 class DLLNode:
     def __init__(self, val=None, prv=None, nxt=None, lst=None):
         if isinstance(val, DLLNode):
-            val = val.val
+            val = val.value
         self.prev = prv
         self.next = nxt
         self.value = val
