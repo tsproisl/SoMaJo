@@ -4,6 +4,10 @@ import collections
 import logging
 import os
 import xml.etree.ElementTree as ET
+import xml.sax
+
+from somajo import doubly_linked_list
+from somajo.token import Token
 
 
 def get_paragraphs(fh):
@@ -64,3 +68,36 @@ def parse_xml(xml, is_file=True):
         return []
     elements = list(text_getter(root))
     return elements
+
+
+class SaxTokenHandler(xml.sax.handler.ContentHandler):
+    def __init__(self):
+        super().__init__()
+        self.token_dll = doubly_linked_list.DLL()
+
+    def characters(self, data):
+        token = Token(data)
+        self.token_dll.append(token)
+
+    def startElement(self, name, attrs):
+        if len(attrs) > 0:
+            text = "<%s %s>" % (name, " ".join(["%s=\"%s\"" % (k, xml.sax.saxutils.escape(v, {'"': "&quot;"})) for k, v in attrs.items()]))
+        else:
+            text = "<%s>" % name
+        token = Token(text, markup=True, locked=True)
+        self.token_dll.append(token)
+
+    def endElement(self, name):
+        text = "</%s>" % name
+        token = Token(text, markup=True, locked=True)
+        self.token_dll.append(token)
+
+
+def parse_xml_to_token_dll(data, is_file=True):
+    """Parse the XML data to a doubly linked list of Token objects"""
+    handler = SaxTokenHandler()
+    if is_file:
+        xml.sax.parse(data, handler)
+    else:
+        xml.sax.parseString(data, handler)
+    return handler.token_dll
