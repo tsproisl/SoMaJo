@@ -314,15 +314,24 @@ class Tokenizer(object):
         n = len(boundaries)
         prev_end = 0
         for i, (start, end) in enumerate(boundaries):
-            left = node.value.text[prev_end:start].strip()
-            if left != "":
-                token_dll.insert_left(Token(left), node)
+            lsa, msa = False, False
+            left = node.value.text[prev_end:start]
             match = node.value.text[start:end]
-            token_dll.insert_left(Token(match, locked=True, token_class=token_class), node)
+            right = node.value.text[end:]
+            if left.endswith(" "):
+                lsa = True
+            if right.startswith(" "):
+                msa = True
+            elif right == "":
+                msa = node.value.space_after
+            left = left.strip()
+            right = right.strip()
+            if left != "":
+                token_dll.insert_left(Token(left, space_after=lsa), node)
+            token_dll.insert_left(Token(match, locked=True, token_class=token_class, space_after=msa), node)
             if i == n - 1:
-                right = node.value.text[end:].strip()
                 if right != "":
-                    token_dll.insert_left(Token(right), node)
+                    token_dll.insert_left(Token(right, space_after=node.value.space_after), node)
             prev_end = end
         if n > 0:
             token_dll.remove(node)
