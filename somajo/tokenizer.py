@@ -9,8 +9,7 @@ import xml.etree.ElementTree as ET
 import regex as re
 
 from somajo import utils
-
-Token = collections.namedtuple("Token", ["token", "token_class"])
+from somajo.token import Token
 
 
 class Tokenizer(object):
