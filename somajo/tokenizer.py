@@ -337,7 +337,6 @@ class Tokenizer(object):
             token_dll.remove(node)
 
     def _split_matches(self, regex, node, token_class="regular", split_named_subgroups=True):
-        """Turn matches for the regex into tokens."""
         boundaries = []
         split_groups = split_named_subgroups and len(regex.groupindex) > 0
         group_numbers = sorted(regex.groupindex.values())
@@ -352,7 +351,6 @@ class Tokenizer(object):
         self._split_on_boundaries(node, boundaries, token_class)
 
     def _split_emojis(self, node, token_class="emoticon"):
-        """Replace all emoji sequences"""
         boundaries = []
         for m in re.finditer(r"\X", node.value.text):
             if m.end() - m.start() > 1:
@@ -545,201 +543,210 @@ class Tokenizer(object):
             warnings.warn("AssertionError: %d tokens left over" % len(agenda))
         return elements
 
-    def _tokenize(self, paragraph):
+    def _tokenize(self, token_dll):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
         social media.
 
         """
-        # reset mappings for the current paragraph
-        self.mapping = {}
-        self.unique_prefix = self._get_unique_prefix(paragraph)
-
-        # normalize whitespace
-        paragraph = self.spaces.sub(" ", paragraph)
-
-        # get rid of control characters
-        paragraph = self.controls.sub("", paragraph)
-
-        # get rid of isolated variation selectors
-        paragraph = self.stranded_variation_selector.sub("", paragraph)
-
-        # normalize whitespace
-        paragraph = self.spaces.sub(" ", paragraph)
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            # convert to Unicode normal form C (NFC)
+            t.value.text = unicodedata.normalize("NFC", t.value.text)
+            # normalize whitespace
+            t.value.text = self.spaces.sub(" ", t.value.text)
+            # get rid of control characters
+            t.value.text = self.controls.sub("", t.value.text)
+            # get rid of isolated variation selectors
+            t.value.text = self.stranded_variation_selector.sub("", t.value.text)
+            # normalize whitespace
+            t.value.text = self.spaces.sub(" ", t.value.text)
 
         # Some tokens are allowed to contain whitespace. Get those out
-        # of the way first. We replace them with unique strings and
-        # undo that later on.
+        # of the way first.
         # - XML tags
-        paragraph = self._replace_regex(paragraph, self.xml_declaration, "XML_tag")
-        paragraph = self._replace_regex(paragraph, self.tag, "XML_tag")
+        self._split_all_matches(self.xml_declaration, token_dll, "XML_tag")
+        self._split_all_matches(self.tag, token_dll, "XML_tag")
         # - email address obfuscation may involve spaces
-        paragraph = self._replace_regex(paragraph, self.email, "email_address")
+        self._split_all_matches(self.email, token_dll, "email_address")
 
         # Emoji sequences can contain zero-width joiners. Get them out
         # of the way next
-        paragraph = self._replace_regex(paragraph, self.unicode_flags, "emoticon")
-        paragraph = self._replace_emojis(paragraph, "emoticon")
+        self._split_all_matches(self.unicode_flags, token_dll, "emoticon")
+        self._split_all_emojis(token_dll, "emoticon")
 
-        # get rid of other junk characters
-        paragraph = self.other_nasties.sub("", paragraph)
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            # get rid of other junk characters
+            t.value.text = self.other_nasties.sub("", t.value.text)
+            # normalize whitespace
+            t.value.text = self.spaces.sub(" ", t.value.text)
+            # Some emoticons contain erroneous spaces. We fix this.
+            t.value.text = self.space_emoticon.sub(r'\1\2', t.value.text)
+            # Split on whitespace
+            wt = t.value.text.split()
+            n_wt = len(wt)
+            for i, tok in enumerate(wt):
+                if i == n_wt - 1:
+                    token_dll.insert_left(Token(tok, space_after=t.value.space_after), t)
+                else:
+                    token_dll.insert_left(Token(tok, space_after=True), t)
+            token_dll.remove(t)
 
-        # normalize whitespace
-        paragraph = self.spaces.sub(" ", paragraph)
+        return token_dll
 
-        # Some emoticons contain erroneous spaces. We fix this.
-        paragraph = self.space_emoticon.sub(r'\1\2', paragraph)
+        # # urls
+        # paragraph = self._replace_regex(paragraph, self.simple_url_with_brackets, "URL")
+        # paragraph = self._replace_regex(paragraph, self.simple_url, "URL")
+        # paragraph = self._replace_regex(paragraph, self.doi, "DOI")
+        # paragraph = self._replace_regex(paragraph, self.doi_with_space, "DOI")
+        # paragraph = self._replace_regex(paragraph, self.url_without_protocol, "URL")
+        # paragraph = self._replace_regex(paragraph, self.reddit_links, "URL")
+        # # paragraph = self._replace_regex(paragraph, self.url)
 
-        # urls
-        paragraph = self._replace_regex(paragraph, self.simple_url_with_brackets, "URL")
-        paragraph = self._replace_regex(paragraph, self.simple_url, "URL")
-        paragraph = self._replace_regex(paragraph, self.doi, "DOI")
-        paragraph = self._replace_regex(paragraph, self.doi_with_space, "DOI")
-        paragraph = self._replace_regex(paragraph, self.url_without_protocol, "URL")
-        paragraph = self._replace_regex(paragraph, self.reddit_links, "URL")
-        # paragraph = self._replace_regex(paragraph, self.url)
+        # # XML entities
+        # paragraph = self._replace_regex(paragraph, self.entity_name, "XML_entity")
+        # paragraph = self._replace_regex(paragraph, self.entity_decimal, "XML_entity")
+        # paragraph = self._replace_regex(paragraph, self.entity_hex, "XML_entity")
 
-        # XML entities
-        paragraph = self._replace_regex(paragraph, self.entity_name, "XML_entity")
-        paragraph = self._replace_regex(paragraph, self.entity_decimal, "XML_entity")
-        paragraph = self._replace_regex(paragraph, self.entity_hex, "XML_entity")
+        # # replace emoticons with unique strings so that they are out
+        # # of the way
+        # paragraph = self.spaces.sub(" ", paragraph)
+        # paragraph = self._replace_regex(paragraph, self.heart_emoticon, "emoticon")
+        # paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
+        # # paragraph = self._replace_regex(paragraph, self.unicode_symbols, "emoticon")
 
-        # replace emoticons with unique strings so that they are out
-        # of the way
-        paragraph = self.spaces.sub(" ", paragraph)
-        paragraph = self._replace_regex(paragraph, self.heart_emoticon, "emoticon")
-        paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
-        # paragraph = self._replace_regex(paragraph, self.unicode_symbols, "emoticon")
+        # # mentions, hashtags
+        # paragraph = self._replace_regex(paragraph, self.mention, "mention")
+        # paragraph = self._replace_regex(paragraph, self.hashtag, "hashtag")
+        # # action words
+        # paragraph = self._replace_regex(paragraph, self.action_word, "action_word")
+        # # underline
+        # paragraph = self.underline.sub(r' \1 \2 \3 ', paragraph)
+        # # textual representations of emoji
+        # paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
 
-        # mentions, hashtags
-        paragraph = self._replace_regex(paragraph, self.mention, "mention")
-        paragraph = self._replace_regex(paragraph, self.hashtag, "hashtag")
-        # action words
-        paragraph = self._replace_regex(paragraph, self.action_word, "action_word")
-        # underline
-        paragraph = self.underline.sub(r' \1 \2 \3 ', paragraph)
-        # textual representations of emoji
-        paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
+        # paragraph = self._replace_regex(paragraph, self.token_with_plus_ampersand)
+        # paragraph = self._replace_set(paragraph, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
 
-        paragraph = self._replace_regex(paragraph, self.token_with_plus_ampersand)
-        paragraph = self._replace_set(paragraph, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
+        # # camelCase
+        # if self.split_camel_case:
+        #     paragraph = self._replace_regex(paragraph, self.camel_case_token)
+        #     paragraph = self._replace_set(paragraph, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
+        #     paragraph = self._replace_regex(paragraph, self.in_and_innen)
+        #     paragraph = self.camel_case.sub(r' \1', paragraph)
 
-        # camelCase
-        if self.split_camel_case:
-            paragraph = self._replace_regex(paragraph, self.camel_case_token)
-            paragraph = self._replace_set(paragraph, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
-            paragraph = self._replace_regex(paragraph, self.in_and_innen)
-            paragraph = self.camel_case.sub(r' \1', paragraph)
+        # # gender star
+        # paragraph = self._replace_regex(paragraph, self.gender_star)
 
-        # gender star
-        paragraph = self._replace_regex(paragraph, self.gender_star)
+        # # English possessive and contracted forms
+        # if self.language == "en":
+        #     paragraph = self._replace_regex(paragraph, self.english_decades, "number_compound")
+        #     paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
+        #     paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
+        #     paragraph = self._replace_regex(paragraph, self.en_not, "regular")
+        #     paragraph = self.en_trailing_apos.sub(r' \1', paragraph)
+        #     for contraction in self.en_twopart_contractions:
+        #         paragraph = contraction.sub(r' \1 \2 ', paragraph)
+        #     for contraction in self.en_threepart_contractions:
+        #         paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
+        #     paragraph = self._replace_regex(paragraph, self.en_no, "regular")
+        #     paragraph = self._replace_regex(paragraph, self.en_degree, "regular")
+        #     paragraph = self._replace_regex(paragraph, self.en_nonbreaking_words, "regular")
+        #     paragraph = self._replace_regex(paragraph, self.en_nonbreaking_prefixes, "regular")
+        #     paragraph = self._replace_regex(paragraph, self.en_nonbreaking_suffixes, "regular")
 
-        # English possessive and contracted forms
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.english_decades, "number_compound")
-            paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_not, "regular")
-            paragraph = self.en_trailing_apos.sub(r' \1', paragraph)
-            for contraction in self.en_twopart_contractions:
-                paragraph = contraction.sub(r' \1 \2 ', paragraph)
-            for contraction in self.en_threepart_contractions:
-                paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
-            paragraph = self._replace_regex(paragraph, self.en_no, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_degree, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_words, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_prefixes, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_suffixes, "regular")
+        # # remove known abbreviations
+        # split_abbreviations = False if self.language == "en" else True
+        # paragraph = self._replace_abbreviations(paragraph, split_multipart_abbrevs=split_abbreviations)
 
-        # remove known abbreviations
-        split_abbreviations = False if self.language == "en" else True
-        paragraph = self._replace_abbreviations(paragraph, split_multipart_abbrevs=split_abbreviations)
+        # # DATES AND NUMBERS
+        # # dates
+        # split_dates = False if self.language == "en" else True
+        # paragraph = self._replace_regex(paragraph, self.three_part_date_year_first, "date", split_named_subgroups=split_dates)
+        # paragraph = self._replace_regex(paragraph, self.three_part_date_dmy, "date", split_named_subgroups=split_dates)
+        # paragraph = self._replace_regex(paragraph, self.three_part_date_mdy, "date", split_named_subgroups=split_dates)
+        # paragraph = self._replace_regex(paragraph, self.two_part_date, "date", split_named_subgroups=split_dates)
+        # # time
+        # if self.language == "en":
+        #     paragraph = self._replace_regex(paragraph, self.en_time, "time")
+        # paragraph = self._replace_regex(paragraph, self.time, "time")
+        # # US phone numbers and ZIP codes
+        # if self.language == "en":
+        #     paragraph = self._replace_regex(paragraph, self.en_us_phone_number, "number")
+        #     paragraph = self._replace_regex(paragraph, self.en_us_zip_code, "number")
+        #     paragraph = self._replace_regex(paragraph, self.en_numerical_identifiers, "number")
+        # # ordinals
+        # if self.language == "de":
+        #     paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
+        # elif self.language == "en":
+        #     paragraph = self._replace_regex(paragraph, self.english_ordinal, "ordinal")
+        # # fractions
+        # paragraph = self._replace_regex(paragraph, self.fraction, "number")
+        # # amounts (1.000,-)
+        # paragraph = self._replace_regex(paragraph, self.amount, "amount")
+        # # semesters
+        # paragraph = self._replace_regex(paragraph, self.semester, "semester")
+        # # measurements
+        # paragraph = self._replace_regex(paragraph, self.measurement, "measurement")
+        # # number compounds
+        # paragraph = self._replace_regex(paragraph, self.number_compound, "number_compound")
+        # # numbers
+        # paragraph = self._replace_regex(paragraph, self.number, "number")
+        # paragraph = self._replace_regex(paragraph, self.ipv4, "number")
+        # paragraph = self._replace_regex(paragraph, self.section_number, "number")
 
-        # DATES AND NUMBERS
-        # dates
-        split_dates = False if self.language == "en" else True
-        paragraph = self._replace_regex(paragraph, self.three_part_date_year_first, "date", split_named_subgroups=split_dates)
-        paragraph = self._replace_regex(paragraph, self.three_part_date_dmy, "date", split_named_subgroups=split_dates)
-        paragraph = self._replace_regex(paragraph, self.three_part_date_mdy, "date", split_named_subgroups=split_dates)
-        paragraph = self._replace_regex(paragraph, self.two_part_date, "date", split_named_subgroups=split_dates)
-        # time
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_time, "time")
-        paragraph = self._replace_regex(paragraph, self.time, "time")
-        # US phone numbers and ZIP codes
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_us_phone_number, "number")
-            paragraph = self._replace_regex(paragraph, self.en_us_zip_code, "number")
-            paragraph = self._replace_regex(paragraph, self.en_numerical_identifiers, "number")
-        # ordinals
-        if self.language == "de":
-            paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
-        elif self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.english_ordinal, "ordinal")
-        # fractions
-        paragraph = self._replace_regex(paragraph, self.fraction, "number")
-        # amounts (1.000,-)
-        paragraph = self._replace_regex(paragraph, self.amount, "amount")
-        # semesters
-        paragraph = self._replace_regex(paragraph, self.semester, "semester")
-        # measurements
-        paragraph = self._replace_regex(paragraph, self.measurement, "measurement")
-        # number compounds
-        paragraph = self._replace_regex(paragraph, self.number_compound, "number_compound")
-        # numbers
-        paragraph = self._replace_regex(paragraph, self.number, "number")
-        paragraph = self._replace_regex(paragraph, self.ipv4, "number")
-        paragraph = self._replace_regex(paragraph, self.section_number, "number")
+        # # (clusters of) question marks and exclamation marks
+        # paragraph = self._replace_regex(paragraph, self.quest_exclam, "symbol")
+        # # arrows
+        # paragraph = self.space_right_arrow.sub(r'\1\2', paragraph)
+        # paragraph = self.space_left_arrow.sub(r'\1\2', paragraph)
+        # paragraph = self._replace_regex(paragraph, self.arrow, "symbol")
+        # # parens
+        # paragraph = self.paired_paren.sub(r' \1 \2 \3 ', paragraph)
+        # paragraph = self.paired_bracket.sub(r' \1 \2 \3 ', paragraph)
+        # paragraph = self.paren.sub(r' \1 ', paragraph)
+        # paragraph = self._replace_regex(paragraph, self.all_paren, "symbol")
+        # # slash
+        # if self.language == "en":
+        #     paragraph = self._replace_regex(paragraph, self.en_slash_words, "regular")
+        # if self.language == "de":
+        #     paragraph = self._replace_regex(paragraph, self.de_slash, "symbol")
+        # # O'Connor and French omitted vocals: L'Enfer, d'accord
+        # paragraph = self._replace_regex(paragraph, self.letter_apostrophe_word, "regular")
+        # # LaTeX-style quotation marks
+        # paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
+        # paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
+        # # single quotation marks, apostrophes
+        # paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
+        # paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
+        # # other punctuation symbols
+        # # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
+        # if self.language == "en":
+        #     paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
+        #     paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
+        #     paragraph = self._replace_regex(paragraph, self.en_quotation_marks, "symbol")
+        #     paragraph = self._replace_regex(paragraph, self.en_other_punctuation, "symbol")
+        # else:
+        #     paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
+        # # ellipsis
+        # paragraph = self._replace_regex(paragraph, self.ellipsis, "symbol")
+        # # dots
+        # # paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
+        # paragraph = self._replace_regex(paragraph, self.dot_without_space, "symbol")
+        # # paragraph = self.dot.sub(r' \1 ', paragraph)
+        # paragraph = self._replace_regex(paragraph, self.dot, "symbol")
 
-        # (clusters of) question marks and exclamation marks
-        paragraph = self._replace_regex(paragraph, self.quest_exclam, "symbol")
-        # arrows
-        paragraph = self.space_right_arrow.sub(r'\1\2', paragraph)
-        paragraph = self.space_left_arrow.sub(r'\1\2', paragraph)
-        paragraph = self._replace_regex(paragraph, self.arrow, "symbol")
-        # parens
-        paragraph = self.paired_paren.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self.paired_bracket.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self.paren.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.all_paren, "symbol")
-        # slash
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_slash_words, "regular")
-        if self.language == "de":
-            paragraph = self._replace_regex(paragraph, self.de_slash, "symbol")
-        # O'Connor and French omitted vocals: L'Enfer, d'accord
-        paragraph = self._replace_regex(paragraph, self.letter_apostrophe_word, "regular")
-        # LaTeX-style quotation marks
-        paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
-        # single quotation marks, apostrophes
-        paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
-        # other punctuation symbols
-        # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_quotation_marks, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_other_punctuation, "symbol")
-        else:
-            paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
-        # ellipsis
-        paragraph = self._replace_regex(paragraph, self.ellipsis, "symbol")
-        # dots
-        # paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.dot_without_space, "symbol")
-        # paragraph = self.dot.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.dot, "symbol")
+        # # tokenize
+        # tokens = paragraph.strip().split()
 
-        # tokenize
-        tokens = paragraph.strip().split()
+        # # reintroduce mapped tokens
+        # tokens = self._reintroduce_instances(tokens)
 
-        # reintroduce mapped tokens
-        tokens = self._reintroduce_instances(tokens)
-
-        return tokens
+        # return tokens
 
     def tokenize(self, paragraph):
         """An alias for tokenize_paragraph"""
@@ -764,7 +771,8 @@ class Tokenizer(object):
         social media.
 
         """
-        token_dll = doubly_linked_list.DLL([paragraph])
+        token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
+        token_dll = self._tokenize(token_dll)
         return token_dll.to_list()
         # # convert paragraph to Unicode normal form C (NFC)
         # paragraph = unicodedata.normalize("NFC", paragraph)
@@ -796,6 +804,7 @@ class Tokenizer(object):
 
         """
         token_dll = utils.parse_xml_to_token_dll(xml, is_file)
+        self._tokenize(token_dll)
         return token_dll.to_list()
         # whole_text = " ".join((e.text for e in elements))
 
