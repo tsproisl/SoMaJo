@@ -308,7 +308,7 @@ class Tokenizer(object):
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
 
-    def _split_on_boundaries(self, node, boundaries):
+    def _split_on_boundaries(self, node, boundaries, token_class):
         """"""
         token_dll = node.list
         n = len(boundaries)
@@ -318,7 +318,7 @@ class Tokenizer(object):
             if left != "":
                 token_dll.insert_left(Token(left), node)
             match = node.value.text[start:end]
-            token_dll.insert_left(Token(match, locked=True), node)
+            token_dll.insert_left(Token(match, locked=True, token_class=token_class), node)
             if i == n - 1:
                 right = node.value.text[end:].strip()
                 if right != "":
