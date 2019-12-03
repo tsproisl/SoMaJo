@@ -308,86 +308,51 @@ class Tokenizer(object):
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
 
-    def _get_unique_prefix(self, text):
-        """Return a string that is not a substring of text."""
-        alphabet = "abcdefghijklmnopqrstuvwxyz"
-        # create random string of length self.unique_string_length
-        unique_string = ""
-        while unique_string in text:
-            unique_string = "".join(random.choice(alphabet) for _ in range(self.unique_string_length))
-        return unique_string
-
-    def _get_unique_suffix(self):
-        """Obtain a unique suffix for combination with self.unique_prefix.
-
-        """
-        digits = "abcdefghijklmnopqrstuvwxyz"
-        n = self.replacement_counter
-        b26 = ""
-        while n > 0:
-            quotient, remainder = divmod(n, 26)
-            b26 = digits[remainder] + b26
-            n = quotient
-        self.replacement_counter += 1
-        return b26.rjust(self.unique_string_length, "a")
-
-    def _get_unique_string(self):
-        """Return a string that is not a substring of text."""
-        return self.unique_prefix + self._get_unique_suffix()
-
-    def _replace_regex(self, text, regex, token_class="regular", split_named_subgroups=True):
-        """Replace instances of regex with unique strings and store
-        replacements in mapping.
-
-        """
-        replacements = {}
-
-        def repl(match):
-            instance = match.group(0)
-            if instance not in replacements:
-                # check if there are named subgroups
-                if split_named_subgroups and len(match.groupdict()) > 0:
-                    parts = [v for k, v in sorted(match.groupdict().items())]
-                    replacements[instance] = self._multipart_replace(instance, parts, token_class)
-                else:
-                    replacement = replacements.setdefault(instance, self._get_unique_string())
-                    self.mapping[replacement] = Token(instance, token_class)
-            return " %s " % replacements[instance]
-        return regex.sub(repl, text)
-
-    def _multipart_replace(self, instance, parts, token_class):
+    def _split_on_boundaries(self, node, boundaries):
         """"""
-        replacements = []
-        for part in parts:
-            replacement = self._get_unique_string()
-            self.mapping[replacement] = Token(part, token_class)
-            replacements.append(replacement)
-        multipart = " ".join(replacements)
-        return multipart
+        token_dll = node.list
+        n = len(boundaries)
+        prev_end = 0
+        for i, (start, end) in enumerate(boundaries):
+            left = node.value.text[prev_end:start].strip()
+            if left != "":
+                token_dll.insert_left(Token(left), node)
+            match = node.value.text[start:end]
+            token_dll.insert_left(Token(match, locked=True), node)
+            if i == n - 1:
+                right = node.value.text[end:].strip()
+                if right != "":
+                    token_dll.insert_left(Token(right), node)
+            prev_end = end
+        if n > 0:
+            token_dll.remove(node)
 
-    def _reintroduce_instances(self, tokens):
-        """Replace the unique strings with the original text."""
-        tokens = [self.mapping.get(t, Token(t, "regular")) for t in tokens]
-        return tokens
+    def _split_matches(self, regex, node, token_class="regular", split_named_subgroups=True):
+        """Turn matches for the regex into tokens."""
+        boundaries = []
+        split_groups = split_named_subgroups and len(regex.groupindex) > 0
+        group_numbers = sorted(regex.groupindex.values())
+        for m in regex.finditer(node.value.text):
+            if split_groups:
+                for g in group_numbers:
+                    start, end = m.span(g)
+                    boundaries.append((start, end))
+            else:
+                start, end = m.span(0)
+                boundaries.append((start, end))
+        self._split_on_boundaries(node, boundaries, token_class)
 
-    def _replace_emojis(self, paragraph, token_class):
+    def _split_emojis(self, node, token_class="emoticon"):
         """Replace all emoji sequences"""
-        replacements = {}
-        emojis = []
-        for m in re.finditer(r"\X", paragraph):
+        boundaries = []
+        for m in re.finditer(r"\X", node.value.text):
             if m.end() - m.start() > 1:
                 if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F]", m.group()):
-                    emojis.append(m.span())
+                    boundaries.append(m.span())
             else:
                 if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}]", m.group()):
-                    emojis.append(m.span())
-        for emoji in reversed(emojis):
-            instance = paragraph[emoji[0]:emoji[1]]
-            instance = instance.strip()
-            replacement = replacements.setdefault(instance, self._get_unique_string())
-            self.mapping[replacement] = Token(instance, token_class)
-            paragraph = paragraph[:emoji[0]] + " " + replacement + " " + paragraph[emoji[1]:]
-        return paragraph
+                    boundaries.append(m.span())
+        self._split_on_boundaries(node, boundaries, token_class)
 
     def _replace_abbreviations(self, text, split_multipart_abbrevs=True):
         """Replace instances of abbreviations with unique strings and store
