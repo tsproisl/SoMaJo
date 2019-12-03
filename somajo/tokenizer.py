@@ -354,6 +354,20 @@ class Tokenizer(object):
                     boundaries.append(m.span())
         self._split_on_boundaries(node, boundaries, token_class)
 
+    def _split_all_matches(self, regex, token_dll, token_class="regular", split_named_subgroups=True):
+        """Turn matches for the regex into tokens."""
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            self._split_matches(regex, t, token_class, split_named_subgroups)
+
+    def _split_all_emojis(self, token_dll, token_class="emoticon"):
+        """Replace all emoji sequences"""
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            self._split_emojis(t, token_class)
+
     def _replace_abbreviations(self, text, split_multipart_abbrevs=True):
         """Replace instances of abbreviations with unique strings and store
         replacements in self.mapping.
