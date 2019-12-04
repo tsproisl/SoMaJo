@@ -621,6 +621,7 @@ class Tokenizer(object):
         # action words
         self._split_all_matches(self.action_word, token_dll, "action_word")
         # underline
+        # TODO: match across multiple tokens
         self._split_all_matches(self.underline, token_dll)
         # textual representations of emoji
         self._split_all_matches(self.emoji, token_dll, "emoticon")
@@ -664,90 +665,86 @@ class Tokenizer(object):
         split_abbreviations = False if self.language == "en" else True
         self._split_abbreviations(token_dll, split_multipart_abbrevs=split_abbreviations)
 
-        # # DATES AND NUMBERS
-        # # dates
-        # split_dates = False if self.language == "en" else True
-        # paragraph = self._replace_regex(paragraph, self.three_part_date_year_first, "date", split_named_subgroups=split_dates)
-        # paragraph = self._replace_regex(paragraph, self.three_part_date_dmy, "date", split_named_subgroups=split_dates)
-        # paragraph = self._replace_regex(paragraph, self.three_part_date_mdy, "date", split_named_subgroups=split_dates)
-        # paragraph = self._replace_regex(paragraph, self.two_part_date, "date", split_named_subgroups=split_dates)
-        # # time
-        # if self.language == "en":
-        #     paragraph = self._replace_regex(paragraph, self.en_time, "time")
-        # paragraph = self._replace_regex(paragraph, self.time, "time")
-        # # US phone numbers and ZIP codes
-        # if self.language == "en":
-        #     paragraph = self._replace_regex(paragraph, self.en_us_phone_number, "number")
-        #     paragraph = self._replace_regex(paragraph, self.en_us_zip_code, "number")
-        #     paragraph = self._replace_regex(paragraph, self.en_numerical_identifiers, "number")
-        # # ordinals
-        # if self.language == "de":
-        #     paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
-        # elif self.language == "en":
-        #     paragraph = self._replace_regex(paragraph, self.english_ordinal, "ordinal")
-        # # fractions
-        # paragraph = self._replace_regex(paragraph, self.fraction, "number")
-        # # amounts (1.000,-)
-        # paragraph = self._replace_regex(paragraph, self.amount, "amount")
-        # # semesters
-        # paragraph = self._replace_regex(paragraph, self.semester, "semester")
-        # # measurements
-        # paragraph = self._replace_regex(paragraph, self.measurement, "measurement")
-        # # number compounds
-        # paragraph = self._replace_regex(paragraph, self.number_compound, "number_compound")
-        # # numbers
-        # paragraph = self._replace_regex(paragraph, self.number, "number")
-        # paragraph = self._replace_regex(paragraph, self.ipv4, "number")
-        # paragraph = self._replace_regex(paragraph, self.section_number, "number")
+        # DATES AND NUMBERS
+        # dates
+        split_dates = False if self.language == "en" else True
+        self._split_all_matches(self.three_part_date_year_first, token_dll, "date", split_named_subgroups=split_dates)
+        self._split_all_matches(self.three_part_date_dmy, token_dll, "date", split_named_subgroups=split_dates)
+        self._split_all_matches(self.three_part_date_mdy, token_dll, "date", split_named_subgroups=split_dates)
+        self._split_all_matches(self.two_part_date, token_dll, "date", split_named_subgroups=split_dates)
+        # time
+        if self.language == "en":
+            self._split_all_matches(self.en_time, token_dll, "time")
+        self._split_all_matches(self.time, token_dll, "time")
+        # US phone numbers and ZIP codes
+        if self.language == "en":
+            self._split_all_matches(self.en_us_phone_number, token_dll, "number")
+            self._split_all_matches(self.en_us_zip_code, token_dll, "number")
+            self._split_all_matches(self.en_numerical_identifiers, token_dll, "number")
+        # ordinals
+        if self.language == "de":
+            self._split_all_matches(self.ordinal, token_dll, "ordinal")
+        elif self.language == "en":
+            self._split_all_matches(self.english_ordinal, token_dll, "ordinal")
+        # fractions
+        self._split_all_matches(self.fraction, token_dll, "number")
+        # amounts (1.000,-)
+        self._split_all_matches(self.amount, token_dll, "amount")
+        # semesters
+        self._split_all_matches(self.semester, token_dll, "semester")
+        # measurements
+        self._split_all_matches(self.measurement, token_dll, "measurement")
+        # number compounds
+        self._split_all_matches(self.number_compound, token_dll, "number_compound")
+        # numbers
+        self._split_all_matches(self.number, token_dll, "number")
+        self._split_all_matches(self.ipv4, token_dll, "number")
+        self._split_all_matches(self.section_number, token_dll, "number")
 
-        # # (clusters of) question marks and exclamation marks
-        # paragraph = self._replace_regex(paragraph, self.quest_exclam, "symbol")
-        # # arrows
+        # (clusters of) question marks and exclamation marks
+        self._split_all_matches(self.quest_exclam, token_dll, "symbol")
+        # arrows
+        # TODO:
         # paragraph = self.space_right_arrow.sub(r'\1\2', paragraph)
         # paragraph = self.space_left_arrow.sub(r'\1\2', paragraph)
-        # paragraph = self._replace_regex(paragraph, self.arrow, "symbol")
-        # # parens
+        self._split_all_matches(self.arrow, token_dll, "symbol")
+        # parens
+        # TODO:
         # paragraph = self.paired_paren.sub(r' \1 \2 \3 ', paragraph)
         # paragraph = self.paired_bracket.sub(r' \1 \2 \3 ', paragraph)
-        # paragraph = self.paren.sub(r' \1 ', paragraph)
+        self._split_all_matches(self.paren, token_dll, "symbol")
         # paragraph = self._replace_regex(paragraph, self.all_paren, "symbol")
-        # # slash
-        # if self.language == "en":
-        #     paragraph = self._replace_regex(paragraph, self.en_slash_words, "regular")
-        # if self.language == "de":
-        #     paragraph = self._replace_regex(paragraph, self.de_slash, "symbol")
-        # # O'Connor and French omitted vocals: L'Enfer, d'accord
-        # paragraph = self._replace_regex(paragraph, self.letter_apostrophe_word, "regular")
-        # # LaTeX-style quotation marks
+        # slash
+        if self.language == "en":
+            self._split_all_matches(self.en_slash_words, token_dll, "regular")
+        if self.language == "de":
+            self._split_all_matches(self.de_slash, token_dll, "symbol")
+        # O'Connor and French omitted vocals: L'Enfer, d'accord
+        self._split_all_matches(self.letter_apostrophe_word, token_dll)
+        # LaTeX-style quotation marks
+        # TODO:
         # paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
         # paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
-        # # single quotation marks, apostrophes
+        # single quotation marks, apostrophes
+        # TODO:
         # paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
         # paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
-        # # other punctuation symbols
-        # # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
-        # if self.language == "en":
-        #     paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
-        #     paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
-        #     paragraph = self._replace_regex(paragraph, self.en_quotation_marks, "symbol")
-        #     paragraph = self._replace_regex(paragraph, self.en_other_punctuation, "symbol")
-        # else:
-        #     paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
-        # # ellipsis
-        # paragraph = self._replace_regex(paragraph, self.ellipsis, "symbol")
-        # # dots
-        # # paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
-        # paragraph = self._replace_regex(paragraph, self.dot_without_space, "symbol")
-        # # paragraph = self.dot.sub(r' \1 ', paragraph)
-        # paragraph = self._replace_regex(paragraph, self.dot, "symbol")
+        # other punctuation symbols
+        # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
+        if self.language == "en":
+            self._split_all_matches(self.en_hyphen, token_dll, "symbol")
+            self._split_all_matches(self.en_quotation_marks, token_dll, "symbol")
+            self._split_all_matches(self.en_other_punctuation, token_dll, "symbol")
+        else:
+            self._split_all_matches(self.other_punctuation, token_dll, "symbol")
+        # ellipsis
+        self._split_all_matches(self.ellipsis, token_dll, "symbol")
+        # dots
+        # paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
+        self._split_all_matches(self.dot_without_space, token_dll, "symbol")
+        # paragraph = self.dot.sub(r' \1 ', paragraph)
+        self._split_all_matches(self.dot, token_dll, "symbol")
 
-        # # tokenize
-        # tokens = paragraph.strip().split()
-
-        # # reintroduce mapped tokens
-        # tokens = self._reintroduce_instances(tokens)
-
-        # return tokens
         return token_dll
 
     def tokenize(self, paragraph):
@@ -807,7 +804,7 @@ class Tokenizer(object):
         """
         token_dll = utils.parse_xml_to_token_dll(xml, is_file)
         self._tokenize(token_dll)
-        return token_dll.to_list()
+        return [t.text for t in token_dll.to_list()]
         # whole_text = " ".join((e.text for e in elements))
 
         # # convert paragraph to Unicode normal form C (NFC)
