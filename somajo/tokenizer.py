@@ -322,13 +322,14 @@ class Tokenizer(object):
             left = node.value.text[prev_end:start]
             match = node.value.text[start:end]
             right = node.value.text[end:]
-            if left.endswith(" "):
+            if left.endswith(" ") or match.startswith(" "):
                 lsa = True
-            if right.startswith(" "):
+            if right.startswith(" ") or match.endswith(" "):
                 msa = True
             elif right == "":
                 msa = node.value.space_after
             left = left.strip()
+            match = match.strip()
             right = right.strip()
             if left != "":
                 token_dll.insert_left(Token(left, space_after=lsa), node)
