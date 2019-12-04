@@ -586,6 +586,7 @@ class Tokenizer(object):
             # normalize whitespace
             t.value.text = self.spaces.sub(" ", t.value.text)
             # Some emoticons contain erroneous spaces. We fix this.
+            # TODO: original_spelling
             t.value.text = self.space_emoticon.sub(r'\1\2', t.value.text)
             # Split on whitespace
             wt = t.value.text.split()
