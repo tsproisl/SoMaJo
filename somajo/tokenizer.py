@@ -268,18 +268,18 @@ class Tokenizer(object):
         self.en_dms = re.compile(r"(?<=\w)(['’][dms])\b", re.IGNORECASE)
         self.en_llreve = re.compile(r"(?<=\w)(['’](?:ll|re|ve))\b", re.IGNORECASE)
         self.en_not = re.compile(r"(?<=\w)(n['’]t)\b", re.IGNORECASE)
-        en_twopart_contractions = [r"\b(a)(lot)\b", r"\b(gon)(na)\b", r"\b(got)(ta)\b", r"\b(lem)(me)\b",
-                                   r"\b(out)(ta)\b", r"\b(wan)(na)\b", r"\b(c'm)(on)\b",
-                                   r"\b(more)(['’]n)\b", r"\b(d['’])(ye)\b", r"(?<!\w)(['’]t)(is)\b",
-                                   r"(?<!\w)(['’]t)(was)\b", r"\b(there)(s)\b", r"\b(i)(m)\b",
-                                   r"\b(you)(re)\b", r"\b(he)(s)\b", r"\b(she)(s)\b",
-                                   r"\b(ai)(nt)\b", r"\b(are)(nt)\b", r"\b(is)(nt)\b",
-                                   r"\b(do)(nt)\b", r"\b(does)(nt)\b", r"\b(did)(nt)\b",
-                                   r"\b(i)(ve)\b", r"\b(you)(ve)\b", r"\b(they)(ve)\b",
-                                   r"\b(have)(nt)\b", r"\b(has)(nt)\b", r"\b(can)(not)\b",
-                                   r"\b(ca)(nt)\b", r"\b(could)(nt)\b", r"\b(wo)(nt)\b",
-                                   r"\b(would)(nt)\b", r"\b(you)(ll)\b", r"\b(let)(s)\b"]
-        en_threepart_contractions = [r"\b(du)(n)(no)\b", r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
+        en_twopart_contractions = [r"\b(?P<p1>a)(?P<p2>lot)\b", r"\b(?P<p1>gon)(?P<p2>na)\b", r"\b(?P<p1>got)(?P<p2>ta)\b", r"\b(?P<p1>lem)(?P<p2>me)\b",
+                                   r"\b(?P<p1>out)(?P<p2>ta)\b", r"\b(?P<p1>wan)(?P<p2>na)\b", r"\b(?P<p1>c'm)(?P<p2>on)\b",
+                                   r"\b(?P<p1>more)(?P<p2>['’]n)\b", r"\b(?P<p1>d['’])(?P<p2>ye)\b", r"(?<!\w)(?P<p1>['’]t)(?P<p2>is)\b",
+                                   r"(?<!\w)(?P<p1>['’]t)(?P<p2>was)\b", r"\b(?P<p1>there)(?P<p2>s)\b", r"\b(?P<p1>i)(?P<p2>m)\b",
+                                   r"\b(?P<p1>you)(?P<p2>re)\b", r"\b(?P<p1>he)(?P<p2>s)\b", r"\b(?P<p1>she)(?P<p2>s)\b",
+                                   r"\b(?P<p1>ai)(?P<p2>nt)\b", r"\b(?P<p1>are)(?P<p2>nt)\b", r"\b(?P<p1>is)(?P<p2>nt)\b",
+                                   r"\b(?P<p1>do)(?P<p2>nt)\b", r"\b(?P<p1>does)(?P<p2>nt)\b", r"\b(?P<p1>did)(?P<p2>nt)\b",
+                                   r"\b(?P<p1>i)(?P<p2>ve)\b", r"\b(?P<p1>you)(?P<p2>ve)\b", r"\b(?P<p1>they)(?P<p2>ve)\b",
+                                   r"\b(?P<p1>have)(?P<p2>nt)\b", r"\b(?P<p1>has)(?P<p2>nt)\b", r"\b(?P<p1>can)(?P<p2>not)\b",
+                                   r"\b(?P<p1>ca)(?P<p2>nt)\b", r"\b(?P<p1>could)(?P<p2>nt)\b", r"\b(?P<p1>wo)(?P<p2>nt)\b",
+                                   r"\b(?P<p1>would)(?P<p2>nt)\b", r"\b(?P<p1>you)(?P<p2>ll)\b", r"\b(?P<p1>let)(?P<p2>s)\b"]
+        en_threepart_contractions = [r"\b(?P<p1>du)(?P<p2>n)(?P<p3>no)\b", r"\b(?P<p1>wha)(?P<p2>dd)(?P<p3>ya)\b", r"\b(?P<p1>wha)(?P<p2>t)(?P<p3>cha)\b", r"\b(?P<p1>i)(?P<p2>'m)(?P<p3>a)\b"]
         # w/o, w/out, b/c, b/t, l/c, w/, d/c, u/s
         self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c|d/c|u/s)\b|\bw/(?!\w)", re.IGNORECASE)
         # word--word
