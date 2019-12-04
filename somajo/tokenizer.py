@@ -362,6 +362,16 @@ class Tokenizer(object):
                     boundaries.append(m.span())
         self._split_on_boundaries(node, boundaries, token_class)
 
+    def _split_set(self, regex, node, items, token_class="regular", ignore_case=False):
+        boundaries = []
+        for m in regex.finditer(node.value.text):
+            instance = m.group(0)
+            if ignore_case:
+                instance = instance.lower()
+            if instance in items:
+                boundaries.append(m.span(0))
+        self._split_on_boundaries(node, boundaries, token_class)
+
     def _split_all_matches(self, regex, token_dll, token_class="regular", split_named_subgroups=True):
         """Turn matches for the regex into tokens."""
         for t in token_dll:
@@ -375,6 +385,14 @@ class Tokenizer(object):
             if t.value.markup or t.value.locked:
                 continue
             self._split_emojis(t, token_class)
+
+    def _split_all_set(self, token_dll, regex, items, token_class="regular", ignore_case=False):
+        """Turn all elements from items into separate tokens. (All elements
+        need to be matched by regex.)"""
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            self._split_set(regex, t, items, token_class, ignore_case)
 
     def _replace_abbreviations(self, text, split_multipart_abbrevs=True):
         """Replace instances of abbreviations with unique strings and store
@@ -405,24 +423,6 @@ class Tokenizer(object):
         text = self.abbreviation.sub(repl, text)
         # text = self._replace_set(text, self.simple_abbreviation_candidates, self.simple_abbreviations, "abbreviation", ignore_case=True)
         return text
-
-    def _replace_set(self, text, regex, items, token_class="regular", ignore_case=False):
-        """Replace all elements from items in text with unique strings."""
-        replacements = {}
-
-        def repl(match):
-            instance = match.group(0)
-            ic_instance = instance
-            if ignore_case:
-                ic_instance = instance.lower()
-            if ic_instance in items:
-                if instance not in replacements:
-                    replacement = replacements.setdefault(instance, self._get_unique_string())
-                    self.mapping[replacement] = Token(instance, token_class)
-                return " %s " % replacements[instance]
-            else:
-                return instance
-        return regex.sub(repl, text)
 
     def _check_spaces(self, tokens, original_text):
         """Compare the tokens with the original text to see which tokens had
