@@ -201,7 +201,7 @@ class Tokenizer(object):
         self.hashtag = re.compile(r'(?<!\w)[#]\w+(?!\w)')
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
         # a pair of underscores can be used to "underline" some text
-        self.underline = re.compile(r"(?<!\w)(_)(\w[^_]+\w)(_)(?!\w)")
+        self.underline = re.compile(r"(?<!\w)(?P<open_ul>_)(?P<text_ul>\w[^_]+\w)(?P<close_ul>_)(?!\w)")
 
         # DATE, TIME, NUMBERS
         self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?![\d.])', re.VERBOSE)
