@@ -283,7 +283,6 @@ class Tokenizer(object):
         # w/o, w/out, b/c, b/t, l/c, w/, d/c, u/s
         self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c|d/c|u/s)\b|\bw/(?!\w)", re.IGNORECASE)
         # word--word
-        self.en_double_hyphen = re.compile(r"(?<=\w)--+(?=\w)")
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
         # English hyphenated words
@@ -294,7 +293,7 @@ class Tokenizer(object):
             self.en_nonbreaking_prefixes = re.compile(r"(?<![\w-])(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_prefixes]) + r")-[\w-]+", re.IGNORECASE)
             self.en_nonbreaking_suffixes = re.compile(r"\b[\w-]+-(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_suffixes]) + r")(?![\w-])", re.IGNORECASE)
             self.en_nonbreaking_words = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_words]) + r")\b", re.IGNORECASE)
-        self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
+        self.en_hyphen = re.compile(r"(?<=\w)-+(?=\w)")
         self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
         self.en_degree = re.compile(r"(?<=\d ?)°(?:F|C|Oe)\b", re.IGNORECASE)
         # quotation marks
