@@ -598,7 +598,6 @@ class Tokenizer(object):
                     token_dll.insert_left(Token(tok, space_after=True), t)
             token_dll.remove(t)
 
-        return token_dll
 
         # # urls
         # paragraph = self._replace_regex(paragraph, self.simple_url_with_brackets, "URL")
@@ -749,6 +748,7 @@ class Tokenizer(object):
         # tokens = self._reintroduce_instances(tokens)
 
         # return tokens
+        return token_dll
 
     def tokenize(self, paragraph):
         """An alias for tokenize_paragraph"""
