@@ -254,7 +254,7 @@ class Tokenizer(object):
                                      (?:(?<=\w)   # alphanumeric character
                                        []})]      # closing paren
                                        (?!\w)) |  # no alphanumeric character
-                                     (?:(?<=\s)   # space
+                                     (?:^         # beginning of string
                                        []})]      # closing paren
                                        (?=\w)) |  # alphanumeric character
                                      (?:(?<=\w-)  # hyphen
