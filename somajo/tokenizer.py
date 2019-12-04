@@ -346,11 +346,9 @@ class Tokenizer(object):
         for m in regex.finditer(node.value.text):
             if split_groups:
                 for g in group_numbers:
-                    start, end = m.span(g)
-                    boundaries.append((start, end))
+                    boundaries.append(m.span(g))
             else:
-                start, end = m.span(0)
-                boundaries.append((start, end))
+                boundaries.append(m.span(0))
         self._split_on_boundaries(node, boundaries, token_class)
 
     def _split_emojis(self, node, token_class="emoticon"):
