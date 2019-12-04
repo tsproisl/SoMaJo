@@ -396,35 +396,33 @@ class Tokenizer(object):
                 continue
             self._split_set(regex, t, items, token_class, ignore_case)
 
-    def _replace_abbreviations(self, text, split_multipart_abbrevs=True):
-        """Replace instances of abbreviations with unique strings and store
-        replacements in self.mapping.
+    def _split_abbreviations(self, token_dll, split_multipart_abbrevs=True):
+        """Turn instances of abbreviations into tokens."""
+        self._split_all_matches(self.single_letter_ellipsis, token_dll, "abbreviation")
+        self._split_all_matches(self.and_cetera, token_dll, "abbreviation")
+        self._split_all_matches(self.str_abbreviations, token_dll, "abbreviation")
+        self._split_all_matches(self.nr_abbreviations, token_dll, "abbreviation")
+        self._split_all_matches(self.single_token_abbreviation, token_dll, "abbreviation")
+        self._split_all_matches(self.single_letter_abbreviation, token_dll, "abbreviation")
+        # TODO: lookbehind
+        # text = self._replace_regex(text, self.ps, "abbreviation")
 
-        """
-        replacements = {}
-        text = self._replace_regex(text, self.single_letter_ellipsis, "abbreviation")
-        text = self._replace_regex(text, self.and_cetera, "abbreviation")
-        text = self._replace_regex(text, self.str_abbreviations, "abbreviation")
-        text = self._replace_regex(text, self.nr_abbreviations, "abbreviation")
-        text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
-        text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
-        text = self.spaces.sub(" ", text)
-        text = self._replace_regex(text, self.ps, "abbreviation")
-
-        def repl(match):
-            instance = match.group(0)
-            if instance not in replacements:
-                # check if it is a multipart abbreviation
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            boundaries = []
+            for m in self.abbreviation.finditer(t.value.text):
+                instance = m.group(0)
                 if split_multipart_abbrevs and self.multipart_abbreviation.fullmatch(instance):
-                    parts = [p.strip() + "." for p in instance.strip(".").split(".")]
-                    replacements[instance] = self._multipart_replace(instance, parts, "abbreviation")
+                    start, end = m.span(0)
+                    s = start
+                    for i, c in enumerate(instance, start=1):
+                        if c == ".":
+                            boundaries.append((s, start + i))
+                            s = start + i
                 else:
-                    replacement = replacements.setdefault(instance, self._get_unique_string())
-                    self.mapping[replacement] = Token(instance, "abbreviation")
-            return " %s " % replacements[instance]
-        text = self.abbreviation.sub(repl, text)
-        # text = self._replace_set(text, self.simple_abbreviation_candidates, self.simple_abbreviations, "abbreviation", ignore_case=True)
-        return text
+                    boundaries.append(m.span(0))
+            self._split_on_boundaries(t, boundaries, "abbreviation")
 
     def _check_spaces(self, tokens, original_text):
         """Compare the tokens with the original text to see which tokens had
@@ -662,9 +660,9 @@ class Tokenizer(object):
             self._split_all_matches(self.en_nonbreaking_prefixes, token_dll)
             self._split_all_matches(self.en_nonbreaking_suffixes, token_dll)
 
-        # # remove known abbreviations
-        # split_abbreviations = False if self.language == "en" else True
-        # paragraph = self._replace_abbreviations(paragraph, split_multipart_abbrevs=split_abbreviations)
+        # remove known abbreviations
+        split_abbreviations = False if self.language == "en" else True
+        self._split_abbreviations(token_dll, split_multipart_abbrevs=split_abbreviations)
 
         # # DATES AND NUMBERS
         # # dates
