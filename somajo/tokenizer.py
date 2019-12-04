@@ -101,9 +101,13 @@ class Tokenizer(object):
         self.reddit_links = re.compile(r'(?<!\w)/?[rlu](?:/\w+)+/?(?!\w)', re.IGNORECASE)
 
         # XML entities
-        self.entity_name = re.compile(r'&(?:quot|amp|apos|lt|gt);', re.IGNORECASE)
-        self.entity_decimal = re.compile(r'&#\d+;')
-        self.entity_hex = re.compile(r'&#x[0-9a-f]+;', re.IGNORECASE)
+        self.entity = re.compile(r"""&(?:
+                                         quot|amp|apos|lt|gt  # named entities
+                                         |
+                                         #\d+                 # decimal entities
+                                         |
+                                         #x[0-9a-f]+          # hexadecimal entities
+                                      );""", re.VERBOSE | re.IGNORECASE)
 
         # EMOTICONS
         emoticon_set = set(["(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
