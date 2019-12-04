@@ -600,40 +600,37 @@ class Tokenizer(object):
                     token_dll.insert_left(Token(tok, space_after=True), t)
             token_dll.remove(t)
 
+        # urls
+        self._split_all_matches(self.simple_url_with_brackets, token_dll, "URL")
+        self._split_all_matches(self.simple_url, token_dll, "URL")
+        self._split_all_matches(self.doi, token_dll, "URL")
+        # TODO: lookbehind
+        self._split_all_matches(self.doi_with_space, token_dll, "URL")
+        self._split_all_matches(self.url_without_protocol, token_dll, "URL")
+        self._split_all_matches(self.reddit_links, token_dll, "URL")
 
-        # # urls
-        # paragraph = self._replace_regex(paragraph, self.simple_url_with_brackets, "URL")
-        # paragraph = self._replace_regex(paragraph, self.simple_url, "URL")
-        # paragraph = self._replace_regex(paragraph, self.doi, "DOI")
-        # paragraph = self._replace_regex(paragraph, self.doi_with_space, "DOI")
-        # paragraph = self._replace_regex(paragraph, self.url_without_protocol, "URL")
-        # paragraph = self._replace_regex(paragraph, self.reddit_links, "URL")
-        # # paragraph = self._replace_regex(paragraph, self.url)
+        # XML entities
+        self._split_all_matches(self.entity, token_dll, "XML_entity")
 
-        # # XML entities
-        # paragraph = self._replace_regex(paragraph, self.entity_name, "XML_entity")
-        # paragraph = self._replace_regex(paragraph, self.entity_decimal, "XML_entity")
-        # paragraph = self._replace_regex(paragraph, self.entity_hex, "XML_entity")
+        # emoticons
+        # TODO: lookbehind
+        self._split_all_matches(self.heart_emoticon, token_dll, "emoticon")
+        self._split_all_matches(self.emoticon, token_dll, "emoticon")
 
-        # # replace emoticons with unique strings so that they are out
-        # # of the way
-        # paragraph = self.spaces.sub(" ", paragraph)
-        # paragraph = self._replace_regex(paragraph, self.heart_emoticon, "emoticon")
-        # paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
-        # # paragraph = self._replace_regex(paragraph, self.unicode_symbols, "emoticon")
+        # mentions, hashtags
+        self._split_all_matches(self.mention, token_dll, "mention")
+        self._split_all_matches(self.hashtag, token_dll, "hashtag")
+        # action words
+        self._split_all_matches(self.action_word, token_dll, "action_word")
+        # underline
+        self._split_all_matches(self.underline, token_dll)
+        # textual representations of emoji
+        self._split_all_matches(self.emoji, token_dll, "emoticon")
 
-        # # mentions, hashtags
-        # paragraph = self._replace_regex(paragraph, self.mention, "mention")
-        # paragraph = self._replace_regex(paragraph, self.hashtag, "hashtag")
-        # # action words
-        # paragraph = self._replace_regex(paragraph, self.action_word, "action_word")
-        # # underline
-        # paragraph = self.underline.sub(r' \1 \2 \3 ', paragraph)
-        # # textual representations of emoji
-        # paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
+        # tokens with + or &
+        self._split_all_matches(self.token_with_plus_ampersand, token_dll)
+        self._split_all_set(token_dll, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
 
-        # paragraph = self._replace_regex(paragraph, self.token_with_plus_ampersand)
-        # paragraph = self._replace_set(paragraph, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
 
         # # camelCase
         # if self.split_camel_case:
