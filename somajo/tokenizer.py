@@ -631,33 +631,36 @@ class Tokenizer(object):
         self._split_all_matches(self.token_with_plus_ampersand, token_dll)
         self._split_all_set(token_dll, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
 
+        # camelCase
+        if self.split_camel_case:
+            self._split_all_matches(self.camel_case_token, token_dll)
+            self._split_all_set(token_dll, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
+            self._split_all_matches(self.in_and_innen, token_dll)
+            # TODO: split to the left of match
+            # paragraph = self.camel_case.sub(r' \1', paragraph)
 
-        # # camelCase
-        # if self.split_camel_case:
-        #     paragraph = self._replace_regex(paragraph, self.camel_case_token)
-        #     paragraph = self._replace_set(paragraph, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
-        #     paragraph = self._replace_regex(paragraph, self.in_and_innen)
-        #     paragraph = self.camel_case.sub(r' \1', paragraph)
+        # gender star
+        self._split_all_matches(self.gender_star, token_dll)
 
-        # # gender star
-        # paragraph = self._replace_regex(paragraph, self.gender_star)
-
-        # # English possessive and contracted forms
-        # if self.language == "en":
-        #     paragraph = self._replace_regex(paragraph, self.english_decades, "number_compound")
-        #     paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
-        #     paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
-        #     paragraph = self._replace_regex(paragraph, self.en_not, "regular")
-        #     paragraph = self.en_trailing_apos.sub(r' \1', paragraph)
-        #     for contraction in self.en_twopart_contractions:
-        #         paragraph = contraction.sub(r' \1 \2 ', paragraph)
-        #     for contraction in self.en_threepart_contractions:
-        #         paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
-        #     paragraph = self._replace_regex(paragraph, self.en_no, "regular")
-        #     paragraph = self._replace_regex(paragraph, self.en_degree, "regular")
-        #     paragraph = self._replace_regex(paragraph, self.en_nonbreaking_words, "regular")
-        #     paragraph = self._replace_regex(paragraph, self.en_nonbreaking_prefixes, "regular")
-        #     paragraph = self._replace_regex(paragraph, self.en_nonbreaking_suffixes, "regular")
+        # English possessive and contracted forms
+        if self.language == "en":
+            self._split_all_matches(self.english_decades, token_dll, "number_compound")
+            self._split_all_matches(self.en_dms, token_dll)
+            self._split_all_matches(self.en_llreve, token_dll)
+            self._split_all_matches(self.en_not, token_dll)
+            # TODO: split to the left of match
+            # paragraph = self.en_trailing_apos.sub(r' \1', paragraph)
+            for contraction in self.en_twopart_contractions:
+                self._split_all_matches(contraction, token_dll)
+            for contraction in self.en_threepart_contractions:
+                self._split_all_matches(contraction, token_dll)
+            # TODO: lookahead
+            # paragraph = self._replace_regex(paragraph, self.en_no, "regular")
+            # TODO: lookbehind
+            # paragraph = self._replace_regex(paragraph, self.en_degree, "regular")
+            self._split_all_matches(self.en_nonbreaking_words, token_dll)
+            self._split_all_matches(self.en_nonbreaking_prefixes, token_dll)
+            self._split_all_matches(self.en_nonbreaking_suffixes, token_dll)
 
         # # remove known abbreviations
         # split_abbreviations = False if self.language == "en" else True
