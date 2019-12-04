@@ -103,9 +103,9 @@ class Tokenizer(object):
         self.entity = re.compile(r"""&(?:
                                          quot|amp|apos|lt|gt  # named entities
                                          |
-                                         #\d+                 # decimal entities
+                                         \#\d+                # decimal entities
                                          |
-                                         #x[0-9a-f]+          # hexadecimal entities
+                                         \#x[0-9a-f]+         # hexadecimal entities
                                       );""", re.VERBOSE | re.IGNORECASE)
 
         # EMOTICONS
