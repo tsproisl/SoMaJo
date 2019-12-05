@@ -476,6 +476,19 @@ class Tokenizer(object):
                 boundaries.append((m.start(), m.start() + 1, None))
                 boundaries.append((m.end() - 1, m.end() + 1, None))
             self._split_on_boundaries(t, boundaries, "regular")
+
+    def _split_paired(self, token_dll, left, right):
+        """Split off paired parens and quotation marks"""
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            m = left.search(t.value.text)
+            if m:
+                open_start, open_end = m.span()
+                remainder = t.value.text[open_end:]
+                # for u in token_dll.__iter__(start=t):
+                #     pass
+
     def _remove_empty_tokens(self, token_dll):
         for t in token_dll:
             if t.value.markup or t.value.locked:
