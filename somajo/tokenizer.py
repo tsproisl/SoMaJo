@@ -34,6 +34,7 @@ class Tokenizer(object):
         self.replacement_counter = 0
 
         self.spaces = re.compile(r"\s+")
+        self.spaces_or_empty = re.compile(r"^\s*$")
         self.controls = re.compile(r"[\u0000-\u001F\u007F-\u009F]")
         self.stranded_variation_selector = re.compile(r" \uFE0F")
         # soft hyphen (00AD), zero-width space (200B), zero-width
