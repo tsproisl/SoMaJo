@@ -463,6 +463,19 @@ class Tokenizer(object):
                     boundaries.append((m.start(), m.end(), None))
             self._split_on_boundaries(t, boundaries, "abbreviation")
 
+    def _remove_empty_tokens(self, token_dll):
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            if self.spaces_or_empty.search(t.value.text):
+                if t.value.first_in_sentence:
+                    next_non_markup = token_dll.next_matching(t, operator.attrgetter("value.markup"), False)
+                    next_non_markup.value.first_in_sentence = True
+                if t.value.last_in_sentence:
+                    previous_non_markup = token_dll.previous_matching(t, operator.attrgetter("value.markup"), False)
+                    previous_non_markup.value.last_in_sentence = True
+                token_dll.remove(t)
+
     def _check_spaces(self, tokens, original_text):
         """Compare the tokens with the original text to see which tokens had
         trailing whitespace (to be able to annotate SpaceAfter=No) and
@@ -624,18 +637,12 @@ class Tokenizer(object):
             t.value.text = self.other_nasties.sub("", t.value.text)
             # normalize whitespace
             t.value.text = self.spaces.sub(" ", t.value.text)
-            # Some emoticons contain erroneous spaces. We fix this.
-            # TODO: original_spelling
-            t.value.text = self.space_emoticon.sub(r'\1\2', t.value.text)
-            # Split on whitespace
-            wt = t.value.text.split()
-            n_wt = len(wt)
-            for i, tok in enumerate(wt):
-                if i == n_wt - 1:
-                    token_dll.insert_left(Token(tok, space_after=t.value.space_after), t)
-                else:
-                    token_dll.insert_left(Token(tok, space_after=True), t)
-            token_dll.remove(t)
+
+        # Remove empty tokens
+        self._remove_empty_tokens(token_dll)
+
+        # Some emoticons contain erroneous spaces. We fix this.
+        self._split_all_matches(self.space_emoticon, token_dll, "emoticon", repl=r'\1\2')
 
         # urls
         self._split_all_matches(self.simple_url_with_brackets, token_dll, "URL")
