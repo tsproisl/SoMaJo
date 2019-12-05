@@ -136,8 +136,6 @@ class Tokenizer(object):
         # (?<=\D[ ])^3   # two leading characters, non-number + space
         # (?<=.[^\d ])^3   # two leading characters, x + non-space-non-number
         self.heart_emoticon = re.compile(r"(?:^|^\D|(?<=\D[ ])|(?<=.[^\d ]))\^3")
-        # NEW1: self.heart_emoticon = re.compile(r"(?<=\D)\^3")
-        # NEW2: self.heart_emoticon = re.compile(r"^\^3")  # plus previous token must end in \D
         # U+2600..U+26FF	Miscellaneous Symbols
         # U+2700..U+27BF	Dingbats
         # U+FE0E..U+FE0F        text and emoji variation selectors
