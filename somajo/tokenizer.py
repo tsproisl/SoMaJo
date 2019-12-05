@@ -246,6 +246,7 @@ class Tokenizer(object):
         self.space_left_arrow = re.compile(r'(<)\s+(-+)')
         self.arrow = re.compile(r'(-+>|<-+|[\u2190-\u21ff])')
         # parens
+        self.empty_paired_parens = re.compile(r"(?P<a>\()\s*(?P<b>\))|(?P<c>\[)\s*(?P<d>\])|(?P<e>\{)\s*(?P<f>\})")
         self.paired_paren = re.compile(r'([(])(?!inn)([^()]*)([)])')
         self.paired_bracket = re.compile(r'(\[)([^][]*)(\])')
         self.paren = re.compile(r"""((?:(?<!\w)   # no alphanumeric character
@@ -753,6 +754,7 @@ class Tokenizer(object):
         self._split_all_matches(self.space_left_arrow, token_dll, "symbol", repl=r'\1\2')
         self._split_all_matches(self.arrow, token_dll, "symbol")
         # parens
+        self._split_all_matches(self.empty_paired_parens, token_dll, "symbol")
         # TODO:
         # paragraph = self.paired_paren.sub(r' \1 \2 \3 ', paragraph)
         # paragraph = self.paired_bracket.sub(r' \1 \2 \3 ', paragraph)
