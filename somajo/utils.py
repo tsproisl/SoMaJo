@@ -74,12 +74,16 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         super().__init__()
         self.token_dll = doubly_linked_list.DLL()
+        self.content = ""
 
     def characters(self, data):
-        token = Token(data)
-        self.token_dll.append(token)
+        self.content += data
 
     def startElement(self, name, attrs):
+        if self.content != "":
+            content_token = Token(self.content)
+            self.token_dll.append(content_token)
+            self.content = ""
         if len(attrs) > 0:
             text = "<%s %s>" % (name, " ".join(["%s=\"%s\"" % (k, xml.sax.saxutils.escape(v, {'"': "&quot;"})) for k, v in attrs.items()]))
         else:
@@ -88,6 +92,10 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
         self.token_dll.append(token)
 
     def endElement(self, name):
+        if self.content != "":
+            content_token = Token(self.content)
+            self.token_dll.append(content_token)
+            self.content = ""
         text = "</%s>" % name
         token = Token(text, markup=True, locked=True)
         self.token_dll.append(token)
