@@ -314,32 +314,41 @@ class Tokenizer(object):
 
     def _split_on_boundaries(self, node, boundaries, token_class):
         """"""
-        token_dll = node.list
         n = len(boundaries)
+        if n == 0:
+            return
+        token_dll = node.list
         prev_end = 0
         for i, (start, end) in enumerate(boundaries):
-            lsa, msa = False, False
+            left_space_after, match_space_after = False, False
             left = node.value.text[prev_end:start]
             match = node.value.text[start:end]
             right = node.value.text[end:]
+            prev_end = end
             if left.endswith(" ") or match.startswith(" "):
-                lsa = True
-            if right.startswith(" ") or match.endswith(" "):
-                msa = True
+                left_space_after = True
+            if match.endswith(" ") or right.startswith(" "):
+                match_space_after = True
             elif right == "":
-                msa = node.value.space_after
+                match_space_after = node.value.space_after
             left = left.strip()
             match = match.strip()
             right = right.strip()
-            if left != "":
-                token_dll.insert_left(Token(left, space_after=lsa), node)
-            token_dll.insert_left(Token(match, locked=True, token_class=token_class, space_after=msa), node)
+            first_in_sentence, match_last_in_sentence, right_last_in_sentence = False, False, False
+            if i == 0:
+                first_in_sentence = node.value.first_in_sentence
             if i == n - 1:
+                match_last_in_sentence = node.value.last_in_sentence
                 if right != "":
-                    token_dll.insert_left(Token(right, space_after=node.value.space_after), node)
-            prev_end = end
-        if n > 0:
-            token_dll.remove(node)
+                    match_last_in_sentence = False
+                    right_last_in_sentence = node.value.last_in_sentence
+            if left != "":
+                token_dll.insert_left(Token(left, space_after=left_space_after, first_in_sentence=first_in_sentence), node)
+                first_in_sentence = False
+            token_dll.insert_left(Token(match, locked=True, token_class=token_class, space_after=match_space_after, first_in_sentence=first_in_sentence, last_in_sentence=match_last_in_sentence), node)
+            if i == n - 1 and right != "":
+                token_dll.insert_left(Token(right, space_after=node.value.space_after, last_in_sentence=right_last_in_sentence), node)
+        token_dll.remove(node)
 
     def _split_matches(self, regex, node, token_class="regular", split_named_subgroups=True):
         boundaries = []
