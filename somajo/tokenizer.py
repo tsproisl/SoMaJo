@@ -748,9 +748,8 @@ class Tokenizer(object):
         # (clusters of) question marks and exclamation marks
         self._split_all_matches(self.quest_exclam, token_dll, "symbol")
         # arrows
-        # TODO:
-        # paragraph = self.space_right_arrow.sub(r'\1\2', paragraph)
-        # paragraph = self.space_left_arrow.sub(r'\1\2', paragraph)
+        self._split_all_matches(self.space_right_arrow, token_dll, "symbol", repl=r'\1\2')
+        self._split_all_matches(self.space_left_arrow, token_dll, "symbol", repl=r'\1\2')
         self._split_all_matches(self.arrow, token_dll, "symbol")
         # parens
         # TODO:
