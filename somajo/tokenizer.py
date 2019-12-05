@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import operator
 import unicodedata
 import warnings
 
@@ -788,6 +789,19 @@ class Tokenizer(object):
         # paragraph = self.dot.sub(r' \1 ', paragraph)
         self._split_all_matches(self.dot, token_dll, "symbol")
 
+        # Split on whitespace
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            wt = t.value.text.split()
+            n_wt = len(wt)
+            for i, tok in enumerate(wt):
+                if i == n_wt - 1:
+                    token_dll.insert_left(Token(tok, space_after=t.value.space_after), t)
+                else:
+                    token_dll.insert_left(Token(tok, space_after=True), t)
+                token_dll.remove(t)
+
         return token_dll
 
     def tokenize(self, paragraph):
@@ -846,7 +860,14 @@ class Tokenizer(object):
 
         """
         token_dll = utils.parse_xml_to_token_dll(xml, is_file)
+        # for t in token_dll:
+        #     print(t.value.text)
         self._tokenize(token_dll)
+        for t in token_dll:
+            tok = t.value
+            if tok.markup:
+                continue
+            tok.text = utils.escape_xml(tok.text)
         return [t.text for t in token_dll.to_list()]
         # whole_text = " ".join((e.text for e in elements))
 
