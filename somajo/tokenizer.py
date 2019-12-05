@@ -471,10 +471,12 @@ class Tokenizer(object):
             if self.spaces_or_empty.search(t.value.text):
                 if t.value.first_in_sentence:
                     next_non_markup = token_dll.next_matching(t, operator.attrgetter("value.markup"), False)
-                    next_non_markup.value.first_in_sentence = True
+                    if next_non_markup is not None:
+                        next_non_markup.value.first_in_sentence = True
                 if t.value.last_in_sentence:
                     previous_non_markup = token_dll.previous_matching(t, operator.attrgetter("value.markup"), False)
-                    previous_non_markup.value.last_in_sentence = True
+                    if previous_non_markup is not None:
+                        previous_non_markup.value.last_in_sentence = True
                 token_dll.remove(t)
 
     def _check_spaces(self, tokens, original_text):
