@@ -312,17 +312,22 @@ class Tokenizer(object):
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
 
-    def _split_on_boundaries(self, node, boundaries, token_class):
+    def _split_on_boundaries(self, node, boundaries, token_class, lock_match=True):
         """"""
         n = len(boundaries)
         if n == 0:
             return
         token_dll = node.list
         prev_end = 0
-        for i, (start, end) in enumerate(boundaries):
+        for i, (start, end, replacement) in enumerate(boundaries):
+            original_spelling = None
             left_space_after, match_space_after = False, False
             left = node.value.text[prev_end:start]
             match = node.value.text[start:end]
+            if replacement is not None:
+                if match != replacement:
+                    original_spelling = match
+                    match = replacement
             right = node.value.text[end:]
             prev_end = end
             if left.endswith(" ") or match.startswith(" "):
@@ -345,21 +350,30 @@ class Tokenizer(object):
             if left != "":
                 token_dll.insert_left(Token(left, space_after=left_space_after, first_in_sentence=first_in_sentence), node)
                 first_in_sentence = False
-            token_dll.insert_left(Token(match, locked=True, token_class=token_class, space_after=match_space_after, first_in_sentence=first_in_sentence, last_in_sentence=match_last_in_sentence), node)
+            token_dll.insert_left(Token(match, locked=lock_match,
+                                        token_class=token_class,
+                                        space_after=match_space_after,
+                                        original_spelling=original_spelling,
+                                        first_in_sentence=first_in_sentence,
+                                        last_in_sentence=match_last_in_sentence),
+                                  node)
             if i == n - 1 and right != "":
                 token_dll.insert_left(Token(right, space_after=node.value.space_after, last_in_sentence=right_last_in_sentence), node)
         token_dll.remove(node)
 
-    def _split_matches(self, regex, node, token_class="regular", split_named_subgroups=True):
+    def _split_matches(self, regex, node, token_class="regular", repl=None, split_named_subgroups=True):
         boundaries = []
         split_groups = split_named_subgroups and len(regex.groupindex) > 0
         group_numbers = sorted(regex.groupindex.values())
         for m in regex.finditer(node.value.text):
             if split_groups:
                 for g in group_numbers:
-                    boundaries.append(m.span(g))
+                    boundaries.append((m.start(g), m.end(g), None))
             else:
-                boundaries.append(m.span(0))
+                if repl is None:
+                    boundaries.append((m.start(), m.end(), None))
+                else:
+                    boundaries.append((m.start(), m.end(), m.expand(repl)))
         self._split_on_boundaries(node, boundaries, token_class)
 
     def _split_emojis(self, node, token_class="emoticon"):
@@ -367,10 +381,10 @@ class Tokenizer(object):
         for m in re.finditer(r"\X", node.value.text):
             if m.end() - m.start() > 1:
                 if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F]", m.group()):
-                    boundaries.append(m.span())
+                    boundaries.append((m.start(), m.end(), None))
             else:
                 if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}]", m.group()):
-                    boundaries.append(m.span())
+                    boundaries.append((m.start(), m.end(), None))
         self._split_on_boundaries(node, boundaries, token_class)
 
     def _split_set(self, regex, node, items, token_class="regular", ignore_case=False):
@@ -380,7 +394,7 @@ class Tokenizer(object):
             if ignore_case:
                 instance = instance.lower()
             if instance in items:
-                boundaries.append(m.span(0))
+                boundaries.append((m.start(), m.end(), None))
         self._split_on_boundaries(node, boundaries, token_class)
 
     def _split_all_matches(self, regex, token_dll, token_class="regular", split_named_subgroups=True):
@@ -427,10 +441,10 @@ class Tokenizer(object):
                     s = start
                     for i, c in enumerate(instance, start=1):
                         if c == ".":
-                            boundaries.append((s, start + i))
+                            boundaries.append((s, start + i, None))
                             s = start + i
                 else:
-                    boundaries.append(m.span(0))
+                    boundaries.append((m.start(), m.end(), None))
             self._split_on_boundaries(t, boundaries, "abbreviation")
 
     def _check_spaces(self, tokens, original_text):
