@@ -27,8 +27,10 @@ class DLL:
         if iterable is not None:
             self.extend(iterable)
 
-    def __iter__(self):
+    def __iter__(self, start=None):
         current = self.first
+        if start is not None:
+            current = start
         while current is not None:
             yield current
             current = current.next
