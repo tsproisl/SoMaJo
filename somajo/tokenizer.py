@@ -444,8 +444,7 @@ class Tokenizer(object):
         self._split_all_matches(self.nr_abbreviations, token_dll, "abbreviation")
         self._split_all_matches(self.single_token_abbreviation, token_dll, "abbreviation")
         self._split_all_matches(self.single_letter_abbreviation, token_dll, "abbreviation")
-        # TODO: lookbehind
-        # text = self._replace_regex(text, self.ps, "abbreviation")
+        self._split_all_matches(self.ps, token_dll, "abbreviation")
 
         for t in token_dll:
             if t.value.markup or t.value.locked:
