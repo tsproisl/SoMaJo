@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import operator
+
 
 class DLLNode:
     def __init__(self, val=None, prv=None, nxt=None, lst=None):
@@ -37,6 +39,20 @@ class DLL:
     def __str__(self):
         return str(self.to_list())
 
+    def _find_matching_node(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None, forward=True):
+        current = item
+        direction = operator.attrgetter("next")
+        if not forward:
+            direction = operator.attrgetter("prev")
+        while direction(current) is not None:
+            current = direction(current)
+            if ignore_attrgetter is not None:
+                if ignore_attrgetter(current) == ignore_value:
+                    continue
+            if attrgetter(current) == value:
+                return current
+        return None
+
     def append(self, item):
         node = DLLNode(item, self.last, None, self)
         if self.first is None:
@@ -55,8 +71,11 @@ class DLL:
             self.first = node
         self.size += 1
 
-    def to_list(self):
-        return [e.value for e in self]
+    def next_matching(self, item, attrgetter, value, ignore_attrgetter, ignore_value):
+        self._find_matching_node(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
+
+    def previous_matching(self, item, attrgetter, value, ignore_attrgetter, ignore_value):
+        self._find_matching_node(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)
 
     def remove(self, node):
         if self.first is node:
@@ -68,3 +87,6 @@ class DLL:
         if node.next is not None:
             node.next.prev = node.prev
         self.size -= 1
+
+    def to_list(self):
+        return [e.value for e in self]
