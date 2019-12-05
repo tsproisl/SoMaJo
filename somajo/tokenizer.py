@@ -663,7 +663,6 @@ class Tokenizer(object):
         self._split_all_matches(self.simple_url_with_brackets, token_dll, "URL")
         self._split_all_matches(self.simple_url, token_dll, "URL")
         self._split_all_matches(self.doi, token_dll, "URL")
-        # TODO: lookbehind
         self._split_all_matches(self.doi_with_space, token_dll, "URL")
         self._split_all_matches(self.url_without_protocol, token_dll, "URL")
         self._split_all_matches(self.reddit_links, token_dll, "URL")
@@ -672,7 +671,6 @@ class Tokenizer(object):
         self._split_all_matches(self.entity, token_dll, "XML_entity")
 
         # emoticons
-        # TODO: lookbehind
         self._split_all_matches(self.heart_emoticon, token_dll, "emoticon")
         self._split_all_matches(self.emoticon, token_dll, "emoticon")
 
@@ -682,8 +680,6 @@ class Tokenizer(object):
         # action words
         self._split_all_matches(self.action_word, token_dll, "action_word")
         # underline
-        # TODO: match across multiple tokens
-        self._split_all_matches(self.underline, token_dll)
         self._split_underline(token_dll)
         # textual representations of emoji
         self._split_all_matches(self.emoji, token_dll, "emoticon")
@@ -713,10 +709,8 @@ class Tokenizer(object):
                 self._split_all_matches(contraction, token_dll)
             for contraction in self.en_threepart_contractions:
                 self._split_all_matches(contraction, token_dll)
-            # TODO: lookahead
-            # paragraph = self._replace_regex(paragraph, self.en_no, "regular")
-            # TODO: lookbehind
-            # paragraph = self._replace_regex(paragraph, self.en_degree, "regular")
+            self._split_all_matches(self.en_no, token_dll)
+            self._split_all_matches(self.en_degree, token_dll)
             self._split_all_matches(self.en_nonbreaking_words, token_dll)
             self._split_all_matches(self.en_nonbreaking_prefixes, token_dll)
             self._split_all_matches(self.en_nonbreaking_suffixes, token_dll)
