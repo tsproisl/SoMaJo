@@ -397,12 +397,20 @@ class Tokenizer(object):
                 boundaries.append((m.start(), m.end(), None))
         self._split_on_boundaries(node, boundaries, token_class)
 
-    def _split_all_matches(self, regex, token_dll, token_class="regular", split_named_subgroups=True):
+    def _split_left(self, regex, node):
+        boundaries = []
+        prev_end = 0
+        for m in regex.finditer(node.value.text):
+            boundaries.append((prev_end, m.start(), None))
+            prev_end = m.start()
+        self._split_on_boundaries(node, boundaries, token_class=None, lock_match=False)
+
+    def _split_all_matches(self, regex, token_dll, token_class="regular", repl=None, split_named_subgroups=True):
         """Turn matches for the regex into tokens."""
         for t in token_dll:
             if t.value.markup or t.value.locked:
                 continue
-            self._split_matches(regex, t, token_class, split_named_subgroups)
+            self._split_matches(regex, t, token_class, repl, split_named_subgroups)
 
     def _split_all_emojis(self, token_dll, token_class="emoticon"):
         """Replace all emoji sequences"""
@@ -418,6 +426,13 @@ class Tokenizer(object):
             if t.value.markup or t.value.locked:
                 continue
             self._split_set(regex, t, items, token_class, ignore_case)
+
+    def _split_all_left(self, regex, token_dll):
+        """Split to the left of the match."""
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            self._split_left(regex, t)
 
     def _split_abbreviations(self, token_dll, split_multipart_abbrevs=True):
         """Turn instances of abbreviations into tokens."""
