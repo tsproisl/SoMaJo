@@ -681,8 +681,7 @@ class Tokenizer(object):
             self._split_all_matches(self.camel_case_token, token_dll)
             self._split_all_set(token_dll, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
             self._split_all_matches(self.in_and_innen, token_dll)
-            # TODO: split to the left of match
-            # paragraph = self.camel_case.sub(r' \1', paragraph)
+            self._split_all_left(self.camel_case, token_dll)
 
         # gender star
         self._split_all_matches(self.gender_star, token_dll)
@@ -693,8 +692,7 @@ class Tokenizer(object):
             self._split_all_matches(self.en_dms, token_dll)
             self._split_all_matches(self.en_llreve, token_dll)
             self._split_all_matches(self.en_not, token_dll)
-            # TODO: split to the left of match
-            # paragraph = self.en_trailing_apos.sub(r' \1', paragraph)
+            self._split_all_left(self.en_trailing_apos, token_dll)
             for contraction in self.en_twopart_contractions:
                 self._split_all_matches(contraction, token_dll)
             for contraction in self.en_threepart_contractions:
