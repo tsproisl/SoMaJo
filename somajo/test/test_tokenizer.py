@@ -935,6 +935,12 @@ class OwnAdditions(TestTokenizer):
     def test_own_103(self):
         self._equal("IP-Adresse des Routers: 192.0.2.42.", "IP-Adresse des Routers : 192.0.2.42 .")
 
+    def test_own_104(self):
+        self._equal(")foo", ") foo")
+
+    def test_own_105(self):
+        self._equal(" )foo", ") foo")
+
 
 class TestSuffixes(TestTokenizer):
     """"""
