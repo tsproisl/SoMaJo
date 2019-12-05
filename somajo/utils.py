@@ -101,3 +101,8 @@ def parse_xml_to_token_dll(data, is_file=True):
     else:
         xml.sax.parseString(data, handler)
     return handler.token_dll
+
+
+def escape_xml(string):
+    """Escape "&", "<" and ">" in string."""
+    return xml.sax.saxutils.escape(string)
