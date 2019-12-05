@@ -463,6 +463,19 @@ class Tokenizer(object):
                     boundaries.append((m.start(), m.end(), None))
             self._split_on_boundaries(t, boundaries, "abbreviation")
 
+    def _split_underline(self, token_dll):
+        """Split off underscores used to represent underlining. Currently,
+        this only operates on a single segment.
+
+        """
+        for t in token_dll:
+            if t.value.markup or t.value.locked:
+                continue
+            boundaries = []
+            for m in self.underline.finditer(t.value.text):
+                boundaries.append((m.start(), m.start() + 1, None))
+                boundaries.append((m.end() - 1, m.end() + 1, None))
+            self._split_on_boundaries(t, boundaries, "regular")
     def _remove_empty_tokens(self, token_dll):
         for t in token_dll:
             if t.value.markup or t.value.locked:
@@ -671,6 +684,7 @@ class Tokenizer(object):
         # underline
         # TODO: match across multiple tokens
         self._split_all_matches(self.underline, token_dll)
+        self._split_underline(token_dll)
         # textual representations of emoji
         self._split_all_matches(self.emoji, token_dll, "emoticon")
 
