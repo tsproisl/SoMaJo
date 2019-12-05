@@ -369,7 +369,8 @@ class Tokenizer(object):
         for m in regex.finditer(node.value.text):
             if split_groups:
                 for g in group_numbers:
-                    boundaries.append((m.start(g), m.end(g), None))
+                    if m.span(g) != (-1, -1):
+                        boundaries.append((m.start(g), m.end(g), None))
             else:
                 if repl is None:
                     boundaries.append((m.start(), m.end(), None))
