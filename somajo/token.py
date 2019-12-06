@@ -14,3 +14,11 @@ class Token:
 
     def __str__(self):
         return self.text
+
+    def extra_info(self):
+        info = []
+        if not self.space_after:
+            info.append("SpaceAfter=No")
+        if self.original_spelling is not None:
+            info.append("OriginalSpelling=\"%s\"" % self.original_spelling)
+        return ", ".join(info)
