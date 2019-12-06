@@ -2,7 +2,7 @@
 
 
 class Token:
-    def __init__(self, text, markup=False, locked=False, token_class="regular", space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
+    def __init__(self, text, markup=False, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
         self.text = text
         self.markup = markup
         self.locked = locked

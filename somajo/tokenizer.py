@@ -345,7 +345,7 @@ class Tokenizer(object):
                     match_last_in_sentence = False
                     right_last_in_sentence = node.value.last_in_sentence
             if left != "":
-                token_dll.insert_left(Token(left, space_after=left_space_after, first_in_sentence=first_in_sentence), node)
+                token_dll.insert_left(Token(left, token_class="regular", space_after=left_space_after, first_in_sentence=first_in_sentence), node)
                 first_in_sentence = False
             token_dll.insert_left(Token(match, locked=lock_match,
                                         token_class=token_class,
@@ -355,7 +355,7 @@ class Tokenizer(object):
                                         last_in_sentence=match_last_in_sentence),
                                   node)
             if i == n - 1 and right != "":
-                token_dll.insert_left(Token(right, space_after=node.value.space_after, last_in_sentence=right_last_in_sentence), node)
+                token_dll.insert_left(Token(right, token_class="regular", space_after=node.value.space_after, last_in_sentence=right_last_in_sentence), node)
         token_dll.remove(node)
 
     def _split_matches(self, regex, node, token_class="regular", repl=None, split_named_subgroups=True):
@@ -674,9 +674,9 @@ class Tokenizer(object):
             n_wt = len(wt)
             for i, tok in enumerate(wt):
                 if i == n_wt - 1:
-                    token_dll.insert_left(Token(tok, space_after=t.value.space_after), t)
+                    token_dll.insert_left(Token(tok, token_class="regular", space_after=t.value.space_after), t)
                 else:
-                    token_dll.insert_left(Token(tok, space_after=True), t)
+                    token_dll.insert_left(Token(tok, token_class="regular", space_after=True), t)
                 token_dll.remove(t)
 
         return token_dll
