@@ -947,6 +947,15 @@ class OwnAdditions(TestTokenizer):
     def test_own_105(self):
         self._equal(" )foo", ") foo")
 
+    def test_own_106(self):
+        self._equal("machst du's?", "machst du's ?")
+
+    def test_own_107(self):
+        self._equal("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
+
+    def test_own_108(self):
+        self._equal('foo "bar -> baz" qux "bar baz" qux', 'foo " bar -> baz " qux " bar baz " qux')
+
 
 class TestUnderline(TestTokenizer):
     """"""
