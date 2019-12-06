@@ -690,7 +690,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("der Student/die Studentin", "der Student / die Studentin")
 
     def test_own_24(self):
-        self._fail_means_improvement("der/die Student(in)", "der / die Student(in)")
+        self._equal("der/die Student(in)", "der / die Student(in)")
 
     def test_own_25(self):
         self._equal("``Wort''", "`` Wort ''")
