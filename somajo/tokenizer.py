@@ -199,7 +199,7 @@ class Tokenizer(object):
         self.hashtag = re.compile(r'(?<!\w)[#]\w+(?!\w)')
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
         # a pair of underscores can be used to "underline" some text
-        self.underline = re.compile(r"(?<!\w)(?P<open_ul>_)(?P<text_ul>\w[^_]+\w)(?P<close_ul>_)(?!\w)")
+        self.underline = re.compile(r"(?<!\w)(?P<left>_)(?P<middle>\w[^_]+\w)(?P<right>_)(?!\w)")
 
         # DATE, TIME, NUMBERS
         self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?![\d.])', re.VERBOSE)
@@ -459,31 +459,19 @@ class Tokenizer(object):
                     boundaries.append((m.start(), m.end(), None))
             self._split_on_boundaries(t, boundaries, "abbreviation")
 
-    def _split_underline(self, token_dll):
-        """Split off underscores used to represent underlining. Currently,
-        this only operates on a single segment.
+    def _split_paired(self, regex, token_dll, token_class="regular"):
+        """Split off paired elements (with capture groups named "left" and
+        "right"). Currently, this only operates on a single segment.
 
         """
         for t in token_dll:
             if t.value.markup or t.value.locked:
                 continue
             boundaries = []
-            for m in self.underline.finditer(t.value.text):
-                boundaries.append((m.start(), m.start() + 1, None))
-                boundaries.append((m.end() - 1, m.end() + 1, None))
-            self._split_on_boundaries(t, boundaries, "regular")
-
-    def _split_paired(self, token_dll, left, right):
-        """Split off paired parens and quotation marks"""
-        for t in token_dll:
-            if t.value.markup or t.value.locked:
-                continue
-            m = left.search(t.value.text)
-            if m:
-                open_start, open_end = m.span()
-                remainder = t.value.text[open_end:]
-                # for u in token_dll.__iter__(start=t):
-                #     pass
+            for m in regex.finditer(t.value.text):
+                boundaries.append((m.start("left"), m.end("left"), None))
+                boundaries.append((m.start("right"), m.end("right"), None))
+            self._split_on_boundaries(t, boundaries, token_class)
 
     def _remove_empty_tokens(self, token_dll):
         for t in token_dll:
@@ -569,7 +557,7 @@ class Tokenizer(object):
         # action words
         self._split_all_matches(self.action_word, token_dll, "action_word")
         # underline
-        self._split_underline(token_dll)
+        self._split_paired(self.underline, token_dll)
         # textual representations of emoji
         self._split_all_matches(self.emoji, token_dll, "emoticon")
 
