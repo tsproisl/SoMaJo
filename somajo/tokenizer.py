@@ -43,10 +43,6 @@ class Tokenizer(object):
         # 202B), l-t-r/r-t-l override (202D, 202E), pop directional
         # formatting (202C), zero-width no-break space (FEFF)
         self.other_nasties = re.compile(r"[\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]")
-        # combination
-        self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+")
-        self.junk_next_to_space = re.compile(r"(?:^|\s)[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+|[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+(?:\s|$)")
-        self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+(?:\s+|$)")
 
         # TAGS, EMAILS, URLs
         self.xml_declaration = re.compile(r"""<\?xml
@@ -242,8 +238,6 @@ class Tokenizer(object):
         self.space_left_arrow = re.compile(r'(<)\s+(-+)')
         self.arrow = re.compile(r'(-+>|<-+|[\u2190-\u21ff])')
         # parens
-        self.paired_paren = re.compile(r'([(])(?!inn)([^()]*)([)])')
-        self.paired_bracket = re.compile(r'(\[)([^][]*)(\])')
         self.all_parens = re.compile(r"""(
                                       (?:(?<=\w)        # alphanumeric character
                                         [(]             # opening paren
@@ -266,7 +260,6 @@ class Tokenizer(object):
                                       #   [)]             # closing paren
                                       #   (?=\w))         # alphanumeric character
                                     )""", re.VERBOSE | re.IGNORECASE)
-        # self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
         self.de_slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         # English possessive and contracted forms
         self.en_trailing_apos = re.compile(r"(?<=[sx])(['’])(?![\w'])")
@@ -305,10 +298,8 @@ class Tokenizer(object):
         # L'Enfer, d'accord, O'Connor
         self.letter_apostrophe_word = re.compile(r"\b([dlo]['’]\p{L}+)\b", re.IGNORECASE)
         self.double_latex_quote = re.compile(r"(?:(?<!`)``(?!`))|(?:(?<!')''(?!'))")
-        # self.paired_double_latex_quote = re.compile(r"(?<!`)(?P<left>``)(?P<middle>[^`']+)(?P<right>'')(?!')")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(?P<left>`)(?P<middle>[^`']+)(?P<right>')(?!')")
         self.paired_single_quot_mark = re.compile(r"(?P<left>['‚‘’])(?P<middle>[^']+)(?P<right>['‘’])")
-        self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
         self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')
         self.en_quotation_marks = re.compile(r'([„“”‚‘’"»«›‹])')
         self.en_other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*,;:+×÷±≤≥=&/–—-]+)')
