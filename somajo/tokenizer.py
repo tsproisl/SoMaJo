@@ -108,7 +108,8 @@ class Tokenizer(object):
                             ":<", ":C", ":[", "=(", "=)", "=D", "=P",
                             ">:", "\\:", "]:", "x(", "^^", "o.O",
                             "\\O/", "\\m/", ":;))", "_))", "*_*", "._.",
-                            ":wink:", ">_<", "*<:-)", ":!:", ":;-))"])
+                            ":wink:", ">_<", "*<:-)", ":!:", ":;-))",
+                            "x'D", ":^)"])
         emoticon_list = sorted(emoticon_set, key=len, reverse=True)
         self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variety of eyes, alt.: [:;8]
                                         [-'oO]?                       # optional nose or tear

@@ -551,6 +551,12 @@ class TestEmoticons(TestTokenizer):
     def test_emoticons_32(self):
         self._equal("stage ️ bf0eb1c8cf477518ebdf43469b3246d1 https://t.co/TjNdsPqfr9", "stage bf0eb1c8cf477518ebdf43469b3246d1 https://t.co/TjNdsPqfr9")
 
+    def test_emoticons_33(self):
+        self._equal("x'D", "x'D")
+
+    def test_emoticons_34(self):
+        self._equal(":^)", ":^)")
+
 
 class TestActions(TestTokenizer):
     """"""
