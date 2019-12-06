@@ -29,10 +29,6 @@ class Tokenizer(object):
         self.token_classes = token_classes
         self.extra_info = extra_info
         self.language = language if language in self.supported_languages else self.default_language
-        self.unique_string_length = 7
-        self.mapping = {}
-        self.unique_prefix = None
-        self.replacement_counter = 0
 
         self.spaces = re.compile(r"\s+")
         self.spaces_or_empty = re.compile(r"^\s*$")
