@@ -242,26 +242,34 @@ class Tokenizer(object):
         self.space_left_arrow = re.compile(r'(<)\s+(-+)')
         self.arrow = re.compile(r'(-+>|<-+|[\u2190-\u21ff])')
         # parens
-        self.empty_paired_parens = re.compile(r"(?P<a>\()\s*(?P<b>\))|(?P<c>\[)\s*(?P<d>\])|(?P<e>\{)\s*(?P<f>\})")
         self.paired_paren = re.compile(r'([(])(?!inn)([^()]*)([)])')
         self.paired_bracket = re.compile(r'(\[)([^][]*)(\])')
-        self.paren = re.compile(r"""((?:(?<!\w)   # no alphanumeric character
-                                       [[{(]      # opening paren
-                                       (?=\w)) |  # alphanumeric character
-                                     (?:(?<=\w)   # alphanumeric character
-                                       []})]      # closing paren
-                                       (?!\w)) |  # no alphanumeric character
-                                     (?:(?:(?<=\s)|^)   # space or start of string
-                                       []})]      # closing paren
-                                       (?=\w)) |  # alphanumeric character
-                                     (?:(?<=\w-)  # hyphen
-                                       [)]        # closing paren
-                                       (?=\w)))   # alphanumeric character
-                                 """, re.VERBOSE)
-        self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
+        self.all_parens = re.compile(r"""(
+                                      (?:(?<=\w)        # alphanumeric character
+                                        [(]             # opening paren
+                                        (?!inn?[)])) |  # not followed by "in)" or "inn)"
+                                      (?:(?<!\w)        # no alphanumeric character
+                                        [(]) |          # opening paren
+                                      (?:(?<!.[(]in|[(]inn)  # not preceded by "(in" or "(inn"
+                                        [)]) |          # closing paren
+                                        [][{}]           # curly and square brackets
+                                      # (?:(?<!\w)        # no alphanumeric character
+                                      #   [[{(]           # opening paren
+                                      #   (?=\w)) |       # alphanumeric character
+                                      # (?:(?<=\w)        # alphanumeric character
+                                      #   []})]           # closing paren
+                                      #   (?!\w)) |       # no alphanumeric character
+                                      # (?:(?:(?<=\s)|^)  # space or start of string
+                                      #   []})]           # closing paren
+                                      #   (?=\w)) |       # alphanumeric character
+                                      # (?:(?<=\w-)       # hyphen
+                                      #   [)]             # closing paren
+                                      #   (?=\w))         # alphanumeric character
+                                    )""", re.VERBOSE | re.IGNORECASE)
+        # self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
         self.de_slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         # English possessive and contracted forms
-        self.en_trailing_apos = re.compile(r"(?<!..in|')(['’])(?!\w)")
+        self.en_trailing_apos = re.compile(r"(?<=[sx])(['’])(?![\w'])")
         self.en_dms = re.compile(r"(?<=\w)(['’][dms])\b", re.IGNORECASE)
         self.en_llreve = re.compile(r"(?<=\w)(['’](?:ll|re|ve))\b", re.IGNORECASE)
         self.en_not = re.compile(r"(?<=\w)(n['’]t)\b", re.IGNORECASE)
@@ -296,9 +304,10 @@ class Tokenizer(object):
         # quotation marks
         # L'Enfer, d'accord, O'Connor
         self.letter_apostrophe_word = re.compile(r"\b([dlo]['’]\p{L}+)\b", re.IGNORECASE)
-        self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
-        self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
-        self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
+        self.double_latex_quote = re.compile(r"(?:(?<!`)``(?!`))|(?:(?<!')''(?!'))")
+        # self.paired_double_latex_quote = re.compile(r"(?<!`)(?P<left>``)(?P<middle>[^`']+)(?P<right>'')(?!')")
+        self.paired_single_latex_quote = re.compile(r"(?<!`)(?P<left>`)(?P<middle>[^`']+)(?P<right>')(?!')")
+        self.paired_single_quot_mark = re.compile(r"(?P<left>['‚‘’])(?P<middle>[^']+)(?P<right>['‘’])")
         self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
         self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')
         self.en_quotation_marks = re.compile(r'([„“”‚‘’"»«›‹])')
@@ -639,12 +648,7 @@ class Tokenizer(object):
         self._split_all_matches(self.space_left_arrow, token_dll, "symbol", repl=r'\1\2')
         self._split_all_matches(self.arrow, token_dll, "symbol")
         # parens
-        self._split_all_matches(self.empty_paired_parens, token_dll, "symbol")
-        # TODO:
-        # paragraph = self.paired_paren.sub(r' \1 \2 \3 ', paragraph)
-        # paragraph = self.paired_bracket.sub(r' \1 \2 \3 ', paragraph)
-        self._split_all_matches(self.paren, token_dll, "symbol")
-        # paragraph = self._replace_regex(paragraph, self.all_paren, "symbol")
+        self._split_all_matches(self.all_parens, token_dll, "symbol")
         # slash
         if self.language == "en":
             self._split_all_matches(self.en_slash_words, token_dll, "regular")
@@ -654,12 +658,11 @@ class Tokenizer(object):
         self._split_all_matches(self.letter_apostrophe_word, token_dll)
         # LaTeX-style quotation marks
         # TODO:
-        # paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
-        # paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
+        self._split_all_matches(self.double_latex_quote, token_dll, "symbol")
+        self._split_paired(self.paired_single_latex_quote, token_dll, "symbol")
         # single quotation marks, apostrophes
         # TODO:
-        # paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
-        # paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
+        self._split_paired(self.paired_single_quot_mark, token_dll, "symbol")
         # other punctuation symbols
         # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
         if self.language == "en":
@@ -671,9 +674,7 @@ class Tokenizer(object):
         # ellipsis
         self._split_all_matches(self.ellipsis, token_dll, "symbol")
         # dots
-        # paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
         self._split_all_matches(self.dot_without_space, token_dll, "symbol")
-        # paragraph = self.dot.sub(r' \1 ', paragraph)
         self._split_all_matches(self.dot, token_dll, "symbol")
 
         # Split on whitespace
