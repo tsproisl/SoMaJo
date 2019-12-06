@@ -717,7 +717,15 @@ class Tokenizer(object):
         """
         token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
         token_dll = self._tokenize(token_dll)
-        return [t.text for t in token_dll.to_list()]
+        if self.token_classes and self.extra_info:
+            tokens = [(t.text, t.token_class, t.extra_info()) for t in token_dll.to_list()]
+        elif self.token_classes:
+            tokens = [(t.text, t.token_class) for t in token_dll.to_list()]
+        elif self.extra_info:
+            tokens = [(t.text, t.extra_info()) for t in token_dll.to_list()]
+        else:
+            tokens = [t.text for t in token_dll.to_list()]
+        return tokens
         # # convert paragraph to Unicode normal form C (NFC)
         # paragraph = unicodedata.normalize("NFC", paragraph)
 
