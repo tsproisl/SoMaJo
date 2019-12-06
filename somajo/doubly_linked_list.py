@@ -73,10 +73,10 @@ class DLL:
             self.first = node
         self.size += 1
 
-    def next_matching(self, item, attrgetter, value, ignore_attrgetter, ignore_value):
+    def next_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
         self._find_matching_node(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
 
-    def previous_matching(self, item, attrgetter, value, ignore_attrgetter, ignore_value):
+    def previous_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
         self._find_matching_node(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)
 
     def remove(self, node):
