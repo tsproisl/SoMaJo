@@ -23,7 +23,7 @@ def arguments():
     parser.add_argument("-e", "--extra_info", action="store_true", help='Output additional information for each token: SpaceAfter=No if the token was not followed by a space and OriginalSpelling="…" if the token contained whitespace.')
     parser.add_argument("-l", "--language", choices=Tokenizer.supported_languages, default=Tokenizer.default_language, help="Choose a language. Currently supported are German (de) and English (en). (Default: de)")
     parser.add_argument("--parallel", type=int, default=1, metavar="N", help="Run N worker processes (up to the number of CPUs) to speed up tokenization.")
-    parser.add_argument("--split_sentences", action="store_true", help="Do also split the paragraphs into sentences.")
+    parser.add_argument("--split_sentences", "--split-sentences", action="store_true", help="Do also split the paragraphs into sentences.")
     parser.add_argument("-v", "--version", action="version", version="SoMaJo %s" % __version__, help="Output version information and exit.")
     parser.add_argument("FILE", type=argparse.FileType("r", encoding="utf-8"), help="The input file (UTF-8-encoded)")
     args = parser.parse_args()
