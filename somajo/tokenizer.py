@@ -648,11 +648,9 @@ class Tokenizer(object):
         # O'Connor and French omitted vocals: L'Enfer, d'accord
         self._split_all_matches(self.letter_apostrophe_word, token_dll)
         # LaTeX-style quotation marks
-        # TODO:
         self._split_all_matches(self.double_latex_quote, token_dll, "symbol")
         self._split_paired(self.paired_single_latex_quote, token_dll, "symbol")
         # single quotation marks, apostrophes
-        # TODO:
         self._split_paired(self.paired_single_quot_mark, token_dll, "symbol")
         # other punctuation symbols
         # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
@@ -755,7 +753,15 @@ class Tokenizer(object):
             if tok.markup:
                 continue
             tok.text = utils.escape_xml(tok.text)
-        return [t.text for t in token_dll.to_list()]
+        if self.token_classes and self.extra_info:
+            tokens = [(t.text, t.token_class, t.extra_info()) for t in token_dll.to_list()]
+        elif self.token_classes:
+            tokens = [(t.text, t.token_class) for t in token_dll.to_list()]
+        elif self.extra_info:
+            tokens = [(t.text, t.extra_info()) for t in token_dll.to_list()]
+        else:
+            tokens = [t.text for t in token_dll.to_list()]
+        return tokens
         # whole_text = " ".join((e.text for e in elements))
 
         # # convert paragraph to Unicode normal form C (NFC)
