@@ -71,39 +71,45 @@ def parse_xml(xml, is_file=True):
 
 
 class SaxTokenHandler(xml.sax.handler.ContentHandler):
-    def __init__(self):
+    def __init__(self, eos_tags=None):
         super().__init__()
+        self.eos_tags = eos_tags
         self.token_dll = doubly_linked_list.DLL()
         self.content = ""
+        self.sentence_start = True
+
+    def _insert_element(self, name, text):
+        sentence_boundary = False
+        if self.eos_tags is not None and name in self.eos_tags:
+            sentence_boundary = True
+        if self.content != "":
+            content_token = Token(self.content, token_class="regular", first_in_sentence=self.sentence_start, last_in_sentence=sentence_boundary)
+            self.token_dll.append(content_token)
+            self.content = ""
+            self.sentence_start = False
+        token = Token(text, markup=True, locked=True)
+        self.token_dll.append(token)
+        if sentence_boundary:
+            self.sentence_start = True
 
     def characters(self, data):
         self.content += data
 
     def startElement(self, name, attrs):
-        if self.content != "":
-            content_token = Token(self.content)
-            self.token_dll.append(content_token)
-            self.content = ""
         if len(attrs) > 0:
             text = "<%s %s>" % (name, " ".join(["%s=\"%s\"" % (k, xml.sax.saxutils.escape(v, {'"': "&quot;"})) for k, v in attrs.items()]))
         else:
             text = "<%s>" % name
-        token = Token(text, markup=True, locked=True)
-        self.token_dll.append(token)
+        self._insert_element(name, text)
 
     def endElement(self, name):
-        if self.content != "":
-            content_token = Token(self.content)
-            self.token_dll.append(content_token)
-            self.content = ""
         text = "</%s>" % name
-        token = Token(text, markup=True, locked=True)
-        self.token_dll.append(token)
+        self._insert_element(name, text)
 
 
-def parse_xml_to_token_dll(data, is_file=True):
+def parse_xml_to_token_dll(data, is_file=True, eos_tags=None):
     """Parse the XML data to a doubly linked list of Token objects"""
-    handler = SaxTokenHandler()
+    handler = SaxTokenHandler(eos_tags)
     if is_file:
         xml.sax.parse(data, handler)
     else:

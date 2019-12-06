@@ -738,13 +738,13 @@ class Tokenizer(object):
         #     else:
         #         return list(tokens)
 
-    def tokenize_xml(self, xml, is_file=True):
+    def tokenize_xml(self, xml, is_file=True, eos_tags=None):
         """Tokenize XML file or XML string according to the guidelines of the
         EmpiriST 2015 shared task on automatic linguistic annotation
         of computer-mediated communication / social media.
 
         """
-        token_dll = utils.parse_xml_to_token_dll(xml, is_file)
+        token_dll = utils.parse_xml_to_token_dll(xml, is_file, eos_tags)
         # for t in token_dll:
         #     print(t.value.text)
         self._tokenize(token_dll)

@@ -46,9 +46,11 @@ def main():
         if eos_tags is None:
             eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         eos_tags = set(eos_tags)
-        tokenized_paragraphs = [tokenizer.tokenize_xml(args.FILE)]
         if args.split_sentences:
+            tokenized_paragraphs = [tokenizer.tokenize_xml(args.FILE, eos_tags)]
             tokenized_paragraphs = list(sentence_splitter.split_xml(tokenized_paragraphs[0], eos_tags))
+        else:
+            tokenized_paragraphs = [tokenizer.tokenize_xml(args.FILE)]
     else:
         if args.paragraph_separator == "empty_lines":
             paragraphs = utils.get_paragraphs(args.FILE)
