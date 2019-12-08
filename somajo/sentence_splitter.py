@@ -104,3 +104,40 @@ class SentenceSplitter():
                         out_sentence.append(tokenized_xml[tag])
                     word_idx += 1
                 yield out_sentence
+
+    def new_split(self, tokens):
+        """Split tokens into sentences."""
+        n = len(tokens)
+        # the last non-markup token is last_in_sentence
+        for token in reversed(tokens):
+            if not token.markup:
+                token.last_in_sentence = True
+                break
+        for i, token in enumerate(tokens):
+            if token.markup:
+                continue
+            if token.last_in_sentence:
+                continue
+            if self.sentence_ending_punct.search(token.text) or token.text.lower() in self.eos_abbreviations:
+                last = None
+                last_token_in_sentence = token
+                first_token_in_sentence = None
+                for j in range(i + 1, n):
+                    token_j = tokens[j]
+                    if token_j.markup:
+                        continue
+                    if first_token_in_sentence is not None:
+                        first_token_in_sentence = token_j
+                    if token_j.text[0].isupper():
+                        last_token_in_sentence.last_in_sentence = True
+                        first_token_in_sentence.first_in_sentence = True
+                        break
+                    elif self.opening_punct.search(token_j.text) and token_j.text != "“":
+                        last = "opening"
+                    elif self.closing_punct.search(token_j.text) and last != "opening":
+                        last_token_in_sentence = token_j
+                        first_token_in_sentence = None
+                        last = "closing"
+                    else:
+                        break
+        return tokens
