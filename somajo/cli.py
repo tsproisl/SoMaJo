@@ -12,6 +12,10 @@ from somajo import utils
 from somajo.version import __version__
 
 
+# New options?
+# - extract text from XML, i.e. strip XML tags
+
+
 def arguments():
     """"""
     parser = argparse.ArgumentParser(description="Tokenize an input file according to the guidelines of the EmpiriST 2015 shared task on automatic linguistic annotation of computer-mediated communication / social media.")
