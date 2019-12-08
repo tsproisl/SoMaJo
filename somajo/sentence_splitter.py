@@ -5,7 +5,7 @@ import regex as re
 from somajo import utils
 
 
-class SentenceSplitter(object):
+class SentenceSplitter():
     def __init__(self, is_tuple=False, language="de"):
         """Create a SentenceSplitter object. If the tokenized paragraphs
         contain token classes or extra info, set is_tuple=True.

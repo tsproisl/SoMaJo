@@ -2,7 +2,6 @@
 
 import operator
 import unicodedata
-import warnings
 
 import regex as re
 
@@ -11,7 +10,7 @@ from somajo import utils
 from somajo.token import Token
 
 
-class Tokenizer(object):
+class Tokenizer():
 
     supported_languages = set(["de", "en"])
     default_language = "de"
