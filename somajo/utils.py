@@ -78,7 +78,7 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
         self.content = ""
         self.sentence_start = True
 
-    def _insert_element(self, name, text):
+    def _insert_element(self, name, text, markup_class):
         sentence_boundary = False
         if self.eos_tags is not None and name in self.eos_tags:
             sentence_boundary = True
@@ -87,7 +87,7 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
             self.token_dll.append(content_token)
             self.content = ""
             self.sentence_start = False
-        token = Token(text, markup=True, locked=True)
+        token = Token(text, markup=True, markup_class=markup_class, locked=True)
         self.token_dll.append(token)
         if sentence_boundary:
             self.sentence_start = True
@@ -100,11 +100,11 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
             text = "<%s %s>" % (name, " ".join(["%s=\"%s\"" % (k, xml.sax.saxutils.escape(v, {'"': "&quot;"})) for k, v in attrs.items()]))
         else:
             text = "<%s>" % name
-        self._insert_element(name, text)
+        self._insert_element(name, text, "start")
 
     def endElement(self, name):
         text = "</%s>" % name
-        self._insert_element(name, text)
+        self._insert_element(name, text, "end")
 
 
 def parse_xml_to_token_dll(data, is_file=True, eos_tags=None):
