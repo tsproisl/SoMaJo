@@ -686,8 +686,8 @@ class Tokenizer():
         return self.tokenize_paragraph(paragraph)
 
     def tokenize_file(self, filename, parsep_empty_lines=True):
-        """Tokenize file and yield tokenized paragraphs."""
-        with open(filename) as f:
+        """Tokenize utf-8-encoded file and yield tokenized paragraphs."""
+        with open(filename, encoding="utf-8") as f:
             if parsep_empty_lines:
                 paragraphs = utils.get_paragraphs(f)
             else:
