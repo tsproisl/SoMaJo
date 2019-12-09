@@ -707,13 +707,13 @@ class Tokenizer():
         token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
         token_dll = self._tokenize(token_dll)
         if self.token_classes and self.extra_info:
-            tokens = [(t.text, t.token_class, t.extra_info()) for t in token_dll.to_list()]
+            tokens = [(t.value.text, t.value.token_class, t.value.extra_info()) for t in token_dll]
         elif self.token_classes:
-            tokens = [(t.text, t.token_class) for t in token_dll.to_list()]
+            tokens = [(t.value.text, t.value.token_class) for t in token_dll]
         elif self.extra_info:
-            tokens = [(t.text, t.extra_info()) for t in token_dll.to_list()]
+            tokens = [(t.value.text, t.value.extra_info()) for t in token_dll]
         else:
-            tokens = [t.text for t in token_dll.to_list()]
+            tokens = [t.value.text for t in token_dll]
         return tokens
 
     def tokenize_xml(self, xml, is_file=True, eos_tags=None):
@@ -730,11 +730,11 @@ class Tokenizer():
                 continue
             tok.text = utils.escape_xml(tok.text)
         if self.token_classes and self.extra_info:
-            tokens = [(t.text, t.token_class, t.extra_info()) for t in token_dll.to_list()]
+            tokens = [(t.value.text, t.value.token_class, t.value.extra_info()) for t in token_dll]
         elif self.token_classes:
-            tokens = [(t.text, t.token_class) for t in token_dll.to_list()]
+            tokens = [(t.value.text, t.value.token_class) for t in token_dll]
         elif self.extra_info:
-            tokens = [(t.text, t.extra_info()) for t in token_dll.to_list()]
+            tokens = [(t.value.text, t.value.extra_info()) for t in token_dll]
         else:
-            tokens = [t.text for t in token_dll.to_list()]
+            tokens = [t.value.text for t in token_dll]
         return tokens
