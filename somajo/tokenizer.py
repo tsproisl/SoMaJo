@@ -686,7 +686,7 @@ class Tokenizer():
         return self.tokenize_paragraph(paragraph)
 
     def tokenize_file(self, filename, parsep_empty_lines=True):
-        """Tokenize utf-8-encoded file and yield tokenized paragraphs."""
+        """Tokenize utf-8-encoded text file and yield tokenized paragraphs."""
         with open(filename, encoding="utf-8") as f:
             if parsep_empty_lines:
                 paragraphs = utils.get_paragraphs(f)
@@ -715,28 +715,6 @@ class Tokenizer():
         else:
             tokens = [t.text for t in token_dll.to_list()]
         return tokens
-        # # convert paragraph to Unicode normal form C (NFC)
-        # paragraph = unicodedata.normalize("NFC", paragraph)
-
-        # tokens = self._tokenize(paragraph)
-
-        # if len(tokens) == 0:
-        #     return []
-
-        # if self.extra_info:
-        #     extra_info = self._check_spaces(tokens, paragraph)
-
-        # tokens, token_classes = zip(*tokens)
-        # if self.token_classes:
-        #     if self.extra_info:
-        #         return list(zip(tokens, token_classes, extra_info))
-        #     else:
-        #         return list(zip(tokens, token_classes))
-        # else:
-        #     if self.extra_info:
-        #         return list(zip(tokens, extra_info))
-        #     else:
-        #         return list(tokens)
 
     def tokenize_xml(self, xml, is_file=True, eos_tags=None):
         """Tokenize XML file or XML string according to the guidelines of the
@@ -745,8 +723,6 @@ class Tokenizer():
 
         """
         token_dll = utils.parse_xml_to_token_dll(xml, is_file, eos_tags)
-        # for t in token_dll:
-        #     print(t.value.text)
         self._tokenize(token_dll)
         for t in token_dll:
             tok = t.value
@@ -762,24 +738,3 @@ class Tokenizer():
         else:
             tokens = [t.text for t in token_dll.to_list()]
         return tokens
-        # whole_text = " ".join((e.text for e in elements))
-
-        # # convert paragraph to Unicode normal form C (NFC)
-        # whole_text = unicodedata.normalize("NFC", whole_text)
-
-        # tokens = self._tokenize(whole_text)
-
-        # tokenized_elements = self._match_xml(tokens, elements)
-        # xml = ET.tostring(tokenized_elements[0].element, encoding="unicode").rstrip()
-
-        # tokens = [l.split("\t") for l in xml.split("\n")]
-        # if self.token_classes:
-        #     if self.extra_info:
-        #         return [t if len(t) == 3 else (t[0], None, None) for t in tokens]
-        #     else:
-        #         return [(t[0], t[1]) if len(t) == 3 else (t[0], None) for t in tokens]
-        # else:
-        #     if self.extra_info:
-        #         return [(t[0], t[2]) if len(t) == 3 else (t[0], None) for t in tokens]
-        #     else:
-        #         return [t[0] for t in tokens]
