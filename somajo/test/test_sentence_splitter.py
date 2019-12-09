@@ -22,7 +22,7 @@ class TestSentenceSplitter(unittest.TestCase):
 
     def _equal_xml(self, raw, tokenized_sentences):
         """"""
-        eos_tags = "title h1 h2 h3 h4 h5 h6 p br div ol ul dl table".split()
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         eos_tags = set(eos_tags)
         tokens = self.tokenizer.tokenize(raw)
         sentences = self.sentence_splitter.split_xml(tokens, eos_tags)
