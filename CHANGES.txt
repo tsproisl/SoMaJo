@@ -1,5 +1,14 @@
 # CHANGELOG #
 
+## Version 2.0.0, ??? ##
+
+### Breaking changes ###
+
+- Removed the tokenizer script (deprecated since version 1.5.0
+  released in October 2017). Use somajo-tokenizer instead.
+
+### Non-breaking changes ###
+
 ## Version 1.11.0, 2019-11-08 ##
 
 - XML sentence splitting: Added hr tag to default sentence breaks
