@@ -10,7 +10,7 @@ class Token:
         The text that makes up the token object
     markup : bool
         Is the token a markup token? (Default: False)
-    markup_class : str
+    markup_class : {None, 'start', 'end'}
         If `markup=True`, then `markup_class` must be either "start" or "end". (Default: None)
     locked : bool
         Mark the token as locked. (Default: False)
