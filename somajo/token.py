@@ -8,22 +8,22 @@ class Token:
     ----------
     text : str
         The text that makes up the token object
-    markup : bool
-        Is the token a markup token? (Default: False)
-    markup_class : {None, 'start', 'end'}
-        If `markup=True`, then `markup_class` must be either "start" or "end". (Default: None)
-    locked : bool
-        Mark the token as locked. (Default: False)
-    token_class : str
-        The class of the token, e.g. "regular", "emoticon", "url", etc. (Default: None)
-    space_after : bool
-        Was there a space after the token in the original data? (Default: True)
-    original_spelling : str
-        The original spelling of the token, if it is different from the one in `text`. (Default: None)
-    first_in_sentence : bool
-        Is it the first token of a sentence? (Default: False)
-    last_in_sentence : bool
-        Is it the last token of a sentence? (Default: False)
+    markup : bool, (default=False)
+        Is the token a markup token?
+    markup_class : {'start', 'end'}, optional (default=None)
+        If `markup=True`, then `markup_class` must be either "start" or "end".
+    locked : bool, (default=False)
+        Mark the token as locked.
+    token_class : str, optional (default=None)
+        The class of the token, e.g. "regular", "emoticon", "url", etc.
+    space_after : bool, (default=True)
+        Was there a space after the token in the original data?
+    original_spelling : str, optional (default=None)
+        The original spelling of the token, if it is different from the one in `text`.
+    first_in_sentence : bool, (default=False)
+        Is it the first token of a sentence?
+    last_in_sentence : bool, (default=False)
+        Is it the last token of a sentence?
 
     """
     def __init__(self, text, *, markup=False, markup_class=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
