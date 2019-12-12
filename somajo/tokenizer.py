@@ -406,14 +406,14 @@ class Tokenizer():
     def _split_all_matches(self, regex, token_dll, token_class="regular", repl=None, split_named_subgroups=True):
         """Turn matches for the regex into tokens."""
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             self._split_matches(regex, t, token_class, repl, split_named_subgroups)
 
     def _split_all_emojis(self, token_dll, token_class="emoticon"):
         """Replace all emoji sequences"""
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             self._split_emojis(t, token_class)
 
@@ -421,14 +421,14 @@ class Tokenizer():
         """Turn all elements from items into separate tokens. (All elements
         need to be matched by regex.)"""
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             self._split_set(regex, t, items, token_class, ignore_case)
 
     def _split_all_left(self, regex, token_dll):
         """Split to the left of the match."""
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             self._split_left(regex, t)
 
@@ -443,7 +443,7 @@ class Tokenizer():
         self._split_all_matches(self.ps, token_dll, "abbreviation")
 
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             boundaries = []
             for m in self.abbreviation.finditer(t.value.text):
@@ -465,7 +465,7 @@ class Tokenizer():
 
         """
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             boundaries = []
             for m in regex.finditer(t.value.text):
@@ -475,7 +475,7 @@ class Tokenizer():
 
     def _remove_empty_tokens(self, token_dll):
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             if self.spaces_or_empty.search(t.value.text):
                 if t.value.first_in_sentence:
@@ -496,7 +496,7 @@ class Tokenizer():
 
         """
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             # convert to Unicode normal form C (NFC)
             t.value.text = unicodedata.normalize("NFC", t.value.text)
@@ -523,7 +523,7 @@ class Tokenizer():
         self._split_all_emojis(token_dll, "emoticon")
 
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             # get rid of other junk characters
             t.value.text = self.other_nasties.sub("", t.value.text)
@@ -668,7 +668,7 @@ class Tokenizer():
 
         # Split on whitespace
         for t in token_dll:
-            if t.value.markup or t.value.locked:
+            if t.value.markup or t.value._locked:
                 continue
             wt = t.value.text.split()
             n_wt = len(wt)

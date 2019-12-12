@@ -35,7 +35,7 @@ class Token:
             assert markup_class == "start" or markup_class == "end"
         self.markup = markup
         self.markup_class = markup_class
-        self.locked = locked
+        self._locked = locked
         self.token_class = token_class
         self.space_after = space_after
         self.original_spelling = original_spelling
