@@ -3,9 +3,9 @@
 import operator
 
 
-class DLLNode:
+class DLLElement:
     def __init__(self, val=None, prv=None, nxt=None, lst=None):
-        if isinstance(val, DLLNode):
+        if isinstance(val, DLLElement):
             val = val.value
         self.prev = prv
         self.next = nxt
@@ -22,8 +22,6 @@ class DLL:
         self.first = None
         self.last = None
         self.size = 0
-        self.last_access_node = None
-        self.last_access_idx = -1
         if iterable is not None:
             self.extend(iterable)
 
@@ -41,7 +39,7 @@ class DLL:
     def __str__(self):
         return str(self.to_list())
 
-    def _find_matching_node(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None, forward=True):
+    def _find_matching_element(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None, forward=True):
         current = item
         direction = operator.attrgetter("next")
         if not forward:
@@ -56,38 +54,38 @@ class DLL:
         return None
 
     def append(self, item):
-        node = DLLNode(item, self.last, None, self)
+        element = DLLElement(item, self.last, None, self)
         if self.first is None:
-            self.first = node
-        self.last = node
+            self.first = element
+        self.last = element
         self.size += 1
 
     def extend(self, iterable):
         for item in iterable:
             self.append(item)
 
-    def insert_left(self, item, ref_node):
-        node = DLLNode(item, ref_node.prev, ref_node, self)
-        ref_node.prev = node
-        if self.first is ref_node:
-            self.first = node
+    def insert_left(self, item, ref_element):
+        element = DLLElement(item, ref_element.prev, ref_element, self)
+        ref_element.prev = element
+        if self.first is ref_element:
+            self.first = element
         self.size += 1
 
     def next_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
-        self._find_matching_node(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
+        self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
 
     def previous_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
-        self._find_matching_node(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)
+        self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)
 
-    def remove(self, node):
-        if self.first is node:
-            self.first = node.next
-        if self.last is node:
-            self.last = node.prev
-        if node.prev is not None:
-            node.prev.next = node.next
-        if node.next is not None:
-            node.next.prev = node.prev
+    def remove(self, element):
+        if self.first is element:
+            self.first = element.next
+        if self.last is element:
+            self.last = element.prev
+        if element.prev is not None:
+            element.prev.next = element.next
+        if element.next is not None:
+            element.next.prev = element.prev
         self.size -= 1
 
     def to_list(self):
