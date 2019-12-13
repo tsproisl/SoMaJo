@@ -18,11 +18,11 @@ class SoMaJo:
 
     """
 
-    supported_languages = set(["de_CMC", "en_PTB"])
-    paragraph_separators = set(["single_newline", "empty_line"])
+    _supported_languages = set(["de_CMC", "en_PTB"])
+    _paragraph_separators = set(["single_newline", "empty_line"])
 
     def __init__(self, language, *, split_camel_case=False, split_sentences=True):
-        assert language in self.supported_languages
+        assert language in self._supported_languages
         self.language = language
         self.split_camel_case = split_camel_case
         self.split_sentences = split_sentences
@@ -50,7 +50,7 @@ class SoMaJo:
             (depending on the value of ``split_sentences``).
 
         """
-        assert paragraph_separator in self.paragraph_separators
+        assert paragraph_separator in self._paragraph_separators
 
     def tokenize_xml_file(self, xml_file, eos_tags, strip_tags=False):
         """Split the contents of an xml file into sequences of tokens.
