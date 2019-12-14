@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import itertools
 import operator
 import unicodedata
 
@@ -708,7 +709,7 @@ class Tokenizer():
                 if tp:
                     yield tp
 
-    def tokenize_paragraph(self, paragraph):
+    def tokenize_paragraph(self, paragraph, legacy=True):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
@@ -717,21 +718,30 @@ class Tokenizer():
         """
         token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
         token_dll = self._tokenize(token_dll)
-        tokens = self._convert_to_legacy(token_dll)
+        if legacy:
+            tokens = self._convert_to_legacy(token_dll)
+        else:
+            tokens = token_dll.to_list()
         return tokens
 
-    def tokenize_xml(self, xml, is_file=True, eos_tags=None):
+    def tokenize_xml(self, xml, is_file=True, eos_tags=None, legacy=True):
         """Tokenize XML file or XML string according to the guidelines of the
         EmpiriST 2015 shared task on automatic linguistic annotation
         of computer-mediated communication / social media.
 
         """
-        token_dll = utils.parse_xml_to_token_dll(xml, is_file, eos_tags)
-        self._tokenize(token_dll)
-        for t in token_dll:
-            tok = t.value
-            if tok.markup:
-                continue
-            tok.text = utils.escape_xml(tok.text)
-        tokens = self._convert_to_legacy(token_dll)
+        def escape(token_dll):
+            for t in token_dll:
+                tok = t.value
+                if tok.markup:
+                    continue
+                tok.text = utils.escape_xml(tok.text)
+            return token_dll
+        token_dlls = utils.xml_chunk_generator(xml, is_file, eos_tags)
+        token_dlls = map(self._tokenize, token_dlls)
+        token_dlls = map(escape, token_dlls)
+        if legacy:
+            tokens = map(self._convert_to_legacy, token_dlls)
+            return list(itertools.chain.from_iterable(tokens))
+        tokens = (token_dll.to_list() for token_dll in token_dlls)
         return tokens
