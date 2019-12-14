@@ -33,6 +33,14 @@ class DLL:
             yield current
             current = current.next
 
+    def __reversed__(self, start=None):
+        current = self.last
+        if start is not None:
+            current = start
+        while current is not None:
+            yield current
+            current = current.prev
+
     def __len__(self):
         return self.size
 
