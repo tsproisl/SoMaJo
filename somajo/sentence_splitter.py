@@ -16,7 +16,7 @@ class SentenceSplitter():
         # full stop, ellipsis, exclamation and question marks
         self.sentence_ending_punct = re.compile(r"^(?:\.+|…+\.*|[!?]+)$")
         self.opening_punct = re.compile(r"^(?:['\"¿¡\p{Pi}\p{Ps}–—]|-{2,})$")
-        if language == "de":
+        if language == "de" or language == "de_CMC":
             self.closing_punct = re.compile(r"^(?:['\"“\p{Pf}\p{Pe}])$")
         else:
             self.closing_punct = re.compile(r"^(?:['\"\p{Pf}\p{Pe}])$")

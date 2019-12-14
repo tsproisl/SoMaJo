@@ -12,10 +12,10 @@ from somajo.token import Token
 
 class Tokenizer():
 
-    supported_languages = set(["de", "en"])
-    default_language = "de"
+    _supported_languages = set(["de", "de_CMC", "en", "en_PTB"])
+    _default_language = "de_CMC"
 
-    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de"):
+    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de_CMC"):
         """Create a Tokenizer object. If split_camel_case is set to True,
         tokens written in CamelCase will be split. If token_classes is
         set to true, the tokenizer will output the token class for
@@ -27,7 +27,7 @@ class Tokenizer():
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
         self.extra_info = extra_info
-        self.language = language if language in self.supported_languages else self.default_language
+        self.language = language if language in self._supported_languages else self.default_language
 
         self.spaces = re.compile(r"\s+")
         self.spaces_or_empty = re.compile(r"^\s*$")
@@ -172,12 +172,12 @@ class Tokenizer():
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?!\p{L}{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])\p{L}\.(?!\p{L}{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
-        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language)
+        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language[:2])
         self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?!\p{L}{1,3}\.)', re.IGNORECASE)
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:\p{L}+\.){2,}')
         # only abbreviations that are not matched by (?:\p{L}\.)+
-        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language)
+        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language[:2])
         # abbrev_simple = [(a, re.search(r"^\p{L}{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])\p{L}{2,}\.(?!\p{L}{1,3}\.)")
@@ -284,10 +284,10 @@ class Tokenizer():
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
         # English hyphenated words
-        if self.language == "en":
-            nonbreaking_prefixes = utils.read_abbreviation_file("non-breaking_prefixes_%s.txt" % self.language)
-            nonbreaking_suffixes = utils.read_abbreviation_file("non-breaking_suffixes_%s.txt" % self.language)
-            nonbreaking_words = utils.read_abbreviation_file("non-breaking_hyphenated_words_%s.txt" % self.language)
+        if self.language == "en" or self.language == "en_PTB":
+            nonbreaking_prefixes = utils.read_abbreviation_file("non-breaking_prefixes_%s.txt" % self.language[:2])
+            nonbreaking_suffixes = utils.read_abbreviation_file("non-breaking_suffixes_%s.txt" % self.language[:2])
+            nonbreaking_words = utils.read_abbreviation_file("non-breaking_hyphenated_words_%s.txt" % self.language[:2])
             self.en_nonbreaking_prefixes = re.compile(r"(?<![\w-])(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_prefixes]) + r")-[\w-]+", re.IGNORECASE)
             self.en_nonbreaking_suffixes = re.compile(r"\b[\w-]+-(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_suffixes]) + r")(?![\w-])", re.IGNORECASE)
             self.en_nonbreaking_words = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_words]) + r")\b", re.IGNORECASE)
@@ -576,7 +576,7 @@ class Tokenizer():
         self._split_all_matches(self.gender_star, token_dll)
 
         # English possessive and contracted forms
-        if self.language == "en":
+        if self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.english_decades, token_dll, "number_compound")
             self._split_all_matches(self.en_dms, token_dll)
             self._split_all_matches(self.en_llreve, token_dll)
@@ -593,29 +593,29 @@ class Tokenizer():
             self._split_all_matches(self.en_nonbreaking_suffixes, token_dll)
 
         # remove known abbreviations
-        split_abbreviations = False if self.language == "en" else True
+        split_abbreviations = False if self.language == "en" or self.language == "en_PTB" else True
         self._split_abbreviations(token_dll, split_multipart_abbrevs=split_abbreviations)
 
         # DATES AND NUMBERS
         # dates
-        split_dates = False if self.language == "en" else True
+        split_dates = False if self.language == "en" or self.language == "en_PTB" else True
         self._split_all_matches(self.three_part_date_year_first, token_dll, "date", split_named_subgroups=split_dates)
         self._split_all_matches(self.three_part_date_dmy, token_dll, "date", split_named_subgroups=split_dates)
         self._split_all_matches(self.three_part_date_mdy, token_dll, "date", split_named_subgroups=split_dates)
         self._split_all_matches(self.two_part_date, token_dll, "date", split_named_subgroups=split_dates)
         # time
-        if self.language == "en":
+        if self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.en_time, token_dll, "time")
         self._split_all_matches(self.time, token_dll, "time")
         # US phone numbers and ZIP codes
-        if self.language == "en":
+        if self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.en_us_phone_number, token_dll, "number")
             self._split_all_matches(self.en_us_zip_code, token_dll, "number")
             self._split_all_matches(self.en_numerical_identifiers, token_dll, "number")
         # ordinals
-        if self.language == "de":
+        if self.language == "de" or self.language == "de_CMC":
             self._split_all_matches(self.ordinal, token_dll, "ordinal")
-        elif self.language == "en":
+        elif self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.english_ordinal, token_dll, "ordinal")
         # fractions
         self._split_all_matches(self.fraction, token_dll, "number")
@@ -641,9 +641,9 @@ class Tokenizer():
         # parens
         self._split_all_matches(self.all_parens, token_dll, "symbol")
         # slash
-        if self.language == "en":
+        if self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.en_slash_words, token_dll, "regular")
-        if self.language == "de":
+        if self.language == "de" or self.language == "de_CMC":
             self._split_all_matches(self.de_slash, token_dll, "symbol")
         # O'Connor and French omitted vocals: L'Enfer, d'accord
         self._split_all_matches(self.letter_apostrophe_word, token_dll)
@@ -654,7 +654,7 @@ class Tokenizer():
         self._split_paired(self.paired_single_quot_mark, token_dll, "symbol")
         # other punctuation symbols
         # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
-        if self.language == "en":
+        if self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.en_hyphen, token_dll, "symbol")
             self._split_all_matches(self.en_quotation_marks, token_dll, "symbol")
             self._split_all_matches(self.en_other_punctuation, token_dll, "symbol")
