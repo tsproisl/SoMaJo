@@ -22,11 +22,13 @@ class SoMaJo:
 
     """
 
-    _supported_languages = set(["de_CMC", "en_PTB"])
-    _paragraph_separators = set(["single_newline", "empty_line"])
+    supported_languages = set(["de_CMC", "en_PTB"])
+    _default_language = "de_CMC"
+    paragraph_separators = set(["empty_lines", "single_newlines"])
+    _default_parsep = "empty_lines"
 
     def __init__(self, language, *, split_camel_case=False, split_sentences=True):
-        assert language in self._supported_languages
+        assert language in self.supported_languages
         self.language = language
         self.split_camel_case = split_camel_case
         self.split_sentences = split_sentences
@@ -34,7 +36,7 @@ class SoMaJo:
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
 
-    def tokenize_text_file(self, text_file, paragraph_separator):
+    def tokenize_text_file(self, text_file, paragraph_separator, *, parallel=1):
         """Split the contents of a text file into sequences of tokens.
 
         Parameters
@@ -54,7 +56,7 @@ class SoMaJo:
             (depending on the value of ``split_sentences``).
 
         """
-        assert paragraph_separator in self._paragraph_separators
+        assert paragraph_separator in self.paragraph_separators
         if isinstance(text_file, str):
             with open(text_file, encoding="utf-8") as fh:
                 paragraphs = utils.get_paragraphs(fh, paragraph_separator)
@@ -67,7 +69,7 @@ class SoMaJo:
             tokenized = itertools.chain.from_iterable(tokenized)
         return tokenized
 
-    def tokenize_xml_file(self, xml_file, eos_tags, strip_tags=False):
+    def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1):
         """Split the contents of an xml file into sequences of tokens.
 
         Parameters
@@ -93,15 +95,16 @@ class SoMaJo:
 
         """
         eos_tags = set(eos_tags)
-        tokenized = self._tokenizer.tokenize_xml(xml_file, is_file=True, eos_tags=True, legacy=False)
+        tokenized = self._tokenizer.tokenize_xml(xml_file, is_file=True, eos_tags=eos_tags, legacy=False)
         if strip_tags:
             tokenized = ([t for t in par if not t.markup] for par in tokenized)
         if self.split_sentences:
-            tokenized = map(self._sentence_splitter._split, tokenized)
+            sentence_splitter = functools.partial(self._sentence_splitter.split_xml, legacy=False)
+            tokenized = map(sentence_splitter, tokenized)
             tokenized = itertools.chain.from_iterable(tokenized)
         return tokenized
 
-    def tokenize_text(self, paragraph):
+    def tokenize_text(self, paragraph, *, parallel=1):
         """Split a paragraph of text into (sequences of) tokens.
 
         Parameters
@@ -124,7 +127,7 @@ class SoMaJo:
             tokenized = itertools.chain.from_iterable(tokenized)
         return tokenized
 
-    def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False):
+    def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1):
         """Split a string of XML data into sequences of tokens.
 
         Parameters
@@ -154,6 +157,7 @@ class SoMaJo:
         if strip_tags:
             tokenized = ([t for t in par if not t.markup] for par in tokenized)
         if self.split_sentences:
-            tokenized = map(self._sentence_splitter._split, tokenized)
+            sentence_splitter = functools.partial(self._sentence_splitter.split_xml, legacy=False)
+            tokenized = map(sentence_splitter, tokenized)
             tokenized = itertools.chain.from_iterable(tokenized)
         return tokenized
