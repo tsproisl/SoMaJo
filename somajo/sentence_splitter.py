@@ -7,7 +7,7 @@ from somajo import utils
 
 
 class SentenceSplitter():
-    def __init__(self, is_tuple=False, language="de"):
+    def __init__(self, is_tuple=False, language="de_CMC"):
         """Create a SentenceSplitter object. If the tokenized paragraphs
         contain token classes or extra info, set is_tuple=True.
 
@@ -22,50 +22,54 @@ class SentenceSplitter():
             self.closing_punct = re.compile(r"^(?:['\"\p{Pf}\p{Pe}])$")
         self.eos_abbreviations = utils.read_abbreviation_file("eos_abbreviations.txt")
 
-    def split(self, tokenized_paragraph):
+    def split(self, tokenized_paragraph, legacy=True):
         """Split tokenized_paragraph into sentences."""
-        if self.is_tuple:
-            tokens = [token.Token(t[0]) for t in tokenized_paragraph]
-        else:
-            tokens = [token.Token(t) for t in tokenized_paragraph]
+        if legacy:
+            if self.is_tuple:
+                tokens = [token.Token(t[0]) for t in tokenized_paragraph]
+            else:
+                tokens = [token.Token(t) for t in tokenized_paragraph]
         tokens = self._split(tokens)
         sentence_boundaries = [i for i, t in enumerate(tokens, start=1) if t.last_in_sentence]
         return [tokenized_paragraph[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
-    def split_xml(self, tokenized_xml, eos_tags):
+    def split_xml(self, tokenized_xml, eos_tags=set(), legacy=True):
         """Split tokenized XML into sentences."""
         n = len(tokenized_xml)
-        opening_tag = re.compile(r"""<(?:[^\s:]+:)?([_A-Z][-.\w]*)(?:\s+[_:A-Z][-.:\w]*\s*=\s*(?:"[^"]*"|'[^']*'))*\s*/?>""", re.IGNORECASE)
-        closing_tag = re.compile(r"^</([_:A-Z][-.:\w]*)\s*>$", re.IGNORECASE)
-        if self.is_tuple:
-            tokens = [token.Token(t[0]) for t in tokenized_xml]
+        if legacy:
+            opening_tag = re.compile(r"""<(?:[^\s:]+:)?([_A-Z][-.\w]*)(?:\s+[_:A-Z][-.:\w]*\s*=\s*(?:"[^"]*"|'[^']*'))*\s*/?>""", re.IGNORECASE)
+            closing_tag = re.compile(r"^</([_:A-Z][-.:\w]*)\s*>$", re.IGNORECASE)
+            if self.is_tuple:
+                tokens = [token.Token(t[0]) for t in tokenized_xml]
+            else:
+                tokens = [token.Token(t) for t in tokenized_xml]
+            first_token_in_sentence = True
+            for i, t in enumerate(tokens):
+                opening = opening_tag.search(t.text)
+                closing = closing_tag.search(t.text)
+                if opening:
+                    t.markup = True
+                    t.markup_class = "start"
+                    tagname = opening.group(1)
+                if closing:
+                    t.markup = True
+                    t.markup_class = "end"
+                    tagname = closing.group(1)
+                if t.markup:
+                    if tagname in eos_tags:
+                        # previous non-markup is last_in_sentence
+                        for j in range(i - 1, -1, -1):
+                            if not tokens[j].markup:
+                                tokens[j].last_in_sentence = True
+                                break
+                        # next non-markup is first_in_sentence
+                        first_token_in_sentence = True
+                    continue
+                if first_token_in_sentence:
+                    t.first_in_sentence = True
+                    first_token_in_sentence = False
         else:
-            tokens = [token.Token(t) for t in tokenized_xml]
-        first_token_in_sentence = True
-        for i, t in enumerate(tokens):
-            opening = opening_tag.search(t.text)
-            closing = closing_tag.search(t.text)
-            if opening:
-                t.markup = True
-                t.markup_class = "start"
-                tagname = opening.group(1)
-            if closing:
-                t.markup = True
-                t.markup_class = "end"
-                tagname = closing.group(1)
-            if t.markup:
-                if tagname in eos_tags:
-                    # previous non-markup is last_in_sentence
-                    for j in range(i - 1, -1, -1):
-                        if not tokens[j].markup:
-                            tokens[j].last_in_sentence = True
-                            break
-                    # next non-markup is first_in_sentence
-                    first_token_in_sentence = True
-                continue
-            if first_token_in_sentence:
-                t.first_in_sentence = True
-                first_token_in_sentence = False
+            tokens = tokenized_xml
         tokens = self._split(tokens)
         sentence_boundaries = []
         for i, t in enumerate(tokens):
@@ -77,6 +81,8 @@ class SentenceSplitter():
                     else:
                         break
                 sentence_boundaries.append(boundary + 1)
+        if len(sentence_boundaries) == 0:
+            sentence_boundaries.append(n)
         if sentence_boundaries[-1] != n:
             sentence_boundaries[-1] = n
         return [tokenized_xml[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
