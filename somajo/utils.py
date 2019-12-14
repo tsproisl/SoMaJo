@@ -107,14 +107,203 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
         self._insert_element(name, text, "end")
 
 
-def parse_xml_to_token_dll(data, is_file=True, eos_tags=None):
-    """Parse the XML data to a doubly linked list of Token objects"""
+def incremental_xml_parser(f, eos_tags=None):
+    parser = xml.sax.make_parser(["xml.sax.xmlreader.IncrementalParser"])
     handler = SaxTokenHandler(eos_tags)
+    parser.setContentHandler(handler)
+    for line in f:
+        parser.feed(line)
+        if len(handler.token_dll) > 0:
+            yield handler.token_dll
+            handler.token_dll = doubly_linked_list.DLL()
+    parser.close()
+
+
+def _xml_chunk_generator(f, eos_tags=None):
+    """Parse the XML data and yield doubly linked lists of Token objects
+    that are delimited by eos_tags.
+
+    """
+    token_dlls = incremental_xml_parser(f, eos_tags)
+    current = doubly_linked_list.DLL()
+    bos, eos = True, False
+    lexical_tokens = 0
+    # yield chunks delimited by eos_tags
+    algo_dot = """digraph {
+    is_tag [label="tag?"]
+    tok_is_eos [label="eos?"]
+    tag_is_eos [label="eos?"]
+    is_bos [label="bos?"]
+    is_eos_tag [label="eos_tag?"]
+    eos_markup_class [label="markup_class"]
+    non_eos_markup_class [label="markup_class"]
+    yield_token [label="eos = False\nyield\nreset"];
+    yield_non_eos [label="eos = False\nyield\nreset"];
+    fis [label = "first_in_sentence = True\nbos = False"];
+    eos_start [label="eos = False\nbos = True\nset last_in_sentence\nyield\nreset"];
+    eos_end [label="eos = True\nbos = True\nset last_in_sentence"];
+
+    start -> is_tag [label = "read"];
+        is_tag -> tok_is_eos [label = "no"];
+            tok_is_eos -> yield_token [label = "yes"];
+                yield_token -> is_bos;
+            tok_is_eos -> is_bos [label = "no"];
+                is_bos -> fis [label = "yes"];
+                    fis -> append;
+                is_bos -> append [label = "no"];
+        is_tag -> is_eos_tag [label = "yes"];
+            is_eos_tag -> tag_is_eos [label = "no"];
+                tag_is_eos -> non_eos_markup_class [label = "yes"];
+                    non_eos_markup_class -> yield_non_eos [label = "start"];
+                        yield_non_eos -> append;
+                    non_eos_markup_class -> append [label = "end"];
+                tag_is_eos -> append [label = "no"];
+            is_eos_tag -> eos_markup_class [label = "yes"];
+                eos_markup_class -> eos_start [label = "start"];
+                    eos_start -> append;
+                eos_markup_class -> eos_end [label = "end"];
+                    eos_end -> append;
+    append -> start;
+}"""
+    # created using https://dot-to-ascii.ggerganov.com/
+    algo_sketch = """
+              read    +----------------------+
+  +-----------------> |         tag?         | -+
+  |                   +----------------------+  |
+  |                     |                       |
+  |                     | no                    |
+  |                     v                       |
+  |                   +----------------------+  |
+  |            +----- |         eos?         |  |
+  |            |      +----------------------+  |
+  |            |        |                       |
+  |            |        | yes                   |
+  |            |        v                       |
+  |            |      +----------------------+  |
+  |            |      |     eos = False      |  |
+  |            | no   |        yield         |  |
+  |            |      |        reset         |  |
+  |            |      +----------------------+  |
+  |            |        |                       |
+  |            |        |                       |
+  |            |        v                       |
+  |            |      +----------------------+  |                                +--------------------------+
+  |            |      |         bos?         |  |                       yes      | first_in_sentence = True |
+  |            +----> |                      | -+------------------------------> |       bos = False        |
+  |                   +----------------------+  |                                +--------------------------+
+  |                     |                       |                                  |
+  |            +--------+                       | yes                              |
+  |            |                                |                                  |
+  |            |      +----------------------+  |                                  |
+  |    +-------+----- |       eos_tag?       | <+                                  |
+  |    |       |      +----------------------+                                     |
+  |    |       |        |                                                          |
+  |    |       |        | no                                                       |
+  |    |       |        v                                                          |
+  |    |       |      +----------------------+                                     |
+  |    |       |      |         eos?         | -+                                  |
+  |    |       |      +----------------------+  |                                  |
+  |    |       |        |                       |                                  |
+  |    | yes   |        | yes                   |                                  |
+  |    |       |        v                       |                                  |
+  |    |       |      +----------------------+  |                                  |
+  |    |       |      |     markup_class     | -+------------------------+         |
+  |    |       |      +----------------------+  |                        |         |
+  |    |       |        |                       |                        |         |
+  |    |       |        +-----------------------+---------+              |         |
+  |    |       |                                |         |              |         |
+  |    |       |      +----------------------+  |         |              |         |
+  |    +-------+----> |     markup_class     | -+---------+--------------+---------+--------------------------------+
+  |            |      +----------------------+  |         |              |         |                                |
+  |            |        |                       |         |              |         |                                |
+  |            |        | end                   |         |              |         |                                |
+  |            |        v                       |         |              |         |                                |
+  |            |      +----------------------+  |         |              |         |                                |
+  |            |      |      eos = True      |  |         |              |         |                                |
+  |            | no   |      bos = True      |  |         |              |         |                                |
+  |            |      | set last_in_sentence |  |         |              |         |                                |
+  |            |      +----------------------+  |         |              |         |                                |
+  |            |        |                       |         |              |         |                                |
+  |            |        |                       | no      | end          +---------+---------------------------+    |
+  |            |        v                       v         v                        |                           |    |
+  |            |      +-----------------------------------------------+            |                           |    |
+  |            +----> |                    append                     | <----------+                           |    |
+  |                   +-----------------------------------------------+                                        |    |
+  |                     |                       ^         ^                                                    |    |
+  |                     |                       |         |                                                    |    |
+  |                     v                       |         |                                                    |    |
+  |                   +----------------------+  |       +-------------+                                        |    |
+  |                   |>>>>>>+-------+<<<<<<<|  |       | eos = False |                                        |    |
+  |                   |>>>>>>| START |<<<<<<<|  |       |    yield    |  start                                 |    |
+  +------------------ |>>>>>>+-------+<<<<<<<|  |       |    reset    | <--------------------------------------+    |
+                      +----------------------+  |       +-------------+                                             |
+                                                |                                                                   |
+                        +-----------------------+                                                                   |
+                        |                                                                                           |
+                      +----------------------+                                                                      |
+                      |     eos = False      |                                                                      |
+                      |      bos = True      |                                                                      |
+                      | set last_in_sentence |                                                                      |
+                      |        yield         |  start                                                               |
+                      |        reset         | <--------------------------------------------------------------------+
+                      +----------------------+
+"""
+    del algo_dot, algo_sketch
+    for token_dll in token_dlls:
+        for token in token_dll:
+            if token.value.markup:
+                # markup
+                if token.value.markup_eos:
+                    bos = True
+                    for t in reversed(current):
+                        if not t.value.markup:
+                            t.value.last_in_sentence = True
+                            break
+                    if token.value.markup_class == "start":
+                        eos = False
+                        if lexical_tokens > 0:
+                            yield current
+                            current = doubly_linked_list.DLL()
+                            lexical_tokens = 0
+                    elif token.value.markup_class == "end":
+                        eos = True
+                else:
+                    if eos and token.value.markup_class == "start":
+                        eos = False
+                        if lexical_tokens > 0:
+                            yield current
+                            current = doubly_linked_list.DLL()
+                            lexical_tokens = 0
+            else:
+                # non-markup
+                if eos:
+                    eos = False
+                    if lexical_tokens > 0:
+                        yield current
+                        current = doubly_linked_list.DLL()
+                        lexical_tokens = 0
+                if bos:
+                    bos = False
+                    token.value.first_in_sentence = True
+                lexical_tokens += 1
+            current.append(token)
+    if len(current) > 0:
+        yield current
+
+
+def xml_chunk_generator(data, is_file=True, eos_tags=None):
+    """Parse the XML data and yield doubly linked lists of Token objects
+    that are delimited by eos_tags.
+
+    """
     if is_file:
-        xml.sax.parse(data, handler)
+        if isinstance(data, str):
+            with open(data, encoding="utf-8") as f:
+                return _xml_chunk_generator(f, eos_tags)
+        else:
+            return _xml_chunk_generator(data, eos_tags)
     else:
-        xml.sax.parseString(data, handler)
-    return handler.token_dll
+        return _xml_chunk_generator(data.split("\n"), eos_tags)
 
 
 def escape_xml(string):
