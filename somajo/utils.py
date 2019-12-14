@@ -3,6 +3,7 @@
 import collections
 import logging
 import os
+import regex as re
 import xml.etree.ElementTree as ET
 import xml.sax
 
@@ -124,6 +125,7 @@ def _xml_chunk_generator(f, eos_tags=None):
     that are delimited by eos_tags.
 
     """
+    non_whitespace = re.compile(r"\S")
     token_dlls = incremental_xml_parser(f, eos_tags)
     current = doubly_linked_list.DLL()
     bos, eos = True, False
@@ -276,16 +278,20 @@ def _xml_chunk_generator(f, eos_tags=None):
                             lexical_tokens = 0
             else:
                 # non-markup
-                if eos:
-                    eos = False
-                    if lexical_tokens > 0:
-                        yield current
-                        current = doubly_linked_list.DLL()
-                        lexical_tokens = 0
-                if bos:
-                    bos = False
-                    token.value.first_in_sentence = True
-                lexical_tokens += 1
+                whitespace = True
+                if non_whitespace.search(token.value.text):
+                    whitespace = False
+                if not whitespace:
+                    if eos:
+                        eos = False
+                        if lexical_tokens > 0:
+                            yield current
+                            current = doubly_linked_list.DLL()
+                            lexical_tokens = 0
+                    if bos:
+                        bos = False
+                        token.value.first_in_sentence = True
+                        lexical_tokens += 1
             current.append(token)
     if len(current) > 0:
         yield current
