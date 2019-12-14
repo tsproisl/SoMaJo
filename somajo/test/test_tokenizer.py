@@ -1,40 +1,47 @@
 #!/usr/bin/env python3
 
+import itertools
 import unittest
 
-from somajo import Tokenizer
+# from somajo import Tokenizer
+from somajo.somajo import SoMaJo
 
 
 class TestTokenizer(unittest.TestCase):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True)
+        # self.tokenizer = Tokenizer(split_camel_case=True)
+        self.tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=False)
 
     def _equal(self, raw, tokenized):
         """"""
-        self.assertEqual(self.tokenizer.tokenize(raw), tokenized.split())
+        self.assertEqual([t.text for t in self.tokenizer.tokenize_text(raw)], tokenized.split())
 
     def _equal_xml(self, raw, tokenized):
         """"""
-        self.assertEqual(self.tokenizer.tokenize_xml(raw, is_file=False), tokenized.split())
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        chunks = self.tokenizer.tokenize_xml(raw, eos_tags)
+        complete = itertools.chain.from_iterable(chunks)
+        self.assertEqual([t.text for t in complete], tokenized.split())
 
     def _fail_means_improvement(self, raw, tokenized):
         """"""
-        self.assertNotEqual(self.tokenizer.tokenize(raw), tokenized.split())
+        self.assertNotEqual([t.text for t in self.tokenizer.tokenize_text(raw)], tokenized.split())
 
 
 class TestEnglishTokenizer(TestTokenizer):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True, language="en")
+        self.tokenizer = SoMaJo("en_PTB", split_camel_case=True, split_sentences=False)
 
 
 class TestWhitespace(TestTokenizer):
     """"""
     def test_whitespace_01(self):
-        # self.assertEqual(self.tokenizer.tokenize("Petra und Simone gehen ins Kino"), "Petra und Simone gehen ins Kino".split())
+        # self.assertEqual(self.tokenizer.tokenize_text("Petra und Simone gehen ins Kino"), "Petra und Simone gehen ins Kino".split())
         self._equal("Petra und Simone gehen ins Kino", "Petra und Simone gehen ins Kino")
 
     def test_whitespace_02(self):
@@ -369,16 +376,16 @@ class TestCamelCase(TestTokenizer):
 class TestTags(TestTokenizer):
     """"""
     def test_tags_01(self):
-        self.assertEqual(self.tokenizer.tokenize('<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'), ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
+        self.assertEqual([t.text for t in self.tokenizer.tokenize_text('<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">')], ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
 
     def test_tags_02(self):
         self._equal("</A>", "</A>")
 
     def test_tags_03(self):
-        self.assertEqual(self.tokenizer.tokenize("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"), ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
+        self.assertEqual([t.text for t in self.tokenizer.tokenize_text("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>")], ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
 
     def test_tags_04(self):
-        self.assertEqual(self.tokenizer.tokenize('<?xml version="1.0" encoding="UTF-8"?>'), ['<?xml version="1.0" encoding="UTF-8"?>'])
+        self.assertEqual([t.text for t in self.tokenizer.tokenize_text('<?xml version="1.0" encoding="UTF-8"?>')], ['<?xml version="1.0" encoding="UTF-8"?>'])
 
 
 class TestEntities(TestTokenizer):
@@ -891,7 +898,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("directory/image.png", "directory/image.png")
 
     def test_own_87(self):
-        self.assertEqual(self.tokenizer.tokenize("name [at] provider [dot] com"), ["name [at] provider [dot] com"])
+        self.assertEqual([t.text for t in self.tokenizer.tokenize_text("name [at] provider [dot] com")], ["name [at] provider [dot] com"])
 
     def test_own_88(self):
         self._equal(":!:", ":!:")
@@ -1030,11 +1037,13 @@ class TestXML(TestTokenizer):
 
     def test_xml_04(self):
         # fail means improvement
-        self.assertNotEqual(self.tokenizer.tokenize_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", is_file=False), ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
+        chunks = self.tokenizer.tokenize_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", eos_tags=None)
+        complete = itertools.chain.from_iterable(chunks)
+        self.assertNotEqual([t.text for t in complete], ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
 
     def test_xml_05(self):
         self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
-    
+
     def test_xml_06(self):
         self._equal_xml("<foo><bar>na so was -&#x200B;</bar><bar>&gt; bla</bar></foo>", "<foo> <bar> na so was - </bar> <bar> &gt; bla </bar> </foo>")
 
@@ -1053,17 +1062,20 @@ class TestXML(TestTokenizer):
 <p>Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹👹 Anstand. Die Dinge, die er ⤵⤵ erkennbar überzeugt von sich gibt, triefen vor Arroganz und Empathielosigkeit (Hartz IV? Mehr als genug; Gefährlich niedrige Versorgung mit Geburtshilfe? Sollen die 💯🚦 Weiber halt nen Kilometer weiter fahren); die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕👹 konservative Interessengruppen (jüngst beispielsweise Abtreibungsgegner) mittels plumpmöglichster Populismen.</p>
         </text>""", """<text> <p> Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt . </p> <p> So 🙇 🙇 manchen Unionspolitikern gestehe ich schon noch irgendwie zu , dass sie durchaus das Bedürfnis haben , ihren Bürgern ein gutes Leben zu ermöglichen . Zwar halte ich ihre Vorstellung von einem " guten Leben " und / oder die ☠ ☣ Wege , auf denen dieses erreicht werden soll , für grundsätzlich falsch - aber da stecken zumindest teilweise durchaus legitim gute Absichten dahinter . </p> <p> Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹 👹 Anstand . Die Dinge , die er ⤵ ⤵ erkennbar überzeugt von sich gibt , triefen vor Arroganz und Empathielosigkeit ( Hartz IV ? Mehr als genug ; Gefährlich niedrige Versorgung mit Geburtshilfe ? Sollen die 💯 🚦 Weiber halt nen Kilometer weiter fahren ) ; die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕 👹 konservative Interessengruppen ( jüngst beispielsweise Abtreibungsgegner ) mittels plumpmöglichster Populismen . </p> </text>""")
 
+    def test_xml_10(self):
+        self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", "<foo> <p> foo bar </p> <p> foo bar </p> </foo>")
+
 
 class TestTokenizerExtra(unittest.TestCase):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True, extra_info=True)
+        self.tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=False)
 
     def _equal(self, raw, tokenized):
         """"""
-        tokens, extra_info = zip(*self.tokenizer.tokenize(raw))
-        self.assertEqual(list(tokens), tokenized.split())
+        tokens = self.tokenizer.tokenize_text(raw)
+        self.assertEqual([t.text for t in tokens], tokenized.split())
 
 
 class TestMisc(TestTokenizerExtra):
@@ -1093,7 +1105,7 @@ class TestMisc(TestTokenizerExtra):
         self._equal("foo ­ ​ bar", "foo bar")
 
     def test_misc_09(self):
-        self.assertEqual(self.tokenizer.tokenize("­ \n­"), [])
+        self.assertEqual([t.text for t in self.tokenizer.tokenize_text("­ \n­")], [])
 
 
 class TestEnglish(TestEnglishTokenizer):
