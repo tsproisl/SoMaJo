@@ -12,6 +12,8 @@ class Token:
         Is the token a markup token?
     markup_class : {'start', 'end'}, optional (default=None)
         If `markup=True`, then `markup_class` must be either "start" or "end".
+    markup_eos : bool, optional (default=None)
+        Is the markup token a sentence boundary?
     locked : bool, (default=False)
         Mark the token as locked.
     token_class : str, optional (default=None)
@@ -26,15 +28,20 @@ class Token:
         Is it the last token of a sentence?
 
     """
-    def __init__(self, text, *, markup=False, markup_class=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
+    def __init__(self, text, *, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
         self.text = text
         if markup:
             assert markup_class is not None
+            assert markup_eos is not None
         if markup_class is not None:
             assert markup
             assert markup_class == "start" or markup_class == "end"
+        if markup_eos is not None:
+            assert markup
+            assert isinstance(markup_eos, bool)
         self.markup = markup
         self.markup_class = markup_class
+        self.markup_eos = markup_eos
         self._locked = locked
         self.token_class = token_class
         self.space_after = space_after
