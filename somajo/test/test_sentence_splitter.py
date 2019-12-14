@@ -61,3 +61,6 @@ class TestXML(TestSentenceSplitter):
 
     def test_xml_05(self):
         self._equal_xml("<foo>Foo<br/>bar</foo>", ["<foo> Foo", "<br/> bar </foo>"])
+
+    def test_xml_06(self):
+        self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", ["<foo> <p> foo bar </p>", "<p> foo bar </p> </foo>"])
