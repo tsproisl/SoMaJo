@@ -87,7 +87,7 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
             self.token_dll.append(content_token)
             self.content = ""
             self.sentence_start = False
-        token = Token(text, markup=True, markup_class=markup_class, locked=True)
+        token = Token(text, markup=True, markup_class=markup_class, markup_eos=sentence_boundary, locked=True)
         self.token_dll.append(token)
         if sentence_boundary:
             self.sentence_start = True
