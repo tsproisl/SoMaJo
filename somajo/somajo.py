@@ -75,11 +75,7 @@ class SoMaJo:
 
         """
         assert paragraph_separator in self.paragraph_separators
-        if isinstance(text_file, str):
-            with open(text_file, encoding="utf-8") as fh:
-                token_dlls = utils.get_paragraphs_dll(fh, paragraph_separator)
-        else:
-            token_dlls = utils.get_paragraphs_dll(text_file, paragraph_separator)
+        token_dlls = utils.get_paragraphs_dll(text_file, paragraph_separator)
         tokens = self._tokenize(token_dlls, parallel=parallel)
         return tokens
 

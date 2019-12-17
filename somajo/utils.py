@@ -14,7 +14,9 @@ from somajo.token import Token
 def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
     if paragraph_separator == "single_newlines":
-        return (line for line in fh if line.strip() != "")
+        for line in fh:
+            if line.strip() != "":
+                yield line
     elif paragraph_separator == "empty_lines":
         paragraph = []
         for line in fh:
@@ -28,10 +30,15 @@ def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
             yield "".join(paragraph)
 
 
-def get_paragraphs_dll(fh, paragraph_separator="empty_lines"):
+def get_paragraphs_dll(text_file, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
-    for paragraph in get_paragraphs_str(fh, paragraph_separator):
-        yield doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
+    if isinstance(text_file, str):
+        with open(text_file, encoding="utf-8") as fh:
+            for paragraph in get_paragraphs_str(fh, paragraph_separator):
+                yield doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
+    else:
+        for paragraph in get_paragraphs_str(text_file, paragraph_separator):
+            yield doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
 
 
 def read_abbreviation_file(filename):
