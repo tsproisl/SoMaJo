@@ -11,7 +11,7 @@ from somajo import doubly_linked_list
 from somajo.token import Token
 
 
-def get_paragraphs(fh, paragraph_separator="empty_lines"):
+def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
     if paragraph_separator == "single_newlines":
         return (line for line in fh if line.strip() != "")
@@ -26,6 +26,12 @@ def get_paragraphs(fh, paragraph_separator="empty_lines"):
                 paragraph.append(line)
         if len(paragraph) > 0:
             yield "".join(paragraph)
+
+
+def get_paragraphs_dll(fh, paragraph_separator="empty_lines"):
+    """Generator for the paragraphs in the file."""
+    for paragraph in get_paragraphs_str(fh, paragraph_separator):
+        yield doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
 
 
 def read_abbreviation_file(filename):
