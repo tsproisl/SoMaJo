@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 
-import functools
 import itertools
+import multiprocessing
 
-from somajo.tokenizer import Tokenizer
-from somajo.sentence_splitter import SentenceSplitter
+from somajo import doubly_linked_list
 from somajo import utils
+from somajo.sentence_splitter import SentenceSplitter
+from somajo.token import Token
+from somajo.tokenizer import Tokenizer
 
 
 class SoMaJo:
@@ -36,6 +38,21 @@ class SoMaJo:
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
 
+    def _tokenize(self, token_dlls, parallel=1):
+        if parallel > 1:
+            pool = multiprocessing.Pool(min(parallel, multiprocessing.cpu_count()))
+            tokens = pool.imap(self.tokenizer._tokenize, token_dlls, 250)
+            # tokenized = map(self._tokenize, paragraphs)
+            if self.split_sentences:
+                tokens = pool.imap(self._sentence_splitter._split_sentences, tokens, 250)
+                tokens = itertools.chain.from_iterable(tokens)
+        else:
+            tokens = map(self._tokenizer._tokenize, token_dlls)
+            if self.split_sentences:
+                tokens = map(self._sentence_splitter._split_sentences, tokens)
+                tokens = itertools.chain.from_iterable(tokens)
+        return tokens
+
     def tokenize_text_file(self, text_file, paragraph_separator, *, parallel=1):
         """Split the contents of a text file into sequences of tokens.
 
@@ -59,15 +76,11 @@ class SoMaJo:
         assert paragraph_separator in self.paragraph_separators
         if isinstance(text_file, str):
             with open(text_file, encoding="utf-8") as fh:
-                paragraphs = utils.get_paragraphs(fh, paragraph_separator)
+                token_dlls = utils.get_paragraphs_dll(fh, paragraph_separator)
         else:
-            paragraphs = utils.get_paragraphs(text_file, paragraph_separator)
-        tokenize_paragraph = functools.partial(self._tokenizer.tokenize_paragraph, legacy=False)
-        tokenized = map(tokenize_paragraph, paragraphs)
-        if self.split_sentences:
-            tokenized = map(self._sentence_splitter._split, tokenized)
-            tokenized = itertools.chain.from_iterable(tokenized)
-        return tokenized
+            token_dlls = utils.get_paragraphs_dll(text_file, paragraph_separator)
+        tokens = self._tokenize(token_dlls, parallel)
+        return tokens
 
     def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1):
         """Split the contents of an xml file into sequences of tokens.
@@ -94,17 +107,16 @@ class SoMaJo:
             ``split_sentences``).
 
         """
-        eos_tags = set(eos_tags)
-        tokenized = self._tokenizer.tokenize_xml(xml_file, is_file=True, eos_tags=eos_tags, legacy=False)
+        if eos_tags is not None:
+            eos_tags = set(eos_tags)
+        token_dlls = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags)
+        tokens = self._tokenize(token_dlls, parallel)
+        tokens = map(utils.escape_xml_tokens, tokens)
         if strip_tags:
-            tokenized = ([t for t in par if not t.markup] for par in tokenized)
-        if self.split_sentences:
-            sentence_splitter = functools.partial(self._sentence_splitter.split_xml, legacy=False)
-            tokenized = map(sentence_splitter, tokenized)
-            tokenized = itertools.chain.from_iterable(tokenized)
-        return tokenized
+            tokens = ([t for t in par if not t.markup] for par in tokens)
+        return tokens
 
-    def tokenize_text(self, paragraph, *, parallel=1):
+    def tokenize_text(self, paragraph):
         """Split a paragraph of text into (sequences of) tokens.
 
         Parameters
@@ -121,11 +133,11 @@ class SoMaJo:
             objects) or ``Token`` objects.
 
         """
-        tokenized = self._tokenizer.tokenize_paragraph(paragraph, legacy=False)
-        if self.split_sentences:
-            tokenized = self._sentence_splitter._split(tokenized)
-            tokenized = itertools.chain.from_iterable(tokenized)
-        return tokenized
+        token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
+        tokens = self._tokenize([token_dll], parallel=1)
+        if not self.split_sentences:
+            tokens = itertools.chain.from_iterable(tokens)
+        return tokens
 
     def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1):
         """Split a string of XML data into sequences of tokens.
@@ -153,11 +165,10 @@ class SoMaJo:
         """
         if eos_tags is not None:
             eos_tags = set(eos_tags)
-        tokenized = self._tokenizer.tokenize_xml(xml_data, is_file=False, eos_tags=eos_tags, legacy=False)
+        token_dlls = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags)
+        tokens = self._tokenize(token_dlls, parallel)
+        tokens = list(tokens)
+        tokens = map(utils.escape_xml_tokens, tokens)
         if strip_tags:
-            tokenized = ([t for t in par if not t.markup] for par in tokenized)
-        if self.split_sentences:
-            sentence_splitter = functools.partial(self._sentence_splitter.split_xml, legacy=False)
-            tokenized = map(sentence_splitter, tokenized)
-            tokenized = itertools.chain.from_iterable(tokenized)
-        return tokenized
+            tokens = ([t for t in par if not t.markup] for par in tokens)
+        return tokens
