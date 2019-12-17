@@ -52,6 +52,7 @@ class Token:
     def __str__(self):
         return self.text
 
+    @property
     def extra_info(self):
         """String representation of extra information.
 
