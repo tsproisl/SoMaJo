@@ -14,7 +14,7 @@ from somajo.token import Token
 def get_paragraphs(fh, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
     if paragraph_separator == "single_newlines":
-        return (line for line in fh)
+        return (line for line in fh if line.strip() != "")
     elif paragraph_separator == "empty_lines":
         paragraph = []
         for line in fh:
