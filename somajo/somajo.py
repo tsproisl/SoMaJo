@@ -73,6 +73,59 @@ class SoMaJo:
             The ``Token`` objects in a single sentence or paragraph
             (depending on the value of ``split_sentences``).
 
+        Examples
+        --------
+        # Tokenization and sentence splitting; input file with
+        # paragraphs separated by empty lines; print one sentence per
+        # line
+        >>> with open("example_empty_lines.txt", encoding="utf-8") as f:
+        ...     print(f.read())
+        ... 
+        Heyi:)
+
+        Was machst du morgen Abend?! Lust auf Film?;-)
+        >>> tokenizer = SoMaJo("de_CMC")
+        >>> with open("example_empty_lines.txt", encoding="utf-8") as f:
+        ...     sentences = tokenizer.tokenize_text_file(f, paragraph_separator="empty_lines")
+        ...     for sentence in sentences:
+        ...             print(" ".join([token.text for token in sentence]))
+        ... 
+        Heyi :)
+        Was machst du morgen Abend ?!
+        Lust auf Film ? ;-)
+
+        # Tokenization and sentence splitting; input file with
+        # paragraphs separated by single newlines; print one token per
+        # line with token classes and extra information; print an
+        # empty line after each sentence
+        >>> with open("example_single_newlines.txt") as f:
+        ...     print(f.read())
+        ... 
+        Heyi:)
+        Was machst du morgen Abend?! Lust auf Film?;-)
+        >>> sentences = tokenizer.tokenize_text_file("example_single_newlines.txt", paragraph_separator="single_newlines")
+        >>> for sentence in sentences:
+        ...     for token in sentence:
+        ...             print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
+        ...     print()
+        ... 
+        Heyi
+        :)
+
+        Was
+        machst
+        du
+        morgen
+        Abend
+        ?!
+
+        Lust
+        auf
+        Film
+        ?
+        ;-)
+
+
         """
         assert paragraph_separator in self.paragraph_separators
         token_dlls = utils.get_paragraphs_dll(text_file, paragraph_separator)
@@ -160,6 +213,11 @@ class SoMaJo:
         ...             print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
         ...     print()
         ... 
+        >>> for sentence in sentences:
+        ...     for token in sentence:
+        ...             print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
+        ...     print()
+        ... 
         Heyi	regular	SpaceAfter=No
         :)	emoticon	
 
@@ -169,11 +227,13 @@ class SoMaJo:
         morgen	regular	
         Abend	regular	SpaceAfter=No
         ?!	symbol	
+
         Lust	regular	
         auf	regular	
         Film	regular	SpaceAfter=No
         ?	symbol	SpaceAfter=No
-        ;-)	emoticon
+        ;-)	emoticon	
+
 
         """
         token_dlls = (doubly_linked_list.DLL([Token(p, first_in_sentence=True, last_in_sentence=True)]) for p in paragraphs)
