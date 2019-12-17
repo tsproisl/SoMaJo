@@ -22,73 +22,75 @@ class SentenceSplitter():
             self.closing_punct = re.compile(r"^(?:['\"\p{Pf}\p{Pe}])$")
         self.eos_abbreviations = utils.read_abbreviation_file("eos_abbreviations.txt")
 
-    def split(self, tokenized_paragraph, legacy=True):
-        """Split tokenized_paragraph into sentences."""
-        if legacy:
-            if self.is_tuple:
-                tokens = [token.Token(t[0]) for t in tokenized_paragraph]
-            else:
-                tokens = [token.Token(t) for t in tokenized_paragraph]
-        tokens = self._split(tokens)
-        sentence_boundaries = [i for i, t in enumerate(tokens, start=1) if t.last_in_sentence]
-        return [tokenized_paragraph[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
-
-    def split_xml(self, tokenized_xml, eos_tags=set(), legacy=True):
-        """Split tokenized XML into sentences."""
-        n = len(tokenized_xml)
-        if legacy:
-            opening_tag = re.compile(r"""<(?:[^\s:]+:)?([_A-Z][-.\w]*)(?:\s+[_:A-Z][-.:\w]*\s*=\s*(?:"[^"]*"|'[^']*'))*\s*/?>""", re.IGNORECASE)
-            closing_tag = re.compile(r"^</([_:A-Z][-.:\w]*)\s*>$", re.IGNORECASE)
-            if self.is_tuple:
-                tokens = [token.Token(t[0]) for t in tokenized_xml]
-            else:
-                tokens = [token.Token(t) for t in tokenized_xml]
-            first_token_in_sentence = True
-            for i, t in enumerate(tokens):
-                opening = opening_tag.search(t.text)
-                closing = closing_tag.search(t.text)
-                if opening:
-                    t.markup = True
-                    t.markup_class = "start"
-                    tagname = opening.group(1)
-                if closing:
-                    t.markup = True
-                    t.markup_class = "end"
-                    tagname = closing.group(1)
-                if t.markup:
-                    if tagname in eos_tags:
-                        # previous non-markup is last_in_sentence
-                        for j in range(i - 1, -1, -1):
-                            if not tokens[j].markup:
-                                tokens[j].last_in_sentence = True
-                                break
-                        # next non-markup is first_in_sentence
-                        first_token_in_sentence = True
-                    continue
-                if first_token_in_sentence:
-                    t.first_in_sentence = True
-                    first_token_in_sentence = False
-        else:
-            tokens = tokenized_xml
-        tokens = self._split(tokens)
+    def _get_sentence_boundaries(self, tokens):
         sentence_boundaries = []
-        for i, t in enumerate(tokens):
+        n = len(tokens)
+        for i, t in enumerate(tokens, start=1):
             if t.last_in_sentence:
                 boundary = i
-                for j in range(i + 1, n):
+                for j in range(i, n):
                     if tokens[j].markup_class == "end":
                         boundary += 1
                     else:
                         break
-                sentence_boundaries.append(boundary + 1)
+                sentence_boundaries.append(boundary)
         if len(sentence_boundaries) == 0:
             sentence_boundaries.append(n)
         if sentence_boundaries[-1] != n:
             sentence_boundaries[-1] = n
+        return sentence_boundaries
+
+    def _split_sentences(self, tokens):
+        """Split list of Token objects into sentences"""
+        tokens, sentence_boundaries = self._split_token_objects(tokens)
+        return (tokens[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries))
+
+    def split(self, tokenized_paragraph):
+        """Split tokenized_paragraph into sentences."""
+        if self.is_tuple:
+            tokens = [token.Token(t[0]) for t in tokenized_paragraph]
+        else:
+            tokens = [token.Token(t) for t in tokenized_paragraph]
+        tokens, sentence_boundaries = self._split_token_objects(tokens)
+        return [tokenized_paragraph[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
+
+    def split_xml(self, tokenized_xml, eos_tags=set()):
+        """Split tokenized XML into sentences."""
+        opening_tag = re.compile(r"""<(?:[^\s:]+:)?([_A-Z][-.\w]*)(?:\s+[_:A-Z][-.:\w]*\s*=\s*(?:"[^"]*"|'[^']*'))*\s*/?>""", re.IGNORECASE)
+        closing_tag = re.compile(r"^</([_:A-Z][-.:\w]*)\s*>$", re.IGNORECASE)
+        if self.is_tuple:
+            tokens = [token.Token(t[0]) for t in tokenized_xml]
+        else:
+            tokens = [token.Token(t) for t in tokenized_xml]
+        first_token_in_sentence = True
+        for i, t in enumerate(tokens):
+            opening = opening_tag.search(t.text)
+            closing = closing_tag.search(t.text)
+            if opening:
+                t.markup = True
+                t.markup_class = "start"
+                tagname = opening.group(1)
+            if closing:
+                t.markup = True
+                t.markup_class = "end"
+                tagname = closing.group(1)
+            if t.markup:
+                if tagname in eos_tags:
+                    # previous non-markup is last_in_sentence
+                    for j in range(i - 1, -1, -1):
+                        if not tokens[j].markup:
+                            tokens[j].last_in_sentence = True
+                            break
+                    # next non-markup is first_in_sentence
+                    first_token_in_sentence = True
+                continue
+            if first_token_in_sentence:
+                t.first_in_sentence = True
+                first_token_in_sentence = False
+        tokens, sentence_boundaries = self._split_token_objects(tokens)
         return [tokenized_xml[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
-    def _split(self, tokens):
-        """Split tokens into sentences."""
+    def _split_token_objects(self, tokens):
         n = len(tokens)
         # the last non-markup token is last_in_sentence
         for tok in reversed(tokens):
@@ -122,4 +124,5 @@ class SentenceSplitter():
                         last = "closing"
                     else:
                         break
-        return tokens
+        sentence_boundaries = self._get_sentence_boundaries(tokens)
+        return tokens, sentence_boundaries
