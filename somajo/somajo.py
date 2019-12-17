@@ -44,10 +44,10 @@ class SoMaJo:
         text_file : str or file-like object
             A file containing text. Either a filename or a file-like
             object.
-        paragraph_separator : {'single_newline', 'empty_line'}, (default='empty_line')
+        paragraph_separator : {'single_newlines', 'empty_lines'}
             How are paragraphs separated in the input? Is there one
-            paragraph per line ('single_newline') or do paragraphs
-            span several lines and are separated by an 'empty_line'?
+            paragraph per line ('single_newlines') or do paragraphs
+            span several lines and are separated by 'empty_lines'?
 
         Yields
         -------
