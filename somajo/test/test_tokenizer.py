@@ -958,7 +958,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("machst du's?", "machst du's ?")
 
     def test_own_107(self):
-        self._equal("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
+        self._fail_means_improvement("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
 
     def test_own_108(self):
         self._equal('foo "bar -> baz" qux "bar baz" qux', 'foo " bar -> baz " qux " bar baz " qux')
