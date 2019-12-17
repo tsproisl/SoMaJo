@@ -324,3 +324,10 @@ def xml_chunk_generator(data, is_file=True, eos_tags=None):
 def escape_xml(string):
     """Escape "&", "<" and ">" in string."""
     return xml.sax.saxutils.escape(string)
+
+
+def escape_xml_tokens(tokens):
+    for t in tokens:
+        if not t.markup:
+            t.text = escape_xml(t.text)
+    return tokens
