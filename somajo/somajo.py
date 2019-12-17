@@ -38,7 +38,7 @@ class SoMaJo:
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
 
-    def _tokenize(self, token_dlls, parallel=1):
+    def _tokenize(self, token_dlls, *, parallel=1):
         if parallel > 1:
             pool = multiprocessing.Pool(min(parallel, multiprocessing.cpu_count()))
             tokens = pool.imap(self.tokenizer._tokenize, token_dlls, 250)
@@ -79,7 +79,7 @@ class SoMaJo:
                 token_dlls = utils.get_paragraphs_dll(fh, paragraph_separator)
         else:
             token_dlls = utils.get_paragraphs_dll(text_file, paragraph_separator)
-        tokens = self._tokenize(token_dlls, parallel)
+        tokens = self._tokenize(token_dlls, parallel=parallel)
         return tokens
 
     def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1):
@@ -110,14 +110,14 @@ class SoMaJo:
         if eos_tags is not None:
             eos_tags = set(eos_tags)
         token_dlls = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags)
-        tokens = self._tokenize(token_dlls, parallel)
+        tokens = self._tokenize(token_dlls, parallel=parallel)
         tokens = map(utils.escape_xml_tokens, tokens)
         if strip_tags:
             tokens = ([t for t in par if not t.markup] for par in tokens)
         return tokens
 
-    def tokenize_text(self, paragraph):
-        """Split a paragraph of text into (sequences of) tokens.
+    def tokenize_text(self, paragraphs, *, parallel=1):
+        """Split paragraphs of text into sequences of tokens.
 
         Parameters
         ----------
@@ -154,6 +154,8 @@ class SoMaJo:
             'div', 'ol', 'ul', 'dl', 'table']``
         strip_tags : bool, (default=False)
             Remove the XML tags from the output.
+        parallel : int, (default=1)
+            Number of processes to use.
 
         Returns
         -------
@@ -166,7 +168,7 @@ class SoMaJo:
         if eos_tags is not None:
             eos_tags = set(eos_tags)
         token_dlls = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags)
-        tokens = self._tokenize(token_dlls, parallel)
+        tokens = self._tokenize(token_dlls, parallel=parallel)
         tokens = list(tokens)
         tokens = map(utils.escape_xml_tokens, tokens)
         if strip_tags:
