@@ -681,7 +681,7 @@ class Tokenizer():
                     token_dll.insert_left(Token(tok, token_class="regular", space_after=True), t)
                 token_dll.remove(t)
 
-        return token_dll
+        return token_dll.to_list()
 
     def _convert_to_legacy(self, token_dll):
         if self.token_classes and self.extra_info:
@@ -703,16 +703,16 @@ class Tokenizer():
         """Tokenize utf-8-encoded text file and yield tokenized paragraphs."""
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_file() is deprecated. Please use somajo.SoMaJo.tokenize_text_file() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
         with open(filename, encoding="utf-8") as f:
+            parsep = "single_newlines"
             if parsep_empty_lines:
-                paragraphs = utils.get_paragraphs(f)
-            else:
-                paragraphs = (line for line in f if line.strip() != "")
+                parsep = "empty_lines"
+            paragraphs = utils.get_paragraphs_str(f, paragraph_separator=parsep)
             tokenized_paragraphs = map(self.tokenize_paragraph, paragraphs)
             for tp in tokenized_paragraphs:
                 if tp:
                     yield tp
 
-    def tokenize_paragraph(self, paragraph, legacy=True):
+    def tokenize_paragraph(self, paragraph):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
@@ -722,31 +722,17 @@ class Tokenizer():
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_paragraph() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
         token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
         token_dll = self._tokenize(token_dll)
-        if legacy:
-            tokens = self._convert_to_legacy(token_dll)
-        else:
-            tokens = token_dll.to_list()
-        return tokens
+        return self._convert_to_legacy(token_dll)
 
-    def tokenize_xml(self, xml, is_file=True, eos_tags=None, legacy=True):
+    def tokenize_xml(self, xml, is_file=True, eos_tags=None):
         """Tokenize XML file or XML string according to the guidelines of the
         EmpiriST 2015 shared task on automatic linguistic annotation
         of computer-mediated communication / social media.
 
         """
-        def escape(token_dll):
-            for t in token_dll:
-                tok = t.value
-                if tok.markup:
-                    continue
-                tok.text = utils.escape_xml(tok.text)
-            return token_dll
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
         token_dlls = utils.xml_chunk_generator(xml, is_file, eos_tags)
         token_dlls = map(self._tokenize, token_dlls)
-        token_dlls = map(escape, token_dlls)
-        if legacy:
-            tokens = map(self._convert_to_legacy, token_dlls)
-            return list(itertools.chain.from_iterable(tokens))
-        tokens = (token_dll.to_list() for token_dll in token_dlls)
-        return tokens
+        token_dlls = map(utils.escape_xml_token_dll, token_dlls)
+        tokens = map(self._convert_to_legacy, token_dlls)
+        return list(itertools.chain.from_iterable(tokens))
