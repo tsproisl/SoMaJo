@@ -3,7 +3,6 @@
 import unittest
 
 from somajo import SoMaJo
-from somajo import Tokenizer
 
 
 class TestSentenceSplitter(unittest.TestCase):
@@ -14,7 +13,7 @@ class TestSentenceSplitter(unittest.TestCase):
 
     def _equal(self, raw, tokenized_sentences):
         """"""
-        sentences = self.tokenizer.tokenize_text(raw)
+        sentences = self.tokenizer.tokenize_text([raw])
         sentences = [" ".join([t.text for t in s]) for s in sentences]
         self.assertEqual(sentences, tokenized_sentences)
 

@@ -16,7 +16,8 @@ class TestTokenizer(unittest.TestCase):
 
     def _equal(self, raw, tokenized):
         """"""
-        self.assertEqual([t.text for t in self.tokenizer.tokenize_text(raw)], tokenized.split())
+        tokens = self.tokenizer.tokenize_text([raw]).__next__()
+        self.assertEqual([t.text for t in tokens], tokenized.split())
 
     def _equal_xml(self, raw, tokenized):
         """"""
@@ -28,7 +29,8 @@ class TestTokenizer(unittest.TestCase):
 
     def _fail_means_improvement(self, raw, tokenized):
         """"""
-        self.assertNotEqual([t.text for t in self.tokenizer.tokenize_text(raw)], tokenized.split())
+        tokens = self.tokenizer.tokenize_text([raw]).__next__()
+        self.assertNotEqual([t.text for t in tokens], tokenized.split())
 
 
 class TestEnglishTokenizer(TestTokenizer):
@@ -376,16 +378,19 @@ class TestCamelCase(TestTokenizer):
 class TestTags(TestTokenizer):
     """"""
     def test_tags_01(self):
-        self.assertEqual([t.text for t in self.tokenizer.tokenize_text('<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">')], ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
+        tokens = self.tokenizer.tokenize_text(['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">']).__next__()
+        self.assertEqual([t.text for t in tokens], ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
 
     def test_tags_02(self):
         self._equal("</A>", "</A>")
 
     def test_tags_03(self):
-        self.assertEqual([t.text for t in self.tokenizer.tokenize_text("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>")], ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
+        tokens = self.tokenizer.tokenize_text(["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"]).__next__()
+        self.assertEqual([t.text for t in tokens], ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
 
     def test_tags_04(self):
-        self.assertEqual([t.text for t in self.tokenizer.tokenize_text('<?xml version="1.0" encoding="UTF-8"?>')], ['<?xml version="1.0" encoding="UTF-8"?>'])
+        tokens = self.tokenizer.tokenize_text(['<?xml version="1.0" encoding="UTF-8"?>']).__next__()
+        self.assertEqual([t.text for t in tokens], ['<?xml version="1.0" encoding="UTF-8"?>'])
 
 
 class TestEntities(TestTokenizer):
@@ -898,7 +903,8 @@ class OwnAdditions(TestTokenizer):
         self._equal("directory/image.png", "directory/image.png")
 
     def test_own_87(self):
-        self.assertEqual([t.text for t in self.tokenizer.tokenize_text("name [at] provider [dot] com")], ["name [at] provider [dot] com"])
+        tokens = self.tokenizer.tokenize_text(["name [at] provider [dot] com"]).__next__()
+        self.assertEqual([t.text for t in tokens], ["name [at] provider [dot] com"])
 
     def test_own_88(self):
         self._equal(":!:", ":!:")
@@ -1074,7 +1080,7 @@ class TestTokenizerExtra(unittest.TestCase):
 
     def _equal(self, raw, tokenized):
         """"""
-        tokens = self.tokenizer.tokenize_text(raw)
+        tokens = self.tokenizer.tokenize_text([raw]).__next__()
         self.assertEqual([t.text for t in tokens], tokenized.split())
 
 
@@ -1105,7 +1111,8 @@ class TestMisc(TestTokenizerExtra):
         self._equal("foo ­ ​ bar", "foo bar")
 
     def test_misc_09(self):
-        self.assertEqual([t.text for t in self.tokenizer.tokenize_text("­ \n­")], [])
+        tokens = self.tokenizer.tokenize_text(["­ \n­"]).__next__()
+        self.assertEqual([t.text for t in tokens], [])
 
 
 class TestEnglish(TestEnglishTokenizer):
