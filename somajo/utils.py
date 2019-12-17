@@ -11,18 +11,21 @@ from somajo import doubly_linked_list
 from somajo.token import Token
 
 
-def get_paragraphs(fh):
+def get_paragraphs(fh, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
-    paragraph = []
-    for line in fh:
-        if line.strip() == "":
-            if len(paragraph) > 0:
-                yield "".join(paragraph)
-                paragraph = []
-        else:
-            paragraph.append(line)
-    if len(paragraph) > 0:
-        yield "".join(paragraph)
+    if paragraph_separator == "single_newlines":
+        return (line for line in fh)
+    elif paragraph_separator == "empty_lines":
+        paragraph = []
+        for line in fh:
+            if line.strip() == "":
+                if len(paragraph) > 0:
+                    yield "".join(paragraph)
+                    paragraph = []
+            else:
+                paragraph.append(line)
+        if len(paragraph) > 0:
+            yield "".join(paragraph)
 
 
 def read_abbreviation_file(filename):
