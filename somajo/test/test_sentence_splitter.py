@@ -2,7 +2,7 @@
 
 import unittest
 
-from somajo import SentenceSplitter
+from somajo import SoMaJo
 from somajo import Tokenizer
 
 
@@ -10,23 +10,20 @@ class TestSentenceSplitter(unittest.TestCase):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True)
-        self.sentence_splitter = SentenceSplitter()
+        self.tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=True)
 
     def _equal(self, raw, tokenized_sentences):
         """"""
-        tokens = self.tokenizer.tokenize(raw)
-        sentences = self.sentence_splitter.split(tokens)
-        sentences = [" ".join(s) for s in sentences]
+        sentences = self.tokenizer.tokenize_text(raw)
+        sentences = [" ".join([t.text for t in s]) for s in sentences]
         self.assertEqual(sentences, tokenized_sentences)
 
     def _equal_xml(self, raw, tokenized_sentences):
         """"""
         eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         eos_tags = set(eos_tags)
-        tokens = self.tokenizer.tokenize(raw)
-        sentences = self.sentence_splitter.split_xml(tokens, eos_tags)
-        sentences = [" ".join(s) for s in sentences]
+        sentences = self.tokenizer.tokenize_xml(raw, eos_tags)
+        sentences = [" ".join([t.text for t in s]) for s in sentences]
         self.assertEqual(sentences, tokenized_sentences)
 
 
@@ -54,13 +51,14 @@ class TestXML(TestSentenceSplitter):
         self._equal_xml("<foo><p></p><p>hallo</p>du</foo>", ["<foo> <p> </p> <p> hallo </p>", "du </foo>"])
 
     def test_xml_03(self):
-        self._equal_xml("<foo>Foo bar.</foo><foo></foo>", ["<foo> Foo bar . </foo> <foo> </foo>"])
+        self._equal_xml("<bar><foo>Foo bar.</foo><foo></foo></bar>", ["<bar> <foo> Foo bar . </foo> <foo> </foo> </bar>"])
 
     def test_xml_04(self):
         self._equal_xml("<foo>Foo<br></br>bar</foo>", ["<foo> Foo", "<br> </br> bar </foo>"])
 
     def test_xml_05(self):
-        self._equal_xml("<foo>Foo<br/>bar</foo>", ["<foo> Foo", "<br/> bar </foo>"])
+        # self._equal_xml("<foo>Foo<br/>bar</foo>", ["<foo> Foo", "<br/> bar </foo>"])
+        self._equal_xml("<foo>Foo<br/>bar</foo>", ["<foo> Foo", "<br> </br> bar </foo>"])
 
     def test_xml_06(self):
         self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", ["<foo> <p> foo bar </p>", "<p> foo bar </p> </foo>"])
