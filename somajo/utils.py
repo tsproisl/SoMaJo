@@ -321,11 +321,14 @@ def xml_chunk_generator(data, is_file=True, eos_tags=None):
     if is_file:
         if isinstance(data, str):
             with open(data, encoding="utf-8") as f:
-                return _xml_chunk_generator(f, eos_tags)
+                for chunk in _xml_chunk_generator(f, eos_tags):
+                    yield chunk
         else:
-            return _xml_chunk_generator(data, eos_tags)
+            for chunk in _xml_chunk_generator(data, eos_tags):
+                yield chunk
     else:
-        return _xml_chunk_generator(data.split("\n"), eos_tags)
+        for chunk in _xml_chunk_generator(data.split("\n"), eos_tags):
+            yield chunk
 
 
 def escape_xml(string):
