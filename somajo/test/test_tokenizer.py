@@ -63,6 +63,20 @@ class TestEnglishTokenizer(TestTokenizer):
         self.tokenizer = Tokenizer(language="en_PTB", split_camel_case=True)
 
 
+class TestTokenizerDeprecated(TestTokenizer):
+    def _equal(self, raw, tokenized):
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        tokens = self.tokenizer.tokenize_paragraph(raw)
+        self.assertEqual(tokens, tokenized)
+
+    def _equal_xml(self, raw, tokenized):
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        tokens = self.tokenizer.tokenize_xml(raw, is_file=False)
+        self.assertEqual(tokens, tokenized)
+
+
 class TestWhitespace(TestTokenizer):
     """"""
     def test_whitespace_01(self):
@@ -1215,3 +1229,12 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_30(self):
         self._equal("my number:456-123-7654!", "my number : 456-123-7654 !")
+
+
+class TestDeprecated(TestTokenizerDeprecated):
+    """"""
+    def test_deprecated_01(self):
+        self._equal("foo bar baz", "foo bar baz")
+
+    def test_deprecated_02(self):
+        self._equal_xml("<p>foo bar baz</p>", "<p> foo bar baz </p>")
