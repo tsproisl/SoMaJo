@@ -36,7 +36,6 @@ class TestSentenceSplitterPretokenized(unittest.TestCase):
     def _equal(self, tokens, tokenized_sentences):
         """"""
         sentences = self.sentence_splitter.split(tokens.split())
-        print(sentences)
         self.assertEqual(sentences, [ts.split() for ts in tokenized_sentences])
 
     def _equal_xml(self, tokens, tokenized_sentences):
