@@ -3,41 +3,64 @@
 import itertools
 import unittest
 
-# from somajo import Tokenizer
-from somajo.somajo import SoMaJo
+from somajo import Tokenizer
+from somajo.doubly_linked_list import DLL
+from somajo.token import Token
+from somajo import utils
 
 
 class TestTokenizer(unittest.TestCase):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        # self.tokenizer = Tokenizer(split_camel_case=True)
-        self.tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=False)
+        self.tokenizer = Tokenizer(language="de_CMC", split_camel_case=True)
 
     def _equal(self, raw, tokenized):
         """"""
-        tokens = self.tokenizer.tokenize_text([raw]).__next__()
-        self.assertEqual([t.text for t in tokens], tokenized.split())
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
+        tokens = self.tokenizer._tokenize(dll)
+        self.assertEqual([t.text for t in tokens], tokenized)
 
     def _equal_xml(self, raw, tokenized):
         """"""
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
         eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         eos_tags = set(eos_tags)
-        chunks = self.tokenizer.tokenize_xml(raw, eos_tags)
-        complete = itertools.chain.from_iterable(chunks)
-        self.assertEqual([t.text for t in complete], tokenized.split())
+        token_dlls = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags)
+        chunks = map(self.tokenizer._tokenize, token_dlls)
+        complete = list(itertools.chain.from_iterable(chunks))
+        complete = utils.escape_xml_tokens(complete)
+        self.assertEqual([t.text for t in complete], tokenized)
 
     def _fail_means_improvement(self, raw, tokenized):
         """"""
-        tokens = self.tokenizer.tokenize_text([raw]).__next__()
-        self.assertNotEqual([t.text for t in tokens], tokenized.split())
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
+        tokens = self.tokenizer._tokenize(dll)
+        self.assertNotEqual([t.text for t in tokens], tokenized)
+
+    def _fail_means_improvement_xml(self, raw, tokenized):
+        """"""
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        token_dlls = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags)
+        chunks = map(self.tokenizer._tokenize, token_dlls)
+        complete = list(itertools.chain.from_iterable(chunks))
+        complete = utils.escape_xml_tokens(complete)
+        self.assertNotEqual([t.text for t in complete], tokenized)
 
 
 class TestEnglishTokenizer(TestTokenizer):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = SoMaJo("en_PTB", split_camel_case=True, split_sentences=False)
+        self.tokenizer = Tokenizer(language="en_PTB", split_camel_case=True)
 
 
 class TestWhitespace(TestTokenizer):
@@ -378,19 +401,16 @@ class TestCamelCase(TestTokenizer):
 class TestTags(TestTokenizer):
     """"""
     def test_tags_01(self):
-        tokens = self.tokenizer.tokenize_text(['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">']).__next__()
-        self.assertEqual([t.text for t in tokens], ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
+        self._equal('<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">', ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
 
     def test_tags_02(self):
         self._equal("</A>", "</A>")
 
     def test_tags_03(self):
-        tokens = self.tokenizer.tokenize_text(["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"]).__next__()
-        self.assertEqual([t.text for t in tokens], ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
+        self._equal("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>", ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
 
     def test_tags_04(self):
-        tokens = self.tokenizer.tokenize_text(['<?xml version="1.0" encoding="UTF-8"?>']).__next__()
-        self.assertEqual([t.text for t in tokens], ['<?xml version="1.0" encoding="UTF-8"?>'])
+        self._equal('<?xml version="1.0" encoding="UTF-8"?>', ['<?xml version="1.0" encoding="UTF-8"?>'])
 
 
 class TestEntities(TestTokenizer):
@@ -903,8 +923,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("directory/image.png", "directory/image.png")
 
     def test_own_87(self):
-        tokens = self.tokenizer.tokenize_text(["name [at] provider [dot] com"]).__next__()
-        self.assertEqual([t.text for t in tokens], ["name [at] provider [dot] com"])
+        self._equal("name [at] provider [dot] com", ["name [at] provider [dot] com"])
 
     def test_own_88(self):
         self._equal(":!:", ":!:")
@@ -1042,10 +1061,7 @@ class TestXML(TestTokenizer):
         self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! <x>:</x>)</foo>", "<foo> der beste Betreuer ? -&gt; Prof Smith ! <x> : </x> ) </foo>")
 
     def test_xml_04(self):
-        # fail means improvement
-        chunks = self.tokenizer.tokenize_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", eos_tags=None)
-        complete = itertools.chain.from_iterable(chunks)
-        self.assertNotEqual([t.text for t in complete], ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
+        self._fail_means_improvement_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
 
     def test_xml_05(self):
         self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
@@ -1072,19 +1088,7 @@ class TestXML(TestTokenizer):
         self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", "<foo> <p> foo bar </p> <p> foo bar </p> </foo>")
 
 
-class TestTokenizerExtra(unittest.TestCase):
-    """"""
-    def setUp(self):
-        """Necessary preparations"""
-        self.tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=False)
-
-    def _equal(self, raw, tokenized):
-        """"""
-        tokens = self.tokenizer.tokenize_text([raw]).__next__()
-        self.assertEqual([t.text for t in tokens], tokenized.split())
-
-
-class TestMisc(TestTokenizerExtra):
+class TestMisc(TestTokenizer):
     """"""
     def test_misc_01(self):
         self._equal("[Alt] + 240 =­\n", "[ Alt ] + 240 =")
@@ -1111,8 +1115,7 @@ class TestMisc(TestTokenizerExtra):
         self._equal("foo ­ ​ bar", "foo bar")
 
     def test_misc_09(self):
-        tokens = self.tokenizer.tokenize_text(["­ \n­"]).__next__()
-        self.assertEqual([t.text for t in tokens], [])
+        self._equal("­ \n­", [])
 
 
 class TestEnglish(TestEnglishTokenizer):
