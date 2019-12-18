@@ -683,15 +683,15 @@ class Tokenizer():
 
         return token_dll.to_list()
 
-    def _convert_to_legacy(self, token_dll):
+    def _convert_to_legacy(self, tokens):
         if self.token_classes and self.extra_info:
-            tokens = [(t.value.text, t.value.token_class, t.value.extra_info()) for t in token_dll]
+            tokens = [(t.text, t.token_class, t.extra_info) for t in tokens]
         elif self.token_classes:
-            tokens = [(t.value.text, t.value.token_class) for t in token_dll]
+            tokens = [(t.text, t.token_class) for t in tokens]
         elif self.extra_info:
-            tokens = [(t.value.text, t.value.extra_info()) for t in token_dll]
+            tokens = [(t.text, t.extra_info) for t in tokens]
         else:
-            tokens = [t.value.text for t in token_dll]
+            tokens = [t.text for t in tokens]
         return tokens
 
     def tokenize(self, paragraph):
@@ -721,8 +721,8 @@ class Tokenizer():
         """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_paragraph() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
         token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
-        token_dll = self._tokenize(token_dll)
-        return self._convert_to_legacy(token_dll)
+        tokens = self._tokenize(token_dll)
+        return self._convert_to_legacy(tokens)
 
     def tokenize_xml(self, xml, is_file=True, eos_tags=None):
         """Tokenize XML file or XML string according to the guidelines of the
@@ -732,7 +732,7 @@ class Tokenizer():
         """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
         token_dlls = utils.xml_chunk_generator(xml, is_file, eos_tags)
-        token_dlls = map(self._tokenize, token_dlls)
-        token_dlls = map(utils.escape_xml_token_dll, token_dlls)
-        tokens = map(self._convert_to_legacy, token_dlls)
+        tokens = map(self._tokenize, token_dlls)
+        tokens = map(utils.escape_xml_tokens, tokens)
+        tokens = map(self._convert_to_legacy, tokens)
         return list(itertools.chain.from_iterable(tokens))
