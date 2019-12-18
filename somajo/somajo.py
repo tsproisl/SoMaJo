@@ -75,15 +75,17 @@ class SoMaJo:
 
         Examples
         --------
-        # Tokenization and sentence splitting; input file with
-        # paragraphs separated by empty lines; print one token per
-        # line with token classes and extra information; print an
-        # empty line after each sentence
+
+        Tokenization and sentence splitting; input file with
+        paragraphs separated by empty lines; print one token per line
+        with token classes and extra information; print an empty line
+        after each sentence:
+
         >>> with open("example_empty_lines.txt") as f:
         ...     print(f.read())
         ... 
         Heyi:)
-        
+        ​
         Was machst du morgen Abend?! Lust auf Film?;-)
         >>> sentences = tokenizer.tokenize_text_file("example_empty_lines.txt", paragraph_separator="single_newlines")
         >>> for sentence in sentences:
@@ -93,24 +95,25 @@ class SoMaJo:
         ... 
         Heyi	regular	SpaceAfter=No
         :)	emoticon	
-        
+        ​
         Was	regular	
         machst	regular	
         du	regular	
         morgen	regular	
         Abend	regular	SpaceAfter=No
         ?!	symbol	
-        
+        ​
         Lust	regular	
         auf	regular	
         Film	regular	SpaceAfter=No
         ?	symbol	SpaceAfter=No
         ;-)	emoticon	
-        
+        ​
 
-        # Tokenization and sentence splitting; input file with
-        # paragraphs separated by single newlines; print one sentence
-        # per line
+        Tokenization and sentence splitting; input file with
+        paragraphs separated by single newlines; print one sentence
+        per line:
+
         >>> with open("example_single_newlines.txt", encoding="utf-8") as f:
         ...     print(f.read())
         ... 
@@ -160,8 +163,10 @@ class SoMaJo:
 
         Examples
         --------
-        # Tokenization and sentence splitting; print one token per
-        # line and an empty line after each sentence
+
+        Tokenization and sentence splitting; print one token per line
+        and an empty line after each sentence:
+
         >>> with open("example.xml") as f:
         ...     print(f.read())
         ... 
@@ -185,7 +190,7 @@ class SoMaJo:
         Heyi
         :)
         </p>
-        
+        ​
         <p>
         Was
         machst
@@ -193,7 +198,7 @@ class SoMaJo:
         morgen
         Abend
         ?!
-        
+        ​
         Lust
         auf
         Film
@@ -202,10 +207,11 @@ class SoMaJo:
         </p>
         </body>
         </html>
-        
+        ​
 
-        # Tokenization and sentence splitting; strip XML tags from the
-        # output and print one sentence per line
+        Tokenization and sentence splitting; strip XML tags from the
+        output and print one sentence per line:
+
         >>> with open("example.xml") as f:
         ...     sentences = tokenizer.tokenize_xml_file(f, eos_tags, strip_tags=True)
         ...     for sentence in sentences:
@@ -215,7 +221,8 @@ class SoMaJo:
         Was machst du morgen Abend ?!
         Lust auf Film ? ;-)
 
-        # Only tokenization; print one token per line
+        Only tokenization; print one token per line
+
         >>> tokenizer = SoMaJo("de_CMC", split_sentences=False)
         >>> chunks = tokenizer.tokenize_xml_file("example.xml", eos_tags)
         >>> for chunk in chunks:
@@ -270,7 +277,10 @@ class SoMaJo:
 
         Examples
         --------
-        # Tokenization and sentence splitting; print one sentence per line
+
+        Tokenization and sentence splitting; print one sentence per
+        line:
+
         >>> paragraphs = ["Heyi:)", "Was machst du morgen Abend?! Lust auf Film?;-)"]
         >>> tokenizer = SoMaJo("de_CMC")
         >>> sentences = tokenizer.tokenize_text(paragraphs)
@@ -281,7 +291,8 @@ class SoMaJo:
         Was machst du morgen Abend ?!
         Lust auf Film ? ;-)
 
-        # Only tokenization; print one paragraph per line
+        Only tokenization; print one paragraph per line:
+
         >>> tokenizer = SoMaJo("de_CMC", split_sentences=False)
         >>> tokenized_paragraphs = tokenizer.tokenize_text(paragraphs)
         >>> for paragraph in tokenized_paragraphs:
@@ -290,9 +301,10 @@ class SoMaJo:
         Heyi :)
         Was machst du morgen Abend ?! Lust auf Film ? ;-)
 
-        # Tokenization and sentence splitting; print one token per
-        # line with token classes and extra information; print an
-        # empty line after each sentence
+        Tokenization and sentence splitting; print one token per line
+        with token classes and extra information; print an empty line
+        after each sentence:
+
         >>> sentences = tokenizer.tokenize_text(paragraphs)
         >>> for sentence in sentences:
         ...     for token in sentence:
@@ -306,20 +318,20 @@ class SoMaJo:
         ... 
         Heyi	regular	SpaceAfter=No
         :)	emoticon	
-        
+        ​
         Was	regular	
         machst	regular	
         du	regular	
         morgen	regular	
         Abend	regular	SpaceAfter=No
         ?!	symbol	
-        
+        ​
         Lust	regular	
         auf	regular	
         Film	regular	SpaceAfter=No
         ?	symbol	SpaceAfter=No
-        ;-)	emoticon	
-        
+        ;-)	emoticon
+        ​
 
         """
         token_dlls = (doubly_linked_list.DLL([Token(p, first_in_sentence=True, last_in_sentence=True)]) for p in paragraphs)
@@ -353,8 +365,10 @@ class SoMaJo:
 
         Examples
         --------
-        # Tokenization and sentence splitting; print one token per
-        # line and an empty line after each sentence
+
+        Tokenization and sentence splitting; print one token per line
+        and an empty line after each sentence:
+
         >>> xml = "<html><body><p>Heyi:)</p><p>Was machst du morgen Abend?! Lust auf Film?;-)</p></body></html>"
         >>> eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         >>> tokenizer = SoMaJo("de_CMC")
@@ -370,7 +384,7 @@ class SoMaJo:
         Heyi
         :)
         </p>
-        
+        ​
         <p>
         Was
         machst
@@ -378,7 +392,7 @@ class SoMaJo:
         morgen
         Abend
         ?!
-        
+        ​
         Lust
         auf
         Film
@@ -387,10 +401,11 @@ class SoMaJo:
         </p>
         </body>
         </html>
-        
+        ​
 
-        # Tokenization and sentence splitting; strip XML tags from the
-        # output and print one sentence per line
+        Tokenization and sentence splitting; strip XML tags from the
+        output and print one sentence per line
+
         >>> sentences = tokenizer.tokenize_xml(xml, eos_tags, strip_tags=True)
         >>> for sentence in sentences:
         ...     print(" ".join([token.text for token in sentence]))
@@ -399,8 +414,9 @@ class SoMaJo:
         Was machst du morgen Abend ?!
         Lust auf Film ? ;-)
 
-        # Only tokenization; print one chunk of XML (delimited by
-        # ``eos_tags``) per line
+        Only tokenization; print one chunk of XML (delimited by
+        ``eos_tags``) per line:
+
         >>> tokenizer = SoMaJo("de_CMC", split_sentences=False)
         >>> chunks = tokenizer.tokenize_xml(xml, eos_tags)
         >>> for chunk in chunks:
