@@ -51,13 +51,13 @@ def main():
     for chunk in chunks:
         n_sentences += 1
         for token in chunk:
+            output = token.text
             if not token.markup:
                 n_tokens += 1
-            output = token.text
-            if args.token_classes and token.token_class is not None:
-                output += "\t" + token.token_class
-            if args.extra_info:
-                output += "\t" + token.extra_info()
+                if args.token_classes:
+                    output += "\t" + token.token_class
+                if args.extra_info:
+                    output += "\t" + token.extra_info
             print(output)
         if args.split_sentences:
             print()
