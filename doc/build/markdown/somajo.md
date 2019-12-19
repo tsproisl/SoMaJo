@@ -21,23 +21,23 @@ Tokenization and sentence splitting.
 * **Parameters**
 
     
-    * **language** (*{'de_CMC'**, **'en_PTB'}*) – Language-specific tokenization rules.
+    * **language** (*{'de_CMC', 'en_PTB'}*) – Language-specific tokenization rules.
 
 
-    * **split_camel_case** (*bool**, **(**default=False**)*) – Split words written in camelCase (excluding established names and terms).
+    * **split_camel_case** (*bool, (default=False)*) – Split words written in camelCase (excluding established names and terms).
 
 
-    * **split_sentences** (*bool**, **(**default=True**)*) – Perform sentence splitting in addition to tokenization.
+    * **split_sentences** (*bool, (default=True)*) – Perform sentence splitting in addition to tokenization.
 
 
 
-### tokenize_text(paragraphs, \*, parallel=1)
+#### tokenize_text(paragraphs, \*, parallel=1)
 Split paragraphs of text into sequences of tokens.
 
 
 * **Parameters**
 
-    **paragraphs** (*iterable*) – An iterable of single paragraphs of text.
+    * **paragraphs** (*iterable*) – An iterable of single paragraphs of text.
 
 
 
@@ -47,7 +47,7 @@ Split paragraphs of text into sequences of tokens.
     (depending on the value of `split_sentences`).
 
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one sentence per
 line:
@@ -111,22 +111,22 @@ Film    regular SpaceAfter=No
 ```
 
 
-### tokenize_text_file(text_file, paragraph_separator, \*, parallel=1)
+#### tokenize_text_file(text_file, paragraph_separator, \*, parallel=1)
 Split the contents of a text file into sequences of tokens.
 
 
 * **Parameters**
 
     
-    * **text_file** (*str** or **file-like object*) – Either a filename or a file-like object containing text.
+    * **text_file** (*str or file-like object*) – Either a filename or a file-like object containing text.
 
 
-    * **paragraph_separator** (*{'single_newlines'**, **'empty_lines'}*) – How are paragraphs separated in the input? Is there one
+    * **paragraph_separator** (*{'single_newlines', 'empty_lines'}*) – How are paragraphs separated in the input? Is there one
     paragraph per line (‘single_newlines’) or do paragraphs
     span several lines and are separated by ‘empty_lines’?
 
 
-    * **parallel** (*int**, **(**default=1**)*) – Number of processes to use.
+    * **parallel** (*int, (default=1)*) – Number of processes to use.
 
 
 
@@ -136,7 +136,7 @@ Split the contents of a text file into sequences of tokens.
     (depending on the value of `split_sentences`).
 
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; input file with
 paragraphs separated by empty lines; print one token per line
@@ -196,7 +196,7 @@ Lust auf Film ? ;-)
 ```
 
 
-### tokenize_xml(xml_data, eos_tags, \*, strip_tags=False, parallel=1)
+#### tokenize_xml(xml_data, eos_tags, \*, strip_tags=False, parallel=1)
 Split a string of XML data into sequences of tokens.
 
 
@@ -213,10 +213,10 @@ Split a string of XML data into sequences of tokens.
     'div', 'ol', 'ul', 'dl', 'table']`
 
 
-    * **strip_tags** (*bool**, **(**default=False**)*) – Remove the XML tags from the output.
+    * **strip_tags** (*bool, (default=False)*) – Remove the XML tags from the output.
 
 
-    * **parallel** (*int**, **(**default=1**)*) – Number of processes to use.
+    * **parallel** (*int, (default=1)*) – Number of processes to use.
 
 
 
@@ -227,7 +227,7 @@ Split a string of XML data into sequences of tokens.
     `split_sentences`).
 
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -295,14 +295,14 @@ Only tokenization; print one chunk of XML (delimited by
 ```
 
 
-### tokenize_xml_file(xml_file, eos_tags, \*, strip_tags=False, parallel=1)
+#### tokenize_xml_file(xml_file, eos_tags, \*, strip_tags=False, parallel=1)
 Split the contents of an xml file into sequences of tokens.
 
 
 * **Parameters**
 
     
-    * **xml_file** (*str** or **file-like object*) – A file containing XML data. Either a filename or a
+    * **xml_file** (*str or file-like object*) – A file containing XML data. Either a filename or a
     file-like object.
 
 
@@ -313,10 +313,10 @@ Split the contents of an xml file into sequences of tokens.
     'div', 'ol', 'ul', 'dl', 'table']`
 
 
-    * **strip_tags** (*bool**, **(**default=False**)*) – Remove the XML tags from the output.
+    * **strip_tags** (*bool, (default=False)*) – Remove the XML tags from the output.
 
 
-    * **parallel** (*int**, **(**default=1**)*) – Number of processes to use.
+    * **parallel** (*int**, (default=1)*) – Number of processes to use.
 
 
 
@@ -327,7 +327,7 @@ Split the contents of an xml file into sequences of tokens.
     `split_sentences`).
 
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -425,7 +425,7 @@ Film
 ## somajo.token module
 
 
-#### class somajo.token.Token(text, \*, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False)
+### class somajo.token.Token(text, \*, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False)
 Bases: `object`
 
 Token objects store a piece of text (in the end a single token) with additional information.
@@ -437,35 +437,35 @@ Token objects store a piece of text (in the end a single token) with additional 
     * **text** (*str*) – The text that makes up the token object
 
 
-    * **markup** (*bool**, **(**default=False**)*) – Is the token a markup token?
+    * **markup** (*bool, (default=False)*) – Is the token a markup token?
 
 
-    * **markup_class** (*{'start'**, **'end'}**, **optional** (**default=None**)*) – If markup=True, then markup_class must be either “start” or “end”.
+    * **markup_class** (*{'start', 'end'}, optional (default=None)*) – If markup=True, then markup_class must be either “start” or “end”.
 
 
-    * **markup_eos** (*bool**, **optional** (**default=None**)*) – Is the markup token a sentence boundary?
+    * **markup_eos** (*bool, optional (default=None)*) – Is the markup token a sentence boundary?
 
 
-    * **locked** (*bool**, **(**default=False**)*) – Mark the token as locked.
+    * **locked** (*bool, (default=False)*) – Mark the token as locked.
 
 
-    * **token_class** (*str**, **optional** (**default=None**)*) – The class of the token, e.g. “regular”, “emoticon”, “url”, etc.
+    * **token_class** (*str, optional (default=None)*) – The class of the token, e.g. “regular”, “emoticon”, “url”, etc.
 
 
-    * **space_after** (*bool**, **(**default=True**)*) – Was there a space after the token in the original data?
+    * **space_after** (*bool, (default=True)*) – Was there a space after the token in the original data?
 
 
-    * **original_spelling** (*str**, **optional** (**default=None**)*) – The original spelling of the token, if it is different from the one in text.
+    * **original_spelling** (*str, optional (default=None)*) – The original spelling of the token, if it is different from the one in text.
 
 
-    * **first_in_sentence** (*bool**, **(**default=False**)*) – Is it the first token of a sentence?
+    * **first_in_sentence** (*bool, (default=False)*) – Is it the first token of a sentence?
 
 
-    * **last_in_sentence** (*bool**, **(**default=False**)*) – Is it the last token of a sentence?
+    * **last_in_sentence** (*bool, (default=False)*) – Is it the last token of a sentence?
 
 
 
-### property extra_info()
+#### property extra_info()
 String representation of extra information.
 
 
