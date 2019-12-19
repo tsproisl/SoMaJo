@@ -84,12 +84,12 @@ after each sentence:
 >>> sentences = tokenizer.tokenize_text(paragraphs)
 >>> for sentence in sentences:
 ...     for token in sentence:
-...         print("{}   {}      {}".format(token.text, token.token_class, token.extra_info))
+...         print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
 ...     print()
 ...
 >>> for sentence in sentences:
 ...     for token in sentence:
-...         print("{}   {}      {}".format(token.text, token.token_class, token.extra_info))
+...         print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
 ...     print()
 ...
 Heyi    regular SpaceAfter=No
@@ -153,7 +153,7 @@ Was machst du morgen Abend?! Lust auf Film?;-)
 >>> sentences = tokenizer.tokenize_text_file("example_empty_lines.txt", paragraph_separator="single_newlines")
 >>> for sentence in sentences:
 ...     for token in sentence:
-...         print("{}   {}      {}".format(token.text, token.token_class, token.extra_info))
+...         print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
 ...     print()
 ...
 Heyi    regular SpaceAfter=No
