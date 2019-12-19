@@ -1,3 +1,17 @@
+# pip install sphinx sphinx-markdown-builder
+# mkdir doc
+# cd doc/
+# sphinx-quickstart --sep -p SoMaJo -a "Thomas Proisl, Peter Uhrig" -v "2.0.0" --ext-autodoc --extensions sphinx.ext.napoleon
+# # edit source/conf.py:
+# # import os
+# # import sys
+# # sys.path.insert(0, os.path.abspath('../..'))
+# cd ..
+# sphinx-apidoc -f -o doc/source/ somajo
+# cd doc
+# make markdown
+
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
