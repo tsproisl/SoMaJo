@@ -935,6 +935,12 @@ class OwnAdditions(TestTokenizer):
     def test_own_103(self):
         self._equal("IP-Adresse des Routers: 192.0.2.42.", "IP-Adresse des Routers : 192.0.2.42 .")
 
+    def test_own_104(self):
+        self._equal("Wir suchen C#-Entwickler.", "Wir suchen C#-Entwickler .")
+
+    def test_own_105(self):
+        self._equal("Programmiersprachen: C++, C#, F#, .Net", "Programmiersprachen : C++ , C# , F# , .Net")
+
 
 class TestSuffixes(TestTokenizer):
     """"""
