@@ -480,3 +480,13 @@ String representation of extra information.
     str
 
 
+##### Examples
+
+```python
+>>> tok = Token(":)", token_class="regular", space_after=False, original_spelling=": )")
+>>> print(tok.text)
+:)
+>>> print(tok.extra_info)
+SpaceAfter=No, OriginalSpelling=": )"
+```
+

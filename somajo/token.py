@@ -60,6 +60,15 @@ class Token:
         -------
         str
             A string representation of the `space_after` and `original_spelling` attributes.
+
+        Examples
+        --------
+        >>> tok = Token(":)", token_class="regular", space_after=False, original_spelling=": )")
+        >>> print(tok.text)
+        :)
+        >>> print(tok.extra_info)
+        SpaceAfter=No, OriginalSpelling=": )"
+
         """
         info = []
         if not self.space_after:
