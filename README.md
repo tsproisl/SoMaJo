@@ -150,6 +150,8 @@ table.
 
 ### Using the module ###
 
+[API documentation](docs/build/markdown/somajo.md)
+
 You can easily incorporate both the tokenizer and the sentence
 splitter into your own Python projects. For tokenization, you have to
 import `somajo.Tokenizer`, create a `Tokenizer` object and call its
