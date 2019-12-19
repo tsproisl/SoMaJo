@@ -5,8 +5,8 @@
 ### New features and improvements ###
 
 - New API: Use new class SoMaJo instead of Tokenizer and
-  SentenceSplitter. As for now, the old API is still supported but
-  will issue deprecation warnings.
+  SentenceSplitter. Currently, the old API is still supported but will
+  issue deprecation warnings.
 - Speed-up: Due to a new internal representation of the input text
   during processing (as a doubly linked list of Token objects),
   tokenization is now two to three times faster.
@@ -15,7 +15,10 @@
   (allowing for arbitrarily large XML input). In addition, if a
   sensible set of eos_tags is specified, processing can also be
   parallelized.
-- New option --strip-tags to suppress the output of XML tags
+- New option --strip-tags to suppress the output of XML tags.
+- Support for textual representations of emojis (:smile:,
+  :stuck_out_tongue_winking_eye:, etc.).
+- Support for textfaces (༼ʘ̚ل͜ʘ̚༽, ╚(ಠ_ಠ)=┐, etc.).
 
 ### Breaking changes ###
 
