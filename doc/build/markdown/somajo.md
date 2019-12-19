@@ -1,71 +1,6 @@
 # somajo package
 
-## Subpackages
 
-
-* somajo.test package
-
-
-    * Submodules
-
-
-    * somajo.test.test_sentence_splitter module
-
-
-    * somajo.test.test_somajo module
-
-
-    * somajo.test.test_tokenizer module
-
-
-    * Module contents
-
-
-## Submodules
-
-## somajo.cli module
-
-
-#### somajo.cli.arguments()
-
-#### somajo.cli.main()
-## somajo.doubly_linked_list module
-
-
-#### class somajo.doubly_linked_list.DLL(iterable=None)
-Bases: `object`
-
-
-### append(item)
-
-### extend(iterable)
-
-### insert_left(item, ref_element)
-
-### next_matching(item, attrgetter, value, ignore_attrgetter=None, ignore_value=None)
-
-### previous_matching(item, attrgetter, value, ignore_attrgetter=None, ignore_value=None)
-
-### remove(element)
-
-### to_list()
-
-#### class somajo.doubly_linked_list.DLLElement(val=None, prv=None, nxt=None, lst=None)
-Bases: `object`
-
-## somajo.sentence_splitter module
-
-
-#### class somajo.sentence_splitter.SentenceSplitter(is_tuple=False, language='de_CMC')
-Bases: `object`
-
-
-### split(tokenized_paragraph)
-Split tokenized_paragraph into sentences.
-
-
-### split_xml(tokenized_xml, eos_tags={})
-Split tokenized XML into sentences.
 
 ## somajo.somajo module
 
@@ -88,10 +23,6 @@ Tokenization and sentence splitting.
     * **split_sentences** (*bool**, **(**default=True**)*) – Perform sentence splitting in addition to tokenization.
 
 
-
-### paragraph_separators( = {'empty_lines', 'single_newlines'})
-
-### supported_languages( = {'de_CMC', 'en_PTB'})
 
 ### tokenize_text(paragraphs, \*, parallel=1)
 Split paragraphs of text into sequences of tokens.
@@ -542,96 +473,3 @@ String representation of extra information.
     str
 
 
-## somajo.tokenizer module
-
-
-#### class somajo.tokenizer.Tokenizer(split_camel_case=False, token_classes=False, extra_info=False, language='de_CMC')
-Bases: `object`
-
-
-### tokenize(paragraph)
-An alias for tokenize_paragraph
-
-
-### tokenize_file(filename, parsep_empty_lines=True)
-Tokenize utf-8-encoded text file and yield tokenized paragraphs.
-
-
-### tokenize_paragraph(paragraph)
-Tokenize paragraph (may contain newlines) according to the
-guidelines of the EmpiriST 2015 shared task on automatic
-linguistic annotation of computer-mediated communication /
-social media.
-
-
-### tokenize_xml(xml, is_file=True, eos_tags=None)
-Tokenize XML file or XML string according to the guidelines of the
-EmpiriST 2015 shared task on automatic linguistic annotation
-of computer-mediated communication / social media.
-
-## somajo.utils module
-
-
-#### class somajo.utils.SaxTokenHandler(eos_tags=None)
-Bases: `xml.sax.handler.ContentHandler`
-
-
-### characters(data)
-Receive notification of character data.
-
-The Parser will call this method to report each chunk of
-character data. SAX parsers may return all contiguous
-character data in a single chunk, or they may split it into
-several chunks; however, all of the characters in any single
-event must come from the same external entity so that the
-Locator provides useful information.
-
-
-### endElement(name)
-Signals the end of an element in non-namespace mode.
-
-The name parameter contains the name of the element type, just
-as with the startElement event.
-
-
-### startElement(name, attrs)
-Signals the start of an element in non-namespace mode.
-
-The name parameter contains the raw XML 1.0 name of the
-element type as a string and the attrs parameter holds an
-instance of the Attributes class containing the attributes of
-the element.
-
-
-#### somajo.utils.escape_xml(string)
-Escape “&”, “<” and “>” in string.
-
-
-#### somajo.utils.escape_xml_tokens(tokens)
-
-#### somajo.utils.get_paragraphs_dll(text_file, paragraph_separator='empty_lines')
-Generator for the paragraphs in the file.
-
-
-#### somajo.utils.get_paragraphs_str(fh, paragraph_separator='empty_lines')
-Generator for the paragraphs in the file.
-
-
-#### somajo.utils.incremental_xml_parser(f, eos_tags=None)
-
-#### somajo.utils.parse_xml(xml, is_file=True)
-Return a list of XML elements and their text/tail as well as the
-whole text of the document.
-
-
-#### somajo.utils.read_abbreviation_file(filename)
-Return the abbreviations from the given filename.
-
-
-#### somajo.utils.xml_chunk_generator(data, is_file=True, eos_tags=None)
-Parse the XML data and yield doubly linked lists of Token objects
-that are delimited by eos_tags.
-
-## somajo.version module
-
-## Module contents
