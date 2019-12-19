@@ -1,40 +1,86 @@
 #!/usr/bin/env python3
 
+import itertools
 import unittest
 
 from somajo import Tokenizer
+from somajo.doubly_linked_list import DLL
+from somajo.token import Token
+from somajo import utils
 
 
 class TestTokenizer(unittest.TestCase):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True)
+        self.tokenizer = Tokenizer(language="de_CMC", split_camel_case=True)
 
     def _equal(self, raw, tokenized):
         """"""
-        self.assertEqual(self.tokenizer.tokenize(raw), tokenized.split())
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
+        tokens = self.tokenizer._tokenize(dll)
+        self.assertEqual([t.text for t in tokens], tokenized)
 
     def _equal_xml(self, raw, tokenized):
         """"""
-        self.assertEqual(self.tokenizer.tokenize_xml(raw, is_file=False), tokenized.split())
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        token_dlls = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags)
+        chunks = map(self.tokenizer._tokenize, token_dlls)
+        complete = list(itertools.chain.from_iterable(chunks))
+        complete = utils.escape_xml_tokens(complete)
+        self.assertEqual([t.text for t in complete], tokenized)
 
     def _fail_means_improvement(self, raw, tokenized):
         """"""
-        self.assertNotEqual(self.tokenizer.tokenize(raw), tokenized.split())
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
+        tokens = self.tokenizer._tokenize(dll)
+        self.assertNotEqual([t.text for t in tokens], tokenized)
+
+    def _fail_means_improvement_xml(self, raw, tokenized):
+        """"""
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        token_dlls = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags)
+        chunks = map(self.tokenizer._tokenize, token_dlls)
+        complete = list(itertools.chain.from_iterable(chunks))
+        complete = utils.escape_xml_tokens(complete)
+        self.assertNotEqual([t.text for t in complete], tokenized)
 
 
 class TestEnglishTokenizer(TestTokenizer):
     """"""
     def setUp(self):
         """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True, language="en")
+        self.tokenizer = Tokenizer(language="en_PTB", split_camel_case=True)
+
+
+class TestTokenizerDeprecated(TestTokenizer):
+    def _equal(self, raw, tokenized):
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        tokens = self.tokenizer.tokenize_paragraph(raw)
+        self.assertEqual(tokens, tokenized)
+
+    def _equal_xml(self, raw, tokenized):
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        tokens = self.tokenizer.tokenize_xml(raw, is_file=False)
+        self.assertEqual(tokens, tokenized)
 
 
 class TestWhitespace(TestTokenizer):
     """"""
     def test_whitespace_01(self):
-        # self.assertEqual(self.tokenizer.tokenize("Petra und Simone gehen ins Kino"), "Petra und Simone gehen ins Kino".split())
+        # self.assertEqual(self.tokenizer.tokenize_text("Petra und Simone gehen ins Kino"), "Petra und Simone gehen ins Kino".split())
         self._equal("Petra und Simone gehen ins Kino", "Petra und Simone gehen ins Kino")
 
     def test_whitespace_02(self):
@@ -369,16 +415,16 @@ class TestCamelCase(TestTokenizer):
 class TestTags(TestTokenizer):
     """"""
     def test_tags_01(self):
-        self.assertEqual(self.tokenizer.tokenize('<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'), ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
+        self._equal('<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">', ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
 
     def test_tags_02(self):
         self._equal("</A>", "</A>")
 
     def test_tags_03(self):
-        self.assertEqual(self.tokenizer.tokenize("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"), ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
+        self._equal("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>", ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
 
     def test_tags_04(self):
-        self.assertEqual(self.tokenizer.tokenize('<?xml version="1.0" encoding="UTF-8"?>'), ['<?xml version="1.0" encoding="UTF-8"?>'])
+        self._equal('<?xml version="1.0" encoding="UTF-8"?>', ['<?xml version="1.0" encoding="UTF-8"?>'])
 
 
 class TestEntities(TestTokenizer):
@@ -551,6 +597,24 @@ class TestEmoticons(TestTokenizer):
     def test_emoticons_32(self):
         self._equal("stage ️ bf0eb1c8cf477518ebdf43469b3246d1 https://t.co/TjNdsPqfr9", "stage bf0eb1c8cf477518ebdf43469b3246d1 https://t.co/TjNdsPqfr9")
 
+    def test_emoticons_33(self):
+        self._equal("x'D", "x'D")
+
+    def test_emoticons_34(self):
+        self._equal(":^)", ":^)")
+
+    def test_emoticons_35(self):
+        self._equal("I want to :scream:!", "I want to :scream: !")
+
+    def test_emoticons_36(self):
+        self._equal(":stuck_out_tongue_winking_eye:", ":stuck_out_tongue_winking_eye:")
+
+    def test_emoticons_37(self):
+        self._equal(":clock230::point_up_2:", ":clock230: :point_up_2:")
+
+    def test_emoticons_38(self):
+        self._equal("( ͡° ͜ʖ ͡°) ¯\\_(ツ)_/¯ ̿̿ ̿̿ ̿̿ ̿'̿'\\̵͇̿̿\\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿ ▄︻̷̿┻̿═━一 ( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°) ʕ•ᴥ•ʔ (▀̿Ĺ̯▀̿ ̿) (ง ͠° ͟ل͜ ͡°)ง ༼ つ ◕_◕ ༽つ ಠ_ಠ (づ｡◕‿‿◕｡)づ ̿'̿'\\̵͇̿̿\\з=( ͠° ͟ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿ (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ ✧ﾟ･: *ヽ(◕ヮ◕ヽ) [̲̅$̲̅(̲̅5̲̅)̲̅$̲̅] ┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴ ( ͡°╭͜ʖ╮͡° ) (͡ ͡° ͜ つ ͡͡°) (• ε •) (ง'̀-'́)ง (ಥ﹏ಥ) ﴾͡๏̯͡๏﴿ O'RLY? (ノಠ益ಠ)ノ彡┻━┻ [̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅] (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ (☞ﾟ∀ﾟ)☞ | (• ◡•)| (❍ᴥ❍ʋ) (◕‿◕✿) (ᵔᴥᵔ) (╯°□°)╯︵ ʞooqǝɔɐɟ (¬‿¬) (☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜) (づ￣ ³￣)づ ლ(ಠ益ಠლ) ಠ╭╮ಠ ̿ ̿ ̿'̿'\\̵͇̿̿\\з=(•_•)=ε/̵͇̿̿/'̿'̿ ̿ /╲/\\╭( ͡° ͡° ͜ʖ ͡° ͡°)╮/\\╱\\ (;´༎ຶД༎ຶ`) ♪~ ᕕ(ᐛ)ᕗ ♥‿♥ ༼ つ  ͡° ͜ʖ ͡° ༽つ ༼ つ ಥ_ಥ ༽つ (╯°□°）╯︵ ┻━┻ ( ͡ᵔ ͜ʖ ͡ᵔ ) ヾ(⌐■_■)ノ♪ ~(˘▾˘~) ◉_◉ \\ (•◡•) / (~˘▾˘)~ (._.) ( l: ) ( .-. ) ( :l ) (._.) ༼ʘ̚ل͜ʘ̚༽ ༼ ºل͟º ༼ ºل͟º ༼ ºل͟º ༽ ºل͟º ༽ ºل͟º ༽ ┬┴┬┴┤(･_├┬┴┬┴ ᕙ(⇀‸↼‶)ᕗ ᕦ(ò_óˇ)ᕤ ┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻ ⚆ _ ⚆ (•_•) ( •_•)>⌐■-■ (⌐■_■) (｡◕‿‿◕｡) ಥ_ಥ ヽ༼ຈل͜ຈ༽ﾉ ⌐╦╦═─ (☞ຈل͜ຈ)☞ ˙͜ʟ˙ ☜(˚▽˚)☞ (•ω•) (ง°ل͜°)ง (｡◕‿◕｡) （╯°□°）╯︵( .o.) :') ┬──┬ ノ( ゜-゜ノ) (っ˘ڡ˘ς) ಠ⌣ಠ ლ(´ڡ`ლ) (°ロ°)☝ ｡◕‿‿◕｡ ( ಠ ͜ʖರೃ) ╚(ಠ_ಠ)=┐ (─‿‿─) ƪ(˘⌣˘)ʃ (；一_一) (¬_¬) ( ⚆ _ ⚆ ) (ʘᗩʘ') ☜(⌒▽⌒)☞ ｡◕‿◕｡ ¯\\(°_o)/¯ (ʘ‿ʘ) ლ,ᔑ•ﺪ͟͠•ᔐ.ლ (´・ω・`) ಠ~ಠ (° ͡ ͜ ͡ʖ ͡ °) ┬─┬ノ( º _ ºノ) (´・ω・)っ由 ಠ_ಥ Ƹ̵̡Ӝ̵̨̄Ʒ (>ლ) ಠ‿↼ ʘ‿ʘ (ღ˘⌣˘ღ) ಠoಠ ರ_ರ (▰˘◡˘▰) ◔̯◔ ◔ ⌣ ◔ (✿´‿`) ¬_¬ ب_ب ｡゜(｀Д´)゜｡ (ó ì_í)=óò=(ì_í ò) °Д° ( ﾟヮﾟ) ┬─┬ ︵ /(.□. ） ٩◔̯◔۶ ≧☉_☉≦ ☼.☼ ^̮^ (>人<) 〆(・∀・＠) (~_^) ^̮^ ^̮^ >_> (^̮^) (/) (°,,°) (/) ^̮^ ^̮^ =U (･.◤)", ["( ͡° ͜ʖ ͡°)", "¯\\_(ツ)_/¯", "̿̿ ̿̿ ̿̿ ̿'̿'\\̵͇̿̿\\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿", "▄︻̷̿┻̿═━一", "( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)", "ʕ•ᴥ•ʔ", "(▀̿Ĺ̯▀̿ ̿)", "(ง ͠° ͟ل͜ ͡°)ง", "༼ つ ◕_◕ ༽つ", "ಠ_ಠ", "(づ｡◕‿‿◕｡)づ", "̿'̿'\\̵͇̿̿\\з=( ͠° ͟ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿", "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ ✧ﾟ･: *ヽ(◕ヮ◕ヽ)", "[̲̅$̲̅(̲̅5̲̅)̲̅$̲̅]", "┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴", "( ͡°╭͜ʖ╮͡° )", "(͡ ͡° ͜ つ ͡͡°)", "(• ε •)", "(ง'̀-'́)ง", "(ಥ﹏ಥ)", "﴾͡๏̯͡๏﴿ O'RLY?", "(ノಠ益ಠ)ノ彡┻━┻", "[̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]", "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧", "(☞ﾟ∀ﾟ)☞", "| (• ◡•)| (❍ᴥ❍ʋ)", "(◕‿◕✿)", "(ᵔᴥᵔ)", "(╯°□°)╯︵ ʞooqǝɔɐɟ", "(¬‿¬)", "(☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜)", "(づ￣ ³￣)づ", "ლ(ಠ益ಠლ)", "ಠ╭╮ಠ", "̿ ̿ ̿'̿'\\̵͇̿̿\\з=(•_•)=ε/̵͇̿̿/'̿'̿ ̿", "/╲/\\╭( ͡° ͡° ͜ʖ ͡° ͡°)╮/\\╱\\", "(;´༎ຶД༎ຶ`)", "♪~ ᕕ(ᐛ)ᕗ", "♥‿♥", "༼ つ ͡° ͜ʖ ͡° ༽つ", "༼ つ ಥ_ಥ ༽つ", "(╯°□°）╯︵ ┻━┻", "( ͡ᵔ ͜ʖ ͡ᵔ )", "ヾ(⌐■_■)ノ♪", "~(˘▾˘~)", "◉_◉", "\\ (•◡•) /", "(~˘▾˘)~", "(._.) ( l: ) ( .-. ) ( :l ) (._.)", "༼ʘ̚ل͜ʘ̚༽", "༼ ºل͟º ༼ ºل͟º ༼ ºل͟º ༽ ºل͟º ༽ ºل͟º ༽", "┬┴┬┴┤(･_├┬┴┬┴", "ᕙ(⇀‸↼‶)ᕗ", "ᕦ(ò_óˇ)ᕤ", "┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻", "⚆ _ ⚆", "(•_•) ( •_•)>⌐■-■ (⌐■_■)", "(｡◕‿‿◕｡)", "ಥ_ಥ", "ヽ༼ຈل͜ຈ༽ﾉ", "⌐╦╦═─", "(☞ຈل͜ຈ)☞", "˙͜ʟ˙", "☜(˚▽˚)☞", "(•ω•)", "(ง°ل͜°)ง", "(｡◕‿◕｡)", "（╯°□°）╯︵( .o.)", ":')", "┬──┬ ノ( ゜-゜ノ)", "(っ˘ڡ˘ς)", "ಠ⌣ಠ", "ლ(´ڡ`ლ)", "(°ロ°)☝", "｡◕‿‿◕｡", "( ಠ ͜ʖರೃ)", "╚(ಠ_ಠ)=┐", "(─‿‿─)", "ƪ(˘⌣˘)ʃ", "(；一_一)", "(¬_¬)", "( ⚆ _ ⚆ )", "(ʘᗩʘ')", "☜(⌒▽⌒)☞", "｡◕‿◕｡", "¯\\(°_o)/¯", "(ʘ‿ʘ)", "ლ,ᔑ•ﺪ͟͠•ᔐ.ლ", "(´・ω・`)", "ಠ~ಠ", "(° ͡ ͜ ͡ʖ ͡ °)", "┬─┬ノ( º _ ºノ)", "(´・ω・)っ由", "ಠ_ಥ", "Ƹ̵̡Ӝ̵̨̄Ʒ", "(>ლ)", "ಠ‿↼", "ʘ‿ʘ", "(ღ˘⌣˘ღ)", "ಠoಠ", "ರ_ರ", "(▰˘◡˘▰)", "◔̯◔", "◔ ⌣ ◔", "(✿´‿`)", "¬_¬", "ب_ب", "｡゜(｀Д´)゜｡", "(ó ì_í)=óò=(ì_í ò)", "°Д°", "( ﾟヮﾟ)", "┬─┬ ︵ /(.□. ）", "٩◔̯◔۶", "≧☉_☉≦", "☼.☼", "^̮^", "(>人<)", "〆(・∀・＠)", "(~_^)", "^̮^", "^̮^", ">_>", "(^̮^)", "(/) (°,,°) (/)", "^̮^", "^̮^", "=U", "(･.◤)"])
+
 
 class TestActions(TestTokenizer):
     """"""
@@ -690,7 +754,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("der Student/die Studentin", "der Student / die Studentin")
 
     def test_own_24(self):
-        self._fail_means_improvement("der/die Student(in)", "der / die Student(in)")
+        self._equal("der/die Student(in)", "der / die Student(in)")
 
     def test_own_25(self):
         self._equal("``Wort''", "`` Wort ''")
@@ -885,7 +949,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("directory/image.png", "directory/image.png")
 
     def test_own_87(self):
-        self.assertEqual(self.tokenizer.tokenize("name [at] provider [dot] com"), ["name [at] provider [dot] com"])
+        self._equal("name [at] provider [dot] com", ["name [at] provider [dot] com"])
 
     def test_own_88(self):
         self._equal(":!:", ":!:")
@@ -941,25 +1005,20 @@ class OwnAdditions(TestTokenizer):
     def test_own_105(self):
         self._equal("Programmiersprachen: C++, C#, F#, .Net", "Programmiersprachen : C++ , C# , F# , .Net")
 
+    def test_own_106(self):
+        self._equal(")foo", ") foo")
 
-class TestSuffixes(TestTokenizer):
-    """"""
-    def test_suffixes_01(self):
-        self.tokenizer.replacement_counter = 0
-        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaaaa")
+    def test_own_107(self):
+        self._equal(" )foo", ") foo")
 
-    def test_suffixes_02(self):
-        self.tokenizer.replacement_counter = 1
-        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaaab")
+    def test_own_108(self):
+        self._equal("machst du's?", "machst du's ?")
 
-    def test_suffixes_03(self):
-        self.tokenizer.replacement_counter = 26
-        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaaba")
+    def test_own_109(self):
+        self._fail_means_improvement("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
 
-    def test_suffixes_04(self):
-        self.tokenizer.replacement_counter = 27
-        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaabb")
-        self.assertEqual(self.tokenizer._get_unique_suffix(), "aaaaabc")
+    def test_own_110(self):
+        self._equal('foo "bar -> baz" qux "bar baz" qux', 'foo " bar -> baz " qux " bar baz " qux')
 
 
 class TestUnderline(TestTokenizer):
@@ -1034,11 +1093,11 @@ class TestXML(TestTokenizer):
         self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! <x>:</x>)</foo>", "<foo> der beste Betreuer ? -&gt; Prof Smith ! <x> : </x> ) </foo>")
 
     def test_xml_04(self):
-        self.assertEqual(self.tokenizer.tokenize_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", is_file=False), ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
+        self._fail_means_improvement_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
 
     def test_xml_05(self):
         self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
-    
+
     def test_xml_06(self):
         self._equal_xml("<foo><bar>na so was -&#x200B;</bar><bar>&gt; bla</bar></foo>", "<foo> <bar> na so was - </bar> <bar> &gt; bla </bar> </foo>")
 
@@ -1057,20 +1116,11 @@ class TestXML(TestTokenizer):
 <p>Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹👹 Anstand. Die Dinge, die er ⤵⤵ erkennbar überzeugt von sich gibt, triefen vor Arroganz und Empathielosigkeit (Hartz IV? Mehr als genug; Gefährlich niedrige Versorgung mit Geburtshilfe? Sollen die 💯🚦 Weiber halt nen Kilometer weiter fahren); die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕👹 konservative Interessengruppen (jüngst beispielsweise Abtreibungsgegner) mittels plumpmöglichster Populismen.</p>
         </text>""", """<text> <p> Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt . </p> <p> So 🙇 🙇 manchen Unionspolitikern gestehe ich schon noch irgendwie zu , dass sie durchaus das Bedürfnis haben , ihren Bürgern ein gutes Leben zu ermöglichen . Zwar halte ich ihre Vorstellung von einem " guten Leben " und / oder die ☠ ☣ Wege , auf denen dieses erreicht werden soll , für grundsätzlich falsch - aber da stecken zumindest teilweise durchaus legitim gute Absichten dahinter . </p> <p> Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹 👹 Anstand . Die Dinge , die er ⤵ ⤵ erkennbar überzeugt von sich gibt , triefen vor Arroganz und Empathielosigkeit ( Hartz IV ? Mehr als genug ; Gefährlich niedrige Versorgung mit Geburtshilfe ? Sollen die 💯 🚦 Weiber halt nen Kilometer weiter fahren ) ; die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕 👹 konservative Interessengruppen ( jüngst beispielsweise Abtreibungsgegner ) mittels plumpmöglichster Populismen . </p> </text>""")
 
-
-class TestTokenizerExtra(unittest.TestCase):
-    """"""
-    def setUp(self):
-        """Necessary preparations"""
-        self.tokenizer = Tokenizer(split_camel_case=True, extra_info=True)
-
-    def _equal(self, raw, tokenized):
-        """"""
-        tokens, extra_info = zip(*self.tokenizer.tokenize(raw))
-        self.assertEqual(list(tokens), tokenized.split())
+    def test_xml_10(self):
+        self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", "<foo> <p> foo bar </p> <p> foo bar </p> </foo>")
 
 
-class TestMisc(TestTokenizerExtra):
+class TestMisc(TestTokenizer):
     """"""
     def test_misc_01(self):
         self._equal("[Alt] + 240 =­\n", "[ Alt ] + 240 =")
@@ -1097,7 +1147,7 @@ class TestMisc(TestTokenizerExtra):
         self._equal("foo ­ ​ bar", "foo bar")
 
     def test_misc_09(self):
-        self.assertEqual(self.tokenizer.tokenize("­ \n­"), [])
+        self._equal("­ \n­", [])
 
 
 class TestEnglish(TestEnglishTokenizer):
@@ -1197,3 +1247,12 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_30(self):
         self._equal("my number:456-123-7654!", "my number : 456-123-7654 !")
+
+
+class TestDeprecated(TestTokenizerDeprecated):
+    """"""
+    def test_deprecated_01(self):
+        self._equal("foo bar baz", "foo bar baz")
+
+    def test_deprecated_02(self):
+        self._equal_xml("<p>foo bar baz</p>", "<p> foo bar baz </p>")

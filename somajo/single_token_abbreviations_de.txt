@@ -37,3 +37,16 @@ Rg.-Präs.
 röm.-kath.
 Uni-Kl.
 USt-IdNr.
+
+# Custom Abbreviations
+C#
+.Net
+E/E
+B.Sc.
+F&R
+M.Sc.
+kfm.
+
+# SAP Versions
+S/4
+R/3

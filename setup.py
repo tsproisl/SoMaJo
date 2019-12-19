@@ -29,7 +29,6 @@ setup(
     ],
     scripts=[
         'bin/somajo-tokenizer',
-        'bin/tokenizer',
     ],
     package_data={
         'somajo': ["abbreviations_de.txt",

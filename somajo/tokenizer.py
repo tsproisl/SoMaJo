@@ -1,24 +1,23 @@
 #!/usr/bin/env python3
 
-import collections
-import random
+import itertools
+import logging
+import operator
 import unicodedata
-import warnings
-import xml.etree.ElementTree as ET
 
 import regex as re
 
+from somajo import doubly_linked_list
 from somajo import utils
+from somajo.token import Token
 
-Token = collections.namedtuple("Token", ["token", "token_class"])
 
+class Tokenizer():
 
-class Tokenizer(object):
+    _supported_languages = set(["de", "de_CMC", "en", "en_PTB"])
+    _default_language = "de_CMC"
 
-    supported_languages = set(["de", "en"])
-    default_language = "de"
-
-    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de"):
+    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de_CMC"):
         """Create a Tokenizer object. If split_camel_case is set to True,
         tokens written in CamelCase will be split. If token_classes is
         set to true, the tokenizer will output the token class for
@@ -30,13 +29,10 @@ class Tokenizer(object):
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
         self.extra_info = extra_info
-        self.language = language if language in self.supported_languages else self.default_language
-        self.unique_string_length = 7
-        self.mapping = {}
-        self.unique_prefix = None
-        self.replacement_counter = 0
+        self.language = language if language in self._supported_languages else self.default_language
 
         self.spaces = re.compile(r"\s+")
+        self.spaces_or_empty = re.compile(r"^\s*$")
         self.controls = re.compile(r"[\u0000-\u001F\u007F-\u009F]")
         self.stranded_variation_selector = re.compile(r" \uFE0F")
         # soft hyphen (00AD), zero-width space (200B), zero-width
@@ -48,10 +44,6 @@ class Tokenizer(object):
         # 202B), l-t-r/r-t-l override (202D, 202E), pop directional
         # formatting (202C), zero-width no-break space (FEFF)
         self.other_nasties = re.compile(r"[\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]")
-        # combination
-        self.starts_with_junk = re.compile(r"^[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+")
-        self.junk_next_to_space = re.compile(r"(?:^|\s)[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+|[\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+(?:\s|$)")
-        self.junk_between_spaces = re.compile(r"(?:^|\s+)[\s\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]+(?:\s+|$)")
 
         # TAGS, EMAILS, URLs
         self.xml_declaration = re.compile(r"""<\?xml
@@ -94,8 +86,8 @@ class Tokenizer(object):
         self.email = re.compile(r"\b[\w.%+-]+(?:@| \[at\] )[\w.-]+(?:\.| \[?dot\]? )\p{L}{2,}\b")
         # simple regex for urls that start with http or www
         # TODO: schließende Klammer am Ende erlauben, wenn nach http etc. eine öffnende kam
-        self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+?\(\S*?\)\S*(?=$|[\'. "!?,;\n\t])', re.IGNORECASE)
-        self.simple_url = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+[^\'. "!?,;:\n\t)]', re.IGNORECASE)
+        self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+?\(\S*?\)\S*(?=$|[\'. "!?,;])', re.IGNORECASE)
+        self.simple_url = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+[^\'. "!?,;:)]', re.IGNORECASE)
         self.doi = re.compile(r'\bdoi:10\.\d+/\S+', re.IGNORECASE)
         self.doi_with_space = re.compile(r'(?<=\bdoi: )10\.\d+/\S+', re.IGNORECASE)
         # we also allow things like tagesschau.de-App
@@ -103,9 +95,13 @@ class Tokenizer(object):
         self.reddit_links = re.compile(r'(?<!\w)/?[rlu](?:/\w+)+/?(?!\w)', re.IGNORECASE)
 
         # XML entities
-        self.entity_name = re.compile(r'&(?:quot|amp|apos|lt|gt);', re.IGNORECASE)
-        self.entity_decimal = re.compile(r'&#\d+;')
-        self.entity_hex = re.compile(r'&#x[0-9a-f]+;', re.IGNORECASE)
+        self.entity = re.compile(r"""&(?:
+                                         quot|amp|apos|lt|gt  # named entities
+                                         |
+                                         \#\d+                # decimal entities
+                                         |
+                                         \#x[0-9a-f]+         # hexadecimal entities
+                                      );""", re.VERBOSE | re.IGNORECASE)
 
         # EMOTICONS
         emoticon_set = set(["(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
@@ -113,8 +109,30 @@ class Tokenizer(object):
                             ":<", ":C", ":[", "=(", "=)", "=D", "=P",
                             ">:", "\\:", "]:", "x(", "^^", "o.O",
                             "\\O/", "\\m/", ":;))", "_))", "*_*", "._.",
-                            ":wink:", ">_<", "*<:-)", ":!:", ":;-))"])
-        emoticon_list = sorted(emoticon_set, key=len, reverse=True)
+                            ":wink:", ">_<", "*<:-)", ":!:", ":;-))",
+                            "x'D", ":^)"])
+        # From https://textfac.es/
+        textfaces_space = set(['⚆ _ ⚆', '˙ ͜ʟ˙', '◔ ⌣ ◔', '( ﾟヮﾟ)', '(• ε •)',
+                               '(づ￣ ³￣)づ', '♪~ ᕕ(ᐛ)ᕗ', '\\ (•◡•) /', '( ಠ ͜ʖರೃ)',
+                               '( ⚆ _ ⚆ )', '(▀̿Ĺ̯▀̿ ̿)', '༼ つ ◕_◕ ༽つ', '༼ つ ಥ_ಥ ༽つ',
+                               '( ͡° ͜ʖ ͡°)', '( ͡°╭͜ʖ╮͡° )', '(╯°□°）╯︵ ┻━┻',
+                               '( ͡ᵔ ͜ʖ ͡ᵔ )', '┬──┬ ノ( ゜-゜ノ)', '┬─┬ノ( º _ ºノ)',
+                               '(ง ͠° ͟ل͜ ͡°)ง', '(͡ ͡° ͜ つ ͡͡°)', "﴾͡๏̯͡๏﴿ O'RLY?",
+                               '（╯°□°）╯︵( .o.)', '(° ͡ ͜ ͡ʖ ͡ °)', '┬─┬ ︵ /(.□. ）',
+                               '(/) (°,,°) (/)', '(☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜)', '| (• ◡•)| (❍ᴥ❍ʋ)',
+                               '༼ つ ͡° ͜ʖ ͡° ༽つ', '(╯°□°)╯︵ ʞooqǝɔɐɟ', '┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻',
+                               '┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴', '(ó ì_í)=óò=(ì_í ò)',
+                               '(•_•) ( •_•)>⌐■-■ (⌐■_■)', '(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ ✧ﾟ･: *ヽ(◕ヮ◕ヽ)',
+                               '[̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]', '/╲/\\╭( ͡° ͡° ͜ʖ ͡° ͡°)╮/\\╱\\',
+                               '( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)', '(._.) ( l: ) ( .-. ) ( :l ) (._.)',
+                               "̿ ̿ ̿'̿'\\̵͇̿̿\\з=(•_•)=ε/̵͇̿̿/'̿'̿ ̿", '༼ ºل͟º ༼ ºل͟º ༼ ºل͟º ༽ ºل͟º ༽ ºل͟º ༽',
+                               "̿'̿'\\̵͇̿̿\\з=( ͠° ͟ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿",
+                               "̿̿ ̿̿ ̿̿ ̿'̿'\\̵͇̿̿\\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿"])
+        textfaces_emoji = set(['♥‿♥', '☼.☼', '≧☉_☉≦', '(°ロ°)☝', '(☞ﾟ∀ﾟ)☞', '☜(˚▽˚)☞', '☜(⌒▽⌒)☞', '(☞ຈل͜ຈ)☞', 'ヾ(⌐■_■)ノ♪'])
+        textfaces_wo_emoji = set(['=U', 'ಠ_ಠ', '◉_◉', 'ಥ_ಥ', ":')", 'ಠ⌣ಠ', 'ಠ~ಠ', 'ಠ_ಥ', 'ಠ‿↼', 'ʘ‿ʘ', 'ಠoಠ', 'ರ_ರ', '◔̯◔', '¬_¬', 'ب_ب', '°Д°', '^̮^', '^̮^', '^̮^', '>_>', '^̮^', '^̮^', 'ಠ╭╮ಠ', '(>ლ)', 'ʕ•ᴥ•ʔ', '(ಥ﹏ಥ)', '(ᵔᴥᵔ)', '(¬‿¬)', '⌐╦╦═─', '(•ω•)', '(¬_¬)', '｡◕‿◕｡', '(ʘ‿ʘ)', '٩◔̯◔۶', '(>人<)', '(~_^)', '(^̮^)', '(･.◤)', '(◕‿◕✿)', '｡◕‿‿◕｡', '(─‿‿─)', '(；一_一)', "(ʘᗩʘ')", '(✿´‿`)', 'ლ(ಠ益ಠლ)', '~(˘▾˘~)', '(~˘▾˘)~', '(｡◕‿◕｡)', '(っ˘ڡ˘ς)', 'ლ(´ڡ`ლ)', 'ƪ(˘⌣˘)ʃ', '(´・ω・`)', '(ღ˘⌣˘ღ)', '(▰˘◡˘▰)', '〆(・∀・＠)', '༼ʘ̚ل͜ʘ̚༽', 'ᕙ(⇀‸↼‶)ᕗ', 'ᕦ(ò_óˇ)ᕤ', '(｡◕‿‿◕｡)', 'ヽ༼ຈل͜ຈ༽ﾉ', '(ง°ل͜°)ง', '╚(ಠ_ಠ)=┐', '(´・ω・)っ由', 'Ƹ̵̡Ӝ̵̨̄Ʒ', '¯\\_(ツ)_/¯', '▄︻̷̿┻̿═━一', "(ง'̀-'́)ง", '¯\\(°_o)/¯', '｡゜(｀Д´)゜｡', '(づ｡◕‿‿◕｡)づ', '(;´༎ຶД༎ຶ`)', '(ノಠ益ಠ)ノ彡┻━┻', 'ლ,ᔑ•ﺪ͟͠•ᔐ.ლ', '(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧', '┬┴┬┴┤(･_├┬┴┬┴', '[̲̅$̲̅(̲̅5̲̅)̲̅$̲̅]'])
+        self.textfaces_space = re.compile(r"|".join([re.escape(_) for _ in sorted(textfaces_space, key=len, reverse=True)]))
+        self.textfaces_emoji = re.compile(r"|".join([re.escape(_) for _ in sorted(textfaces_emoji, key=len, reverse=True)]))
+        emoticon_list = sorted(emoticon_set | textfaces_wo_emoji, key=len, reverse=True)
         self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variety of eyes, alt.: [:;8]
                                         [-'oO]?                       # optional nose or tear
                                         (?: \)+ | \(+ | [*] | ([DPp])\1*(?!\w)))   # a variety of mouths
@@ -123,6 +141,8 @@ class Tokenizer(object):
                                    r"(?:\b[Xx]D+\b)" +
                                    r"|" +
                                    r"(?:\b(?:D'?:|oO)\b)" +
+                                   r"|" +
+                                   r"(?:(?<!\b\d{1,2}):\w+:(?!\d{2}\b))" +   # Textual representations of emojis: :smile:, etc. We don't want to match times: 08:30:00
                                    r"|" +
                                    r"|".join([re.escape(_) for _ in emoticon_list]), re.VERBOSE)
         self.space_emoticon = re.compile(r'([:;])[ ]+([()])')
@@ -177,12 +197,12 @@ class Tokenizer(object):
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?!\p{L}{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])\p{L}\.(?!\p{L}{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
-        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language)
+        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language[:2])
         self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?!\p{L}{1,3}\.)', re.IGNORECASE)
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:\p{L}+\.){2,}')
         # only abbreviations that are not matched by (?:\p{L}\.)+
-        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language)
+        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language[:2])
         # abbrev_simple = [(a, re.search(r"^\p{L}{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])\p{L}{2,}\.(?!\p{L}{1,3}\.)")
@@ -200,7 +220,7 @@ class Tokenizer(object):
         self.hashtag = re.compile(r'(?<!\w)[#]\w+(?!\w)')
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
         # a pair of underscores can be used to "underline" some text
-        self.underline = re.compile(r"(?<!\w)(_)(\w[^_]+\w)(_)(?!\w)")
+        self.underline = re.compile(r"(?<!\w)(?P<left>_)(?P<middle>\w[^_]+\w)(?P<right>_)(?!\w)")
 
         # DATE, TIME, NUMBERS
         self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?![\d.])', re.VERBOSE)
@@ -243,64 +263,68 @@ class Tokenizer(object):
         self.space_left_arrow = re.compile(r'(<)\s+(-+)')
         self.arrow = re.compile(r'(-+>|<-+|[\u2190-\u21ff])')
         # parens
-        self.paired_paren = re.compile(r'([(])(?!inn)([^()]*)([)])')
-        self.paired_bracket = re.compile(r'(\[)([^][]*)(\])')
-        self.paren = re.compile(r"""((?:(?<!\w)   # no alphanumeric character
-                                       [[{(]      # opening paren
-                                       (?=\w)) |  # alphanumeric character
-                                     (?:(?<=\w)   # alphanumeric character
-                                       []})]      # closing paren
-                                       (?!\w)) |  # no alphanumeric character
-                                     (?:(?<=\s)   # space
-                                       []})]      # closing paren
-                                       (?=\w)) |  # alphanumeric character
-                                     (?:(?<=\w-)  # hyphen
-                                       [)]        # closing paren
-                                       (?=\w)))   # alphanumeric character
-                                 """, re.VERBOSE)
-        self.all_paren = re.compile(r"(?<=\s)[][(){}](?=\s)")
+        self.all_parens = re.compile(r"""(
+                                      (?:(?<=\w)        # alphanumeric character
+                                        [(]             # opening paren
+                                        (?!inn?[)])) |  # not followed by "in)" or "inn)"
+                                      (?:(?<!\w)        # no alphanumeric character
+                                        [(]) |          # opening paren
+                                      (?:(?<!.[(]in|[(]inn)  # not preceded by "(in" or "(inn"
+                                        [)]) |          # closing paren
+                                        [][{}]           # curly and square brackets
+                                      # (?:(?<!\w)        # no alphanumeric character
+                                      #   [[{(]           # opening paren
+                                      #   (?=\w)) |       # alphanumeric character
+                                      # (?:(?<=\w)        # alphanumeric character
+                                      #   []})]           # closing paren
+                                      #   (?!\w)) |       # no alphanumeric character
+                                      # (?:(?:(?<=\s)|^)  # space or start of string
+                                      #   []})]           # closing paren
+                                      #   (?=\w)) |       # alphanumeric character
+                                      # (?:(?<=\w-)       # hyphen
+                                      #   [)]             # closing paren
+                                      #   (?=\w))         # alphanumeric character
+                                    )""", re.VERBOSE | re.IGNORECASE)
         self.de_slash = re.compile(r'(/+)(?!in(?:nen)?|en)')
         # English possessive and contracted forms
-        self.en_trailing_apos = re.compile(r"(?<!..in|')(['’])(?!\w)")
+        self.en_trailing_apos = re.compile(r"(?<=[sx])(['’])(?![\w'])")
         self.en_dms = re.compile(r"(?<=\w)(['’][dms])\b", re.IGNORECASE)
         self.en_llreve = re.compile(r"(?<=\w)(['’](?:ll|re|ve))\b", re.IGNORECASE)
         self.en_not = re.compile(r"(?<=\w)(n['’]t)\b", re.IGNORECASE)
-        en_twopart_contractions = [r"\b(a)(lot)\b", r"\b(gon)(na)\b", r"\b(got)(ta)\b", r"\b(lem)(me)\b",
-                                   r"\b(out)(ta)\b", r"\b(wan)(na)\b", r"\b(c'm)(on)\b",
-                                   r"\b(more)(['’]n)\b", r"\b(d['’])(ye)\b", r"(?<!\w)(['’]t)(is)\b",
-                                   r"(?<!\w)(['’]t)(was)\b", r"\b(there)(s)\b", r"\b(i)(m)\b",
-                                   r"\b(you)(re)\b", r"\b(he)(s)\b", r"\b(she)(s)\b",
-                                   r"\b(ai)(nt)\b", r"\b(are)(nt)\b", r"\b(is)(nt)\b",
-                                   r"\b(do)(nt)\b", r"\b(does)(nt)\b", r"\b(did)(nt)\b",
-                                   r"\b(i)(ve)\b", r"\b(you)(ve)\b", r"\b(they)(ve)\b",
-                                   r"\b(have)(nt)\b", r"\b(has)(nt)\b", r"\b(can)(not)\b",
-                                   r"\b(ca)(nt)\b", r"\b(could)(nt)\b", r"\b(wo)(nt)\b",
-                                   r"\b(would)(nt)\b", r"\b(you)(ll)\b", r"\b(let)(s)\b"]
-        en_threepart_contractions = [r"\b(du)(n)(no)\b", r"\b(wha)(dd)(ya)\b", r"\b(wha)(t)(cha)\b", r"\b(i)('m)(a)\b"]
+        en_twopart_contractions = [r"\b(?P<p1>a)(?P<p2>lot)\b", r"\b(?P<p1>gon)(?P<p2>na)\b", r"\b(?P<p1>got)(?P<p2>ta)\b", r"\b(?P<p1>lem)(?P<p2>me)\b",
+                                   r"\b(?P<p1>out)(?P<p2>ta)\b", r"\b(?P<p1>wan)(?P<p2>na)\b", r"\b(?P<p1>c'm)(?P<p2>on)\b",
+                                   r"\b(?P<p1>more)(?P<p2>['’]n)\b", r"\b(?P<p1>d['’])(?P<p2>ye)\b", r"(?<!\w)(?P<p1>['’]t)(?P<p2>is)\b",
+                                   r"(?<!\w)(?P<p1>['’]t)(?P<p2>was)\b", r"\b(?P<p1>there)(?P<p2>s)\b", r"\b(?P<p1>i)(?P<p2>m)\b",
+                                   r"\b(?P<p1>you)(?P<p2>re)\b", r"\b(?P<p1>he)(?P<p2>s)\b", r"\b(?P<p1>she)(?P<p2>s)\b",
+                                   r"\b(?P<p1>ai)(?P<p2>nt)\b", r"\b(?P<p1>are)(?P<p2>nt)\b", r"\b(?P<p1>is)(?P<p2>nt)\b",
+                                   r"\b(?P<p1>do)(?P<p2>nt)\b", r"\b(?P<p1>does)(?P<p2>nt)\b", r"\b(?P<p1>did)(?P<p2>nt)\b",
+                                   r"\b(?P<p1>i)(?P<p2>ve)\b", r"\b(?P<p1>you)(?P<p2>ve)\b", r"\b(?P<p1>they)(?P<p2>ve)\b",
+                                   r"\b(?P<p1>have)(?P<p2>nt)\b", r"\b(?P<p1>has)(?P<p2>nt)\b", r"\b(?P<p1>can)(?P<p2>not)\b",
+                                   r"\b(?P<p1>ca)(?P<p2>nt)\b", r"\b(?P<p1>could)(?P<p2>nt)\b", r"\b(?P<p1>wo)(?P<p2>nt)\b",
+                                   r"\b(?P<p1>would)(?P<p2>nt)\b", r"\b(?P<p1>you)(?P<p2>ll)\b", r"\b(?P<p1>let)(?P<p2>s)\b"]
+        en_threepart_contractions = [r"\b(?P<p1>du)(?P<p2>n)(?P<p3>no)\b", r"\b(?P<p1>wha)(?P<p2>dd)(?P<p3>ya)\b", r"\b(?P<p1>wha)(?P<p2>t)(?P<p3>cha)\b", r"\b(?P<p1>i)(?P<p2>'m)(?P<p3>a)\b"]
         # w/o, w/out, b/c, b/t, l/c, w/, d/c, u/s
         self.en_slash_words = re.compile(r"\b(?:w/o|w/out|b/t|l/c|b/c|d/c|u/s)\b|\bw/(?!\w)", re.IGNORECASE)
         # word--word
-        self.en_double_hyphen = re.compile(r"(?<=\w)--+(?=\w)")
         self.en_twopart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_twopart_contractions]
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
         # English hyphenated words
-        if self.language == "en":
-            nonbreaking_prefixes = utils.read_abbreviation_file("non-breaking_prefixes_%s.txt" % self.language)
-            nonbreaking_suffixes = utils.read_abbreviation_file("non-breaking_suffixes_%s.txt" % self.language)
-            nonbreaking_words = utils.read_abbreviation_file("non-breaking_hyphenated_words_%s.txt" % self.language)
+        if self.language == "en" or self.language == "en_PTB":
+            nonbreaking_prefixes = utils.read_abbreviation_file("non-breaking_prefixes_%s.txt" % self.language[:2])
+            nonbreaking_suffixes = utils.read_abbreviation_file("non-breaking_suffixes_%s.txt" % self.language[:2])
+            nonbreaking_words = utils.read_abbreviation_file("non-breaking_hyphenated_words_%s.txt" % self.language[:2])
             self.en_nonbreaking_prefixes = re.compile(r"(?<![\w-])(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_prefixes]) + r")-[\w-]+", re.IGNORECASE)
             self.en_nonbreaking_suffixes = re.compile(r"\b[\w-]+-(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_suffixes]) + r")(?![\w-])", re.IGNORECASE)
             self.en_nonbreaking_words = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_words]) + r")\b", re.IGNORECASE)
-        self.en_hyphen = re.compile(r"(?<=\w)(-)(?=\w)")
+        self.en_hyphen = re.compile(r"(?<=\w)-+(?=\w)")
         self.en_no = re.compile(r"\b(no\.)\s*(?=\d)", re.IGNORECASE)
         self.en_degree = re.compile(r"(?<=\d ?)°(?:F|C|Oe)\b", re.IGNORECASE)
         # quotation marks
         # L'Enfer, d'accord, O'Connor
         self.letter_apostrophe_word = re.compile(r"\b([dlo]['’]\p{L}+)\b", re.IGNORECASE)
-        self.paired_double_latex_quote = re.compile(r"(?<!`)(``)([^`']+)('')(?!')")
-        self.paired_single_latex_quote = re.compile(r"(?<!`)(`)([^`']+)(')(?!')")
-        self.paired_single_quot_mark = re.compile(r"(['‚‘’])([^']+)(['‘’])")
-        self.all_quote = re.compile(r"(?<=\s)(?:``|''|`|['‚‘’])(?=\s)")
+        self.double_latex_quote = re.compile(r"(?:(?<!`)``(?!`))|(?:(?<!')''(?!'))")
+        self.paired_single_latex_quote = re.compile(r"(?<!`)(?P<left>`)(?P<middle>[^`']+)(?P<right>')(?!')")
+        self.paired_single_quot_mark = re.compile(r"(?P<left>['‚‘’])(?P<middle>[^']+)(?P<right>['‘’])")
         self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')
         self.en_quotation_marks = re.compile(r'([„“”‚‘’"»«›‹])')
         self.en_other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*,;:+×÷±≤≥=&/–—-]+)')
@@ -310,462 +334,407 @@ class Tokenizer(object):
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
 
-    def _get_unique_prefix(self, text):
-        """Return a string that is not a substring of text."""
-        alphabet = "abcdefghijklmnopqrstuvwxyz"
-        # create random string of length self.unique_string_length
-        unique_string = ""
-        while unique_string in text:
-            unique_string = "".join(random.choice(alphabet) for _ in range(self.unique_string_length))
-        return unique_string
-
-    def _get_unique_suffix(self):
-        """Obtain a unique suffix for combination with self.unique_prefix.
-
-        """
-        digits = "abcdefghijklmnopqrstuvwxyz"
-        n = self.replacement_counter
-        b26 = ""
-        while n > 0:
-            quotient, remainder = divmod(n, 26)
-            b26 = digits[remainder] + b26
-            n = quotient
-        self.replacement_counter += 1
-        return b26.rjust(self.unique_string_length, "a")
-
-    def _get_unique_string(self):
-        """Return a string that is not a substring of text."""
-        return self.unique_prefix + self._get_unique_suffix()
-
-    def _replace_regex(self, text, regex, token_class="regular", split_named_subgroups=True):
-        """Replace instances of regex with unique strings and store
-        replacements in mapping.
-
-        """
-        replacements = {}
-
-        def repl(match):
-            instance = match.group(0)
-            if instance not in replacements:
-                # check if there are named subgroups
-                if split_named_subgroups and len(match.groupdict()) > 0:
-                    parts = [v for k, v in sorted(match.groupdict().items())]
-                    replacements[instance] = self._multipart_replace(instance, parts, token_class)
-                else:
-                    replacement = replacements.setdefault(instance, self._get_unique_string())
-                    self.mapping[replacement] = Token(instance, token_class)
-            return " %s " % replacements[instance]
-        return regex.sub(repl, text)
-
-    def _multipart_replace(self, instance, parts, token_class):
+    def _split_on_boundaries(self, node, boundaries, token_class, lock_match=True):
         """"""
-        replacements = []
-        for part in parts:
-            replacement = self._get_unique_string()
-            self.mapping[replacement] = Token(part, token_class)
-            replacements.append(replacement)
-        multipart = " ".join(replacements)
-        return multipart
+        n = len(boundaries)
+        if n == 0:
+            return
+        token_dll = node.list
+        prev_end = 0
+        for i, (start, end, replacement) in enumerate(boundaries):
+            original_spelling = None
+            left_space_after, match_space_after = False, False
+            left = node.value.text[prev_end:start]
+            match = node.value.text[start:end]
+            if replacement is not None:
+                if match != replacement:
+                    original_spelling = match
+                    match = replacement
+            right = node.value.text[end:]
+            prev_end = end
+            if left.endswith(" ") or match.startswith(" "):
+                left_space_after = True
+            if match.endswith(" ") or right.startswith(" "):
+                match_space_after = True
+            elif right == "":
+                match_space_after = node.value.space_after
+            left = left.strip()
+            match = match.strip()
+            right = right.strip()
+            first_in_sentence, match_last_in_sentence, right_last_in_sentence = False, False, False
+            if i == 0:
+                first_in_sentence = node.value.first_in_sentence
+            if i == n - 1:
+                match_last_in_sentence = node.value.last_in_sentence
+                if right != "":
+                    match_last_in_sentence = False
+                    right_last_in_sentence = node.value.last_in_sentence
+            if left != "":
+                token_dll.insert_left(Token(left, token_class="regular", space_after=left_space_after, first_in_sentence=first_in_sentence), node)
+                first_in_sentence = False
+            token_dll.insert_left(Token(match, locked=lock_match,
+                                        token_class=token_class,
+                                        space_after=match_space_after,
+                                        original_spelling=original_spelling,
+                                        first_in_sentence=first_in_sentence,
+                                        last_in_sentence=match_last_in_sentence),
+                                  node)
+            if i == n - 1 and right != "":
+                token_dll.insert_left(Token(right, token_class="regular", space_after=node.value.space_after, last_in_sentence=right_last_in_sentence), node)
+        token_dll.remove(node)
 
-    def _reintroduce_instances(self, tokens):
-        """Replace the unique strings with the original text."""
-        tokens = [self.mapping.get(t, Token(t, "regular")) for t in tokens]
-        return tokens
+    def _split_matches(self, regex, node, token_class="regular", repl=None, split_named_subgroups=True):
+        boundaries = []
+        split_groups = split_named_subgroups and len(regex.groupindex) > 0
+        group_numbers = sorted(regex.groupindex.values())
+        for m in regex.finditer(node.value.text):
+            if split_groups:
+                for g in group_numbers:
+                    if m.span(g) != (-1, -1):
+                        boundaries.append((m.start(g), m.end(g), None))
+            else:
+                if repl is None:
+                    boundaries.append((m.start(), m.end(), None))
+                else:
+                    boundaries.append((m.start(), m.end(), m.expand(repl)))
+        self._split_on_boundaries(node, boundaries, token_class)
 
-    def _replace_emojis(self, paragraph, token_class):
-        """Replace all emoji sequences"""
-        replacements = {}
-        emojis = []
-        for m in re.finditer(r"\X", paragraph):
+    def _split_emojis(self, node, token_class="emoticon"):
+        boundaries = []
+        for m in re.finditer(r"\X", node.value.text):
             if m.end() - m.start() > 1:
                 if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F]", m.group()):
-                    emojis.append(m.span())
+                    boundaries.append((m.start(), m.end(), None))
             else:
                 if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}]", m.group()):
-                    emojis.append(m.span())
-        for emoji in reversed(emojis):
-            instance = paragraph[emoji[0]:emoji[1]]
-            instance = instance.strip()
-            replacement = replacements.setdefault(instance, self._get_unique_string())
-            self.mapping[replacement] = Token(instance, token_class)
-            paragraph = paragraph[:emoji[0]] + " " + replacement + " " + paragraph[emoji[1]:]
-        return paragraph
+                    boundaries.append((m.start(), m.end(), None))
+        self._split_on_boundaries(node, boundaries, token_class)
 
-    def _replace_abbreviations(self, text, split_multipart_abbrevs=True):
-        """Replace instances of abbreviations with unique strings and store
-        replacements in self.mapping.
-
-        """
-        replacements = {}
-        text = self._replace_regex(text, self.single_letter_ellipsis, "abbreviation")
-        text = self._replace_regex(text, self.and_cetera, "abbreviation")
-        text = self._replace_regex(text, self.str_abbreviations, "abbreviation")
-        text = self._replace_regex(text, self.nr_abbreviations, "abbreviation")
-        text = self._replace_regex(text, self.single_token_abbreviation, "abbreviation")
-        text = self._replace_regex(text, self.single_letter_abbreviation, "abbreviation")
-        text = self.spaces.sub(" ", text)
-        text = self._replace_regex(text, self.ps, "abbreviation")
-
-        def repl(match):
-            instance = match.group(0)
-            if instance not in replacements:
-                # check if it is a multipart abbreviation
-                if split_multipart_abbrevs and self.multipart_abbreviation.fullmatch(instance):
-                    parts = [p.strip() + "." for p in instance.strip(".").split(".")]
-                    replacements[instance] = self._multipart_replace(instance, parts, "abbreviation")
-                else:
-                    replacement = replacements.setdefault(instance, self._get_unique_string())
-                    self.mapping[replacement] = Token(instance, "abbreviation")
-            return " %s " % replacements[instance]
-        text = self.abbreviation.sub(repl, text)
-        # text = self._replace_set(text, self.simple_abbreviation_candidates, self.simple_abbreviations, "abbreviation", ignore_case=True)
-        return text
-
-    def _replace_set(self, text, regex, items, token_class="regular", ignore_case=False):
-        """Replace all elements from items in text with unique strings."""
-        replacements = {}
-
-        def repl(match):
-            instance = match.group(0)
-            ic_instance = instance
+    def _split_set(self, regex, node, items, token_class="regular", ignore_case=False):
+        boundaries = []
+        for m in regex.finditer(node.value.text):
+            instance = m.group(0)
             if ignore_case:
-                ic_instance = instance.lower()
-            if ic_instance in items:
-                if instance not in replacements:
-                    replacement = replacements.setdefault(instance, self._get_unique_string())
-                    self.mapping[replacement] = Token(instance, token_class)
-                return " %s " % replacements[instance]
-            else:
-                return instance
-        return regex.sub(repl, text)
+                instance = instance.lower()
+            if instance in items:
+                boundaries.append((m.start(), m.end(), None))
+        self._split_on_boundaries(node, boundaries, token_class)
 
-    def _check_spaces(self, tokens, original_text):
-        """Compare the tokens with the original text to see which tokens had
-        trailing whitespace (to be able to annotate SpaceAfter=No) and
-        which tokens contained internal whitespace (to be able to
-        annotate OriginalSpelling="...").
+    def _split_left(self, regex, node):
+        boundaries = []
+        prev_end = 0
+        for m in regex.finditer(node.value.text):
+            boundaries.append((prev_end, m.start(), None))
+            prev_end = m.start()
+        self._split_on_boundaries(node, boundaries, token_class=None, lock_match=False)
+
+    def _split_all_matches(self, regex, token_dll, token_class="regular", repl=None, split_named_subgroups=True):
+        """Turn matches for the regex into tokens."""
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            self._split_matches(regex, t, token_class, repl, split_named_subgroups)
+
+    def _split_all_emojis(self, token_dll, token_class="emoticon"):
+        """Replace all emoji sequences"""
+        self._split_all_matches(self.textfaces_emoji, token_dll, "emoticon")
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            self._split_emojis(t, token_class)
+
+    def _split_all_set(self, token_dll, regex, items, token_class="regular", ignore_case=False):
+        """Turn all elements from items into separate tokens. (All elements
+        need to be matched by regex.)"""
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            self._split_set(regex, t, items, token_class, ignore_case)
+
+    def _split_all_left(self, regex, token_dll):
+        """Split to the left of the match."""
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            self._split_left(regex, t)
+
+    def _split_abbreviations(self, token_dll, split_multipart_abbrevs=True):
+        """Turn instances of abbreviations into tokens."""
+        self._split_all_matches(self.single_letter_ellipsis, token_dll, "abbreviation")
+        self._split_all_matches(self.and_cetera, token_dll, "abbreviation")
+        self._split_all_matches(self.str_abbreviations, token_dll, "abbreviation")
+        self._split_all_matches(self.nr_abbreviations, token_dll, "abbreviation")
+        self._split_all_matches(self.single_token_abbreviation, token_dll, "abbreviation")
+        self._split_all_matches(self.single_letter_abbreviation, token_dll, "abbreviation")
+        self._split_all_matches(self.ps, token_dll, "abbreviation")
+
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            boundaries = []
+            for m in self.abbreviation.finditer(t.value.text):
+                instance = m.group(0)
+                if split_multipart_abbrevs and self.multipart_abbreviation.fullmatch(instance):
+                    start, end = m.span(0)
+                    s = start
+                    for i, c in enumerate(instance, start=1):
+                        if c == ".":
+                            boundaries.append((s, start + i, None))
+                            s = start + i
+                else:
+                    boundaries.append((m.start(), m.end(), None))
+            self._split_on_boundaries(t, boundaries, "abbreviation")
+
+    def _split_paired(self, regex, token_dll, token_class="regular"):
+        """Split off paired elements (with capture groups named "left" and
+        "right"). Currently, this only operates on a single segment.
 
         """
-        extra_info = ["" for _ in tokens]
-        normalized = self.junk_between_spaces.sub(" ", original_text)
-        normalized = self.spaces.sub(" ", normalized)
-        normalized = normalized.strip()
-        for token_index, t in enumerate(tokens):
-            original_spelling = None
-            token = t.token
-            token_length = len(token)
-            if normalized.startswith(token):
-                normalized = normalized[token_length:]
-            else:
-                orig = []
-                for char in token:
-                    first_char = None
-                    while first_char != char:
-                        try:
-                            first_char = normalized[0]
-                            normalized = normalized[1:]
-                            orig.append(first_char)
-                        except IndexError:
-                            warnings.warn("Error aligning tokens with original text!\nOriginal text: '%s'\nToken: '%s'\nRemaining normalized text: '%s'\nValue of orig: '%s'" % (original_text, token, normalized, "".join(orig)))
-                            break
-                original_spelling = "".join(orig)
-            m = self.starts_with_junk.search(normalized)
-            if m:
-                if original_spelling is None:
-                    original_spelling = token
-                original_spelling += normalized[:m.end()]
-                normalized = normalized[m.end():]
-            if original_spelling is not None:
-                extra_info[token_index] = 'OriginalSpelling="%s"' % original_spelling
-            if len(normalized) > 0:
-                if normalized.startswith(" "):
-                    normalized = normalized[1:]
-                else:
-                    if len(extra_info[token_index]) > 0:
-                        extra_info[token_index] = ", " + extra_info[token_index]
-                    extra_info[token_index] = "SpaceAfter=No" + extra_info[token_index]
-        try:
-            assert len(normalized) == 0
-        except AssertionError:
-            warnings.warn("AssertionError in this paragraph: '%s'\nTokens: %s\nRemaining normalized text: '%s'" % (original_text, tokens, normalized))
-        return extra_info
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            boundaries = []
+            for m in regex.finditer(t.value.text):
+                boundaries.append((m.start("left"), m.end("left"), None))
+                boundaries.append((m.start("right"), m.end("right"), None))
+            self._split_on_boundaries(t, boundaries, token_class)
 
-    def _match_xml(self, tokens, elements):
-        """"""
-        agenda = list(reversed(tokens))
-        for element in elements:
-            original_text = unicodedata.normalize("NFC", element.text)
-            normalized = self.junk_between_spaces.sub(" ", original_text)
-            normalized = self.spaces.sub(" ", normalized)
-            normalized = normalized.strip()
-            output = []
-            while len(normalized) > 0:
-                t = agenda.pop()
-                original_spelling = None
-                extra_info = ""
-                token = t.token
-                if normalized.startswith(token):
-                    normalized = normalized[len(token):]
-                elif token.startswith(normalized):
-                    agenda.append(Token(token[len(normalized):].lstrip(), t.token_class))
-                    token = normalized
-                    normalized = ""
-                else:
-                    orig = []
-                    processed = []
-                    for char in token:
-                        first_char = None
-                        while first_char != char:
-                            try:
-                                first_char = normalized[0]
-                                normalized = normalized[1:]
-                                orig.append(first_char)
-                            except IndexError:
-                                warnings.warn("Error aligning tokens with original text!\nOriginal text: '%s'\nToken: '%s'\nRemaining normalized text: '%s'\nValue of orig: '%s'" % (original_text, token, normalized, "".join(orig)))
-                                break
-                        else:
-                            processed.append(char)
-                    if len(processed) != len(token):
-                        agenda.append(Token(token[len(processed):].lstrip(), t.token_class))
-                        token = token[:len(processed)]
-                    original_spelling = "".join(orig)
-                m = self.starts_with_junk.search(normalized)
-                if m:
-                    if original_spelling is None:
-                        original_spelling = token
-                    original_spelling += normalized[:m.end()]
-                    normalized = normalized[m.end():]
-                if original_spelling is not None:
-                    extra_info = 'OriginalSpelling="%s"' % original_spelling
-                if len(normalized) > 0:
-                    if normalized.startswith(" "):
-                        normalized = normalized[1:]
-                    else:
-                        if len(extra_info) > 0:
-                            extra_info = ", " + extra_info
-                        extra_info = "SpaceAfter=No" + extra_info
-                output.append("\t".join((token, t.token_class, extra_info)))
-            if len(output) > 0:
-                tokenized_text = "\n" + "\n".join(output) + "\n"
-            else:
-                tokenized_text = "\n"
-            if element.type == "text":
-                element.element.text = tokenized_text
-            elif element.type == "tail":
-                element.element.tail = tokenized_text
-        try:
-            assert len(agenda) == 0
-        except AssertionError:
-            warnings.warn("AssertionError: %d tokens left over" % len(agenda))
-        return elements
+    def _remove_empty_tokens(self, token_dll):
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            if self.spaces_or_empty.search(t.value.text):
+                if t.value.first_in_sentence:
+                    next_non_markup = token_dll.next_matching(t, operator.attrgetter("value.markup"), False)
+                    if next_non_markup is not None:
+                        next_non_markup.value.first_in_sentence = True
+                if t.value.last_in_sentence:
+                    previous_non_markup = token_dll.previous_matching(t, operator.attrgetter("value.markup"), False)
+                    if previous_non_markup is not None:
+                        previous_non_markup.value.last_in_sentence = True
+                token_dll.remove(t)
 
-    def _tokenize(self, paragraph):
+    def _tokenize(self, token_dll):
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
         social media.
 
         """
-        # reset mappings for the current paragraph
-        self.mapping = {}
-        self.unique_prefix = self._get_unique_prefix(paragraph)
-
-        # normalize whitespace
-        paragraph = self.spaces.sub(" ", paragraph)
-
-        # get rid of control characters
-        paragraph = self.controls.sub("", paragraph)
-
-        # get rid of isolated variation selectors
-        paragraph = self.stranded_variation_selector.sub("", paragraph)
-
-        # normalize whitespace
-        paragraph = self.spaces.sub(" ", paragraph)
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            # convert to Unicode normal form C (NFC)
+            t.value.text = unicodedata.normalize("NFC", t.value.text)
+            # normalize whitespace
+            t.value.text = self.spaces.sub(" ", t.value.text)
+            # get rid of control characters
+            t.value.text = self.controls.sub("", t.value.text)
+            # get rid of isolated variation selectors
+            t.value.text = self.stranded_variation_selector.sub("", t.value.text)
+            # normalize whitespace
+            t.value.text = self.spaces.sub(" ", t.value.text)
 
         # Some tokens are allowed to contain whitespace. Get those out
-        # of the way first. We replace them with unique strings and
-        # undo that later on.
+        # of the way first.
         # - XML tags
-        paragraph = self._replace_regex(paragraph, self.xml_declaration, "XML_tag")
-        paragraph = self._replace_regex(paragraph, self.tag, "XML_tag")
+        self._split_all_matches(self.xml_declaration, token_dll, "XML_tag")
+        self._split_all_matches(self.tag, token_dll, "XML_tag")
         # - email address obfuscation may involve spaces
-        paragraph = self._replace_regex(paragraph, self.email, "email_address")
+        self._split_all_matches(self.email, token_dll, "email_address")
 
         # Emoji sequences can contain zero-width joiners. Get them out
         # of the way next
-        paragraph = self._replace_regex(paragraph, self.unicode_flags, "emoticon")
-        paragraph = self._replace_emojis(paragraph, "emoticon")
+        # First textfaces that contain whitespace:
+        self._split_all_matches(self.textfaces_space, token_dll, "emoticon")
+        # Then flags:
+        self._split_all_matches(self.unicode_flags, token_dll, "emoticon")
+        # Then all other emojis
+        self._split_all_emojis(token_dll, "emoticon")
 
-        # get rid of other junk characters
-        paragraph = self.other_nasties.sub("", paragraph)
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            # get rid of other junk characters
+            t.value.text = self.other_nasties.sub("", t.value.text)
+            # normalize whitespace
+            t.value.text = self.spaces.sub(" ", t.value.text)
 
-        # normalize whitespace
-        paragraph = self.spaces.sub(" ", paragraph)
+        # Remove empty tokens
+        self._remove_empty_tokens(token_dll)
 
         # Some emoticons contain erroneous spaces. We fix this.
-        paragraph = self.space_emoticon.sub(r'\1\2', paragraph)
+        self._split_all_matches(self.space_emoticon, token_dll, "emoticon", repl=r'\1\2')
 
         # urls
-        paragraph = self._replace_regex(paragraph, self.simple_url_with_brackets, "URL")
-        paragraph = self._replace_regex(paragraph, self.simple_url, "URL")
-        paragraph = self._replace_regex(paragraph, self.doi, "DOI")
-        paragraph = self._replace_regex(paragraph, self.doi_with_space, "DOI")
-        paragraph = self._replace_regex(paragraph, self.url_without_protocol, "URL")
-        paragraph = self._replace_regex(paragraph, self.reddit_links, "URL")
-        # paragraph = self._replace_regex(paragraph, self.url)
+        self._split_all_matches(self.simple_url_with_brackets, token_dll, "URL")
+        self._split_all_matches(self.simple_url, token_dll, "URL")
+        self._split_all_matches(self.doi, token_dll, "URL")
+        self._split_all_matches(self.doi_with_space, token_dll, "URL")
+        self._split_all_matches(self.url_without_protocol, token_dll, "URL")
+        self._split_all_matches(self.reddit_links, token_dll, "URL")
 
         # XML entities
-        paragraph = self._replace_regex(paragraph, self.entity_name, "XML_entity")
-        paragraph = self._replace_regex(paragraph, self.entity_decimal, "XML_entity")
-        paragraph = self._replace_regex(paragraph, self.entity_hex, "XML_entity")
+        self._split_all_matches(self.entity, token_dll, "XML_entity")
 
-        # replace emoticons with unique strings so that they are out
-        # of the way
-        paragraph = self.spaces.sub(" ", paragraph)
-        paragraph = self._replace_regex(paragraph, self.heart_emoticon, "emoticon")
-        paragraph = self._replace_regex(paragraph, self.emoticon, "emoticon")
-        # paragraph = self._replace_regex(paragraph, self.unicode_symbols, "emoticon")
+        # emoticons
+        self._split_all_matches(self.heart_emoticon, token_dll, "emoticon")
+        self._split_all_matches(self.emoticon, token_dll, "emoticon")
 
         # mentions, hashtags
-        paragraph = self._replace_regex(paragraph, self.mention, "mention")
-        paragraph = self._replace_regex(paragraph, self.hashtag, "hashtag")
+        self._split_all_matches(self.mention, token_dll, "mention")
+        self._split_all_matches(self.hashtag, token_dll, "hashtag")
         # action words
-        paragraph = self._replace_regex(paragraph, self.action_word, "action_word")
+        self._split_all_matches(self.action_word, token_dll, "action_word")
         # underline
-        paragraph = self.underline.sub(r' \1 \2 \3 ', paragraph)
+        self._split_paired(self.underline, token_dll)
         # textual representations of emoji
-        paragraph = self._replace_regex(paragraph, self.emoji, "emoticon")
+        self._split_all_matches(self.emoji, token_dll, "emoticon")
 
-        paragraph = self._replace_regex(paragraph, self.token_with_plus_ampersand)
-        paragraph = self._replace_set(paragraph, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
+        # tokens with + or &
+        self._split_all_matches(self.token_with_plus_ampersand, token_dll)
+        self._split_all_set(token_dll, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
 
         # camelCase
         if self.split_camel_case:
-            paragraph = self._replace_regex(paragraph, self.camel_case_token)
-            paragraph = self._replace_set(paragraph, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
-            paragraph = self._replace_regex(paragraph, self.in_and_innen)
-            paragraph = self.camel_case.sub(r' \1', paragraph)
+            self._split_all_matches(self.camel_case_token, token_dll)
+            self._split_all_set(token_dll, self.simple_camel_case_candidates, self.simple_camel_case_tokens)
+            self._split_all_matches(self.in_and_innen, token_dll)
+            self._split_all_left(self.camel_case, token_dll)
 
         # gender star
-        paragraph = self._replace_regex(paragraph, self.gender_star)
+        self._split_all_matches(self.gender_star, token_dll)
 
         # English possessive and contracted forms
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.english_decades, "number_compound")
-            paragraph = self._replace_regex(paragraph, self.en_dms, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_llreve, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_not, "regular")
-            paragraph = self.en_trailing_apos.sub(r' \1', paragraph)
+        if self.language == "en" or self.language == "en_PTB":
+            self._split_all_matches(self.english_decades, token_dll, "number_compound")
+            self._split_all_matches(self.en_dms, token_dll)
+            self._split_all_matches(self.en_llreve, token_dll)
+            self._split_all_matches(self.en_not, token_dll)
+            self._split_all_left(self.en_trailing_apos, token_dll)
             for contraction in self.en_twopart_contractions:
-                paragraph = contraction.sub(r' \1 \2 ', paragraph)
+                self._split_all_matches(contraction, token_dll)
             for contraction in self.en_threepart_contractions:
-                paragraph = contraction.sub(r' \1 \2 \3 ', paragraph)
-            paragraph = self._replace_regex(paragraph, self.en_no, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_degree, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_words, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_prefixes, "regular")
-            paragraph = self._replace_regex(paragraph, self.en_nonbreaking_suffixes, "regular")
+                self._split_all_matches(contraction, token_dll)
+            self._split_all_matches(self.en_no, token_dll)
+            self._split_all_matches(self.en_degree, token_dll)
+            self._split_all_matches(self.en_nonbreaking_words, token_dll)
+            self._split_all_matches(self.en_nonbreaking_prefixes, token_dll)
+            self._split_all_matches(self.en_nonbreaking_suffixes, token_dll)
 
         # remove known abbreviations
-        split_abbreviations = False if self.language == "en" else True
-        paragraph = self._replace_abbreviations(paragraph, split_multipart_abbrevs=split_abbreviations)
+        split_abbreviations = False if self.language == "en" or self.language == "en_PTB" else True
+        self._split_abbreviations(token_dll, split_multipart_abbrevs=split_abbreviations)
 
         # DATES AND NUMBERS
         # dates
-        split_dates = False if self.language == "en" else True
-        paragraph = self._replace_regex(paragraph, self.three_part_date_year_first, "date", split_named_subgroups=split_dates)
-        paragraph = self._replace_regex(paragraph, self.three_part_date_dmy, "date", split_named_subgroups=split_dates)
-        paragraph = self._replace_regex(paragraph, self.three_part_date_mdy, "date", split_named_subgroups=split_dates)
-        paragraph = self._replace_regex(paragraph, self.two_part_date, "date", split_named_subgroups=split_dates)
+        split_dates = False if self.language == "en" or self.language == "en_PTB" else True
+        self._split_all_matches(self.three_part_date_year_first, token_dll, "date", split_named_subgroups=split_dates)
+        self._split_all_matches(self.three_part_date_dmy, token_dll, "date", split_named_subgroups=split_dates)
+        self._split_all_matches(self.three_part_date_mdy, token_dll, "date", split_named_subgroups=split_dates)
+        self._split_all_matches(self.two_part_date, token_dll, "date", split_named_subgroups=split_dates)
         # time
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_time, "time")
-        paragraph = self._replace_regex(paragraph, self.time, "time")
+        if self.language == "en" or self.language == "en_PTB":
+            self._split_all_matches(self.en_time, token_dll, "time")
+        self._split_all_matches(self.time, token_dll, "time")
         # US phone numbers and ZIP codes
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_us_phone_number, "number")
-            paragraph = self._replace_regex(paragraph, self.en_us_zip_code, "number")
-            paragraph = self._replace_regex(paragraph, self.en_numerical_identifiers, "number")
+        if self.language == "en" or self.language == "en_PTB":
+            self._split_all_matches(self.en_us_phone_number, token_dll, "number")
+            self._split_all_matches(self.en_us_zip_code, token_dll, "number")
+            self._split_all_matches(self.en_numerical_identifiers, token_dll, "number")
         # ordinals
-        if self.language == "de":
-            paragraph = self._replace_regex(paragraph, self.ordinal, "ordinal")
-        elif self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.english_ordinal, "ordinal")
+        if self.language == "de" or self.language == "de_CMC":
+            self._split_all_matches(self.ordinal, token_dll, "ordinal")
+        elif self.language == "en" or self.language == "en_PTB":
+            self._split_all_matches(self.english_ordinal, token_dll, "ordinal")
         # fractions
-        paragraph = self._replace_regex(paragraph, self.fraction, "number")
+        self._split_all_matches(self.fraction, token_dll, "number")
         # amounts (1.000,-)
-        paragraph = self._replace_regex(paragraph, self.amount, "amount")
+        self._split_all_matches(self.amount, token_dll, "amount")
         # semesters
-        paragraph = self._replace_regex(paragraph, self.semester, "semester")
+        self._split_all_matches(self.semester, token_dll, "semester")
         # measurements
-        paragraph = self._replace_regex(paragraph, self.measurement, "measurement")
+        self._split_all_matches(self.measurement, token_dll, "measurement")
         # number compounds
-        paragraph = self._replace_regex(paragraph, self.number_compound, "number_compound")
+        self._split_all_matches(self.number_compound, token_dll, "number_compound")
         # numbers
-        paragraph = self._replace_regex(paragraph, self.number, "number")
-        paragraph = self._replace_regex(paragraph, self.ipv4, "number")
-        paragraph = self._replace_regex(paragraph, self.section_number, "number")
+        self._split_all_matches(self.number, token_dll, "number")
+        self._split_all_matches(self.ipv4, token_dll, "number")
+        self._split_all_matches(self.section_number, token_dll, "number")
 
         # (clusters of) question marks and exclamation marks
-        paragraph = self._replace_regex(paragraph, self.quest_exclam, "symbol")
+        self._split_all_matches(self.quest_exclam, token_dll, "symbol")
         # arrows
-        paragraph = self.space_right_arrow.sub(r'\1\2', paragraph)
-        paragraph = self.space_left_arrow.sub(r'\1\2', paragraph)
-        paragraph = self._replace_regex(paragraph, self.arrow, "symbol")
+        self._split_all_matches(self.space_right_arrow, token_dll, "symbol", repl=r'\1\2')
+        self._split_all_matches(self.space_left_arrow, token_dll, "symbol", repl=r'\1\2')
+        self._split_all_matches(self.arrow, token_dll, "symbol")
         # parens
-        paragraph = self.paired_paren.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self.paired_bracket.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self.paren.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.all_paren, "symbol")
+        self._split_all_matches(self.all_parens, token_dll, "symbol")
         # slash
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_slash_words, "regular")
-        if self.language == "de":
-            paragraph = self._replace_regex(paragraph, self.de_slash, "symbol")
+        if self.language == "en" or self.language == "en_PTB":
+            self._split_all_matches(self.en_slash_words, token_dll, "regular")
+        if self.language == "de" or self.language == "de_CMC":
+            self._split_all_matches(self.de_slash, token_dll, "symbol")
         # O'Connor and French omitted vocals: L'Enfer, d'accord
-        paragraph = self._replace_regex(paragraph, self.letter_apostrophe_word, "regular")
+        self._split_all_matches(self.letter_apostrophe_word, token_dll)
         # LaTeX-style quotation marks
-        paragraph = self.paired_double_latex_quote.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self.paired_single_latex_quote.sub(r' \1 \2 \3 ', paragraph)
+        self._split_all_matches(self.double_latex_quote, token_dll, "symbol")
+        self._split_paired(self.paired_single_latex_quote, token_dll, "symbol")
         # single quotation marks, apostrophes
-        paragraph = self.paired_single_quot_mark.sub(r' \1 \2 \3 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.all_quote, "symbol")
+        self._split_paired(self.paired_single_quot_mark, token_dll, "symbol")
         # other punctuation symbols
         # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
-        if self.language == "en":
-            paragraph = self._replace_regex(paragraph, self.en_hyphen, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_double_hyphen, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_quotation_marks, "symbol")
-            paragraph = self._replace_regex(paragraph, self.en_other_punctuation, "symbol")
+        if self.language == "en" or self.language == "en_PTB":
+            self._split_all_matches(self.en_hyphen, token_dll, "symbol")
+            self._split_all_matches(self.en_quotation_marks, token_dll, "symbol")
+            self._split_all_matches(self.en_other_punctuation, token_dll, "symbol")
         else:
-            paragraph = self._replace_regex(paragraph, self.other_punctuation, "symbol")
+            self._split_all_matches(self.other_punctuation, token_dll, "symbol")
         # ellipsis
-        paragraph = self._replace_regex(paragraph, self.ellipsis, "symbol")
+        self._split_all_matches(self.ellipsis, token_dll, "symbol")
         # dots
-        # paragraph = self.dot_without_space.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.dot_without_space, "symbol")
-        # paragraph = self.dot.sub(r' \1 ', paragraph)
-        paragraph = self._replace_regex(paragraph, self.dot, "symbol")
+        self._split_all_matches(self.dot_without_space, token_dll, "symbol")
+        self._split_all_matches(self.dot, token_dll, "symbol")
 
-        # tokenize
-        tokens = paragraph.strip().split()
+        # Split on whitespace
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            wt = t.value.text.split()
+            n_wt = len(wt)
+            for i, tok in enumerate(wt):
+                if i == n_wt - 1:
+                    token_dll.insert_left(Token(tok, token_class="regular", space_after=t.value.space_after), t)
+                else:
+                    token_dll.insert_left(Token(tok, token_class="regular", space_after=True), t)
+                token_dll.remove(t)
 
-        # reintroduce mapped tokens
-        tokens = self._reintroduce_instances(tokens)
+        return token_dll.to_list()
 
+    def _convert_to_legacy(self, tokens):
+        if self.token_classes and self.extra_info:
+            tokens = [(t.text, t.token_class, t.extra_info) for t in tokens]
+        elif self.token_classes:
+            tokens = [(t.text, t.token_class) for t in tokens]
+        elif self.extra_info:
+            tokens = [(t.text, t.extra_info) for t in tokens]
+        else:
+            tokens = [t.text for t in tokens]
         return tokens
 
     def tokenize(self, paragraph):
         """An alias for tokenize_paragraph"""
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
         return self.tokenize_paragraph(paragraph)
 
     def tokenize_file(self, filename, parsep_empty_lines=True):
-        """Tokenize file and yield tokenized paragraphs."""
-        with open(filename) as f:
+        """Tokenize utf-8-encoded text file and yield tokenized paragraphs."""
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_file() is deprecated. Please use somajo.SoMaJo.tokenize_text_file() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
+        with open(filename, encoding="utf-8") as f:
+            parsep = "single_newlines"
             if parsep_empty_lines:
-                paragraphs = utils.get_paragraphs(f)
-            else:
-                paragraphs = (line for line in f if line.strip() != "")
+                parsep = "empty_lines"
+            paragraphs = utils.get_paragraphs_str(f, paragraph_separator=parsep)
             tokenized_paragraphs = map(self.tokenize_paragraph, paragraphs)
             for tp in tokenized_paragraphs:
                 if tp:
@@ -778,54 +747,20 @@ class Tokenizer(object):
         social media.
 
         """
-        # convert paragraph to Unicode normal form C (NFC)
-        paragraph = unicodedata.normalize("NFC", paragraph)
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_paragraph() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
+        token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
+        tokens = self._tokenize(token_dll)
+        return self._convert_to_legacy(tokens)
 
-        tokens = self._tokenize(paragraph)
-
-        if len(tokens) == 0:
-            return []
-
-        if self.extra_info:
-            extra_info = self._check_spaces(tokens, paragraph)
-
-        tokens, token_classes = zip(*tokens)
-        if self.token_classes:
-            if self.extra_info:
-                return list(zip(tokens, token_classes, extra_info))
-            else:
-                return list(zip(tokens, token_classes))
-        else:
-            if self.extra_info:
-                return list(zip(tokens, extra_info))
-            else:
-                return list(tokens)
-
-    def tokenize_xml(self, xml, is_file=True):
+    def tokenize_xml(self, xml, is_file=True, eos_tags=None):
         """Tokenize XML file or XML string according to the guidelines of the
         EmpiriST 2015 shared task on automatic linguistic annotation
         of computer-mediated communication / social media.
 
         """
-        elements = utils.parse_xml(xml, is_file)
-        whole_text = " ".join((e.text for e in elements))
-
-        # convert paragraph to Unicode normal form C (NFC)
-        whole_text = unicodedata.normalize("NFC", whole_text)
-
-        tokens = self._tokenize(whole_text)
-
-        tokenized_elements = self._match_xml(tokens, elements)
-        xml = ET.tostring(tokenized_elements[0].element, encoding="unicode").rstrip()
-
-        tokens = [l.split("\t") for l in xml.split("\n")]
-        if self.token_classes:
-            if self.extra_info:
-                return [t if len(t) == 3 else (t[0], None, None) for t in tokens]
-            else:
-                return [(t[0], t[1]) if len(t) == 3 else (t[0], None) for t in tokens]
-        else:
-            if self.extra_info:
-                return [(t[0], t[2]) if len(t) == 3 else (t[0], None) for t in tokens]
-            else:
-                return [t[0] for t in tokens]
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
+        token_dlls = utils.xml_chunk_generator(xml, is_file, eos_tags)
+        tokens = map(self._tokenize, token_dlls)
+        tokens = map(utils.escape_xml_tokens, tokens)
+        tokens = map(self._convert_to_legacy, tokens)
+        return list(itertools.chain.from_iterable(tokens))

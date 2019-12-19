@@ -112,7 +112,7 @@ i.e. if it is a number, an emoticon, an abbreviation, etc.:
 If you want to be able to reconstruct the untokenized input to a
 certain extent, SoMaJo can also provide you with additional details
 for each token, i.e. if the token was followed by whitespace or if it
-contained internal whitespace (according to the tokenization
+contained internal whitespace (according to the EmpiriST tokenization
 guidelines, things like “: )” get normalized to “:)”):
 
     somajo-tokenizer -e <file>
@@ -129,7 +129,7 @@ processes used via the `--parallel` option:
 
     somajo-tokenizer --parallel <number> <file>
 
-SoMaJo can also split the input paragraphs into sentences:
+SoMaJo can split the input paragraphs into sentences:
 
     somajo-tokenizer --split_sentences <file>
 
@@ -142,7 +142,7 @@ If you also want to do sentence splitting, you can use (multiple
 instances of) the `--tag` option to specify XML tags that are always
 sentence breaks, i.e. that can never occur in the middle of a
 sentence. Per default, the sentence splitter uses the following list
-of tags: title, h1, h2, h3, h4, h5, h6, p, br, div, ol, ul, dl and
+of tags: title, h1, h2, h3, h4, h5, h6, p, br, hr, div, ol, ul, dl and
 table.
 
     somajo-tokenizer --xml --split_sentences --tag h1 --tag p --tag div <xml-file>
@@ -150,61 +150,65 @@ table.
 
 ### Using the module ###
 
-You can easily incorporate both the tokenizer and the sentence
-splitter into your own Python projects. For tokenization, you have to
-import `somajo.Tokenizer`, create a `Tokenizer` object and call its
-`tokenize_file` or `tokenize_paragraph` method. Sentence splitting
-operates on paragraphs of tokenized text, i.e. on the output of the
-tokenize methods. You have to import `somajo.SentenceSplitter`,
-create a `SentenceSplitter` object and call its `split` method. Here is an example for tokenizing and splitting a single paragraph:
+You can easily incorporate SoMaJo into your own Python projects. All
+you need to do is importing `somajo.SoMaJo`, creating a `SoMaJo`
+object and calling one of its tokenizer functions: `tokenize_text`,
+`tokenize_text_file`, `tokenize_xml` or `tokenize_xml_file`. These
+functions return a generator that yields tokenized chunks of text. By
+default, these chunks of text are sentences. If you set
+`split_sentences=False`, then the chunks of text are either paragraphs
+or chunks of XML. Every tokenized chunk of text is a list of `Token`
+objects.
+
+For more details, take a look at the [API
+documentation](doc/build/markdown/somajo.md).
+
+Here is an example for tokenizing and sentence splitting two paragraphs:
 
 ```python
-from somajo import Tokenizer, SentenceSplitter
+from somajo import SoMaJo
 
-tokenizer = Tokenizer(split_camel_case=True, token_classes=False, extra_info=False)
-# set is_tuple=True if token_classes=True or extra_info=True
-sentence_splitter = SentenceSplitter(is_tuple=False)
+tokenizer = SoMaJo("de_CMC", split_camel_case=True)
 
 # note that paragraphs are allowed to contain newlines
-paragraph = "der beste Betreuer?\n-- ProfSmith! : )"
+paragraphs = ["der beste Betreuer?\n-- ProfSmith! : )",
+              "Was machst du morgen Abend?! Lust auf Film?;-)"]
 
-tokens = tokenizer.tokenize_paragraph(paragraph)
-print("\n".join(tokens), "\n")
-
-sentences = sentence_splitter.split(tokens)
+sentences = tokenizer.tokenize_text(paragraphs)
 for sentence in sentences:
-    print("\n".join(sentence), "\n")
+    for token in sentence:
+        print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
+    print()
 ```
 
 And here is an example for tokenizing and sentence splitting a whole
-file. The option `parsep_empty_lines=False` states that paragraphs are
-delimited by newlines instead of empty lines:
+file. The option `paragraph_separator="single_newlines"` states that
+paragraphs are delimited by newlines instead of empty lines:
 
 ```python
-# If paragraphs are not separated by empty lines, specify parsep_empty_lines=False:
-tokenized_paragraphs = tokenizer.tokenize_file("Beispieldatei.txt", parsep_empty_lines=False)
-
-for paragraph in tokenized_paragraphs:
-    sentences = sentence_splitter.split(paragraph)
-    for sentence in sentences:
-        print("\n".join(sentence), "\n")
+sentences = tokenizer.tokenize_text_file("Beispieldatei.txt", paragraph_separator="single_newlines")
+for sentence in sentences:
+    for token in sentence:
+        print(token.text)
+    print()
 ```
 
-For processing XML data, use the `tokenize_xml` and `split_xml` methods:
+For processing XML data, use the `tokenize_xml` or `tokenize_xml_file` methods:
 
 ```python
+eos_tags = ["title", "h1", "p"]
+
 # you can read from an open file object
-tokens = tokenizer.tokenize_xml(file_object)
+sentences = tokenizer.tokenize_xml_file(file_object, eos_tags)
+# or you can specify a file name
+sentences = tokenizer.tokenize_xml_file("Beispieldatei.xml", eos_tags)
 # or you can pass a string with XML data
-tokens = tokenizer.tokenize_xml(xml_string, is_file=False)
-
-print("\n".join(tokens), "\n")
-
-eos_tags = set(["title", "h1", "p"])
-sentences = sentence_splitter.split_xml(tokens, eos_tags)
+sentences = tokenizer.tokenize_xml(xml_string, eos_tags)
 
 for sentence in sentences:
-    print("\n".join(sentence), "\n")
+    for token in sentence:
+        print(token.text)
+    print()
 ```
 
 ## Evaluation ##
@@ -233,21 +237,22 @@ and CLEAR [(Warner et al.,
 For tokenizing English text on the command line, specify the language
 via the `-l` or `--language` option:
 
-    somajo-tokenizer -l en <file>
+    somajo-tokenizer -l en_PTB <file>
 
-From Python, you can pass `language="en"` to the `Tokenizer` and
-`SentenceSplitter` constructors, e.g.:
+From Python, you can pass `language="en_PTB"` to the `SoMaJo`
+constructor, e.g.:
 
 ```python
-tokenizer = Tokenizer(language="en")
-tokens = tokenizer.tokenize("That aint bad!:D")
+paragraphs = ["That aint bad!:D"]
+tokenizer = SoMaJo(language="en_PTB")
+sentences = tokenizer.tokenize_text(paragraphs)
 ```
 
 Performance of the English tokenizer:
 
 | Corpus               | Precision | Recall | F₁    |
 |----------------------|-----------|--------|-------|
-| English Web Treebank | 99.63     | 99.63  | 99.63 |
+| English Web Treebank | 99.65     | 99.62  | 99.63 |
 
 
 ## References ##
