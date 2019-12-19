@@ -603,6 +603,15 @@ class TestEmoticons(TestTokenizer):
     def test_emoticons_34(self):
         self._equal(":^)", ":^)")
 
+    def test_emoticons_35(self):
+        self._equal("I want to :scream:!", "I want to :scream: !")
+
+    def test_emoticons_36(self):
+        self._equal(":stuck_out_tongue_winking_eye:", ":stuck_out_tongue_winking_eye:")
+
+    def test_emoticons_37(self):
+        self._equal(":clock230::point_up_2:", ":clock230: :point_up_2:")
+
 
 class TestActions(TestTokenizer):
     """"""
