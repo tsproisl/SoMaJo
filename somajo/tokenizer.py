@@ -111,7 +111,28 @@ class Tokenizer():
                             "\\O/", "\\m/", ":;))", "_))", "*_*", "._.",
                             ":wink:", ">_<", "*<:-)", ":!:", ":;-))",
                             "x'D", ":^)"])
-        emoticon_list = sorted(emoticon_set, key=len, reverse=True)
+        # From https://textfac.es/
+        textfaces_space = set(['⚆ _ ⚆', '˙ ͜ʟ˙', '◔ ⌣ ◔', '( ﾟヮﾟ)', '(• ε •)',
+                               '(づ￣ ³￣)づ', '♪~ ᕕ(ᐛ)ᕗ', '\\ (•◡•) /', '( ಠ ͜ʖರೃ)',
+                               '( ⚆ _ ⚆ )', '(▀̿Ĺ̯▀̿ ̿)', '༼ つ ◕_◕ ༽つ', '༼ つ ಥ_ಥ ༽つ',
+                               '( ͡° ͜ʖ ͡°)', '( ͡°╭͜ʖ╮͡° )', '(╯°□°）╯︵ ┻━┻',
+                               '( ͡ᵔ ͜ʖ ͡ᵔ )', '┬──┬ ノ( ゜-゜ノ)', '┬─┬ノ( º _ ºノ)',
+                               '(ง ͠° ͟ل͜ ͡°)ง', '(͡ ͡° ͜ つ ͡͡°)', "﴾͡๏̯͡๏﴿ O'RLY?",
+                               '（╯°□°）╯︵( .o.)', '(° ͡ ͜ ͡ʖ ͡ °)', '┬─┬ ︵ /(.□. ）',
+                               '(/) (°,,°) (/)', '(☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜)', '| (• ◡•)| (❍ᴥ❍ʋ)',
+                               '༼ つ ͡° ͜ʖ ͡° ༽つ', '(╯°□°)╯︵ ʞooqǝɔɐɟ', '┻━┻ ︵ヽ(`Д´)ﾉ︵ ┻━┻',
+                               '┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴', '(ó ì_í)=óò=(ì_í ò)',
+                               '(•_•) ( •_•)>⌐■-■ (⌐■_■)', '(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧ ✧ﾟ･: *ヽ(◕ヮ◕ヽ)',
+                               '[̲̅$̲̅(̲̅ ͡° ͜ʖ ͡°̲̅)̲̅$̲̅]', '/╲/\\╭( ͡° ͡° ͜ʖ ͡° ͡°)╮/\\╱\\',
+                               '( ͡°( ͡° ͜ʖ( ͡° ͜ʖ ͡°)ʖ ͡°) ͡°)', '(._.) ( l: ) ( .-. ) ( :l ) (._.)',
+                               "̿ ̿ ̿'̿'\\̵͇̿̿\\з=(•_•)=ε/̵͇̿̿/'̿'̿ ̿", '༼ ºل͟º ༼ ºل͟º ༼ ºل͟º ༽ ºل͟º ༽ ºل͟º ༽',
+                               "̿'̿'\\̵͇̿̿\\з=( ͠° ͟ʖ ͡°)=ε/̵͇̿̿/'̿̿ ̿ ̿ ̿ ̿ ̿",
+                               "̿̿ ̿̿ ̿̿ ̿'̿'\\̵͇̿̿\\з= ( ▀ ͜͞ʖ▀) =ε/̵͇̿̿/’̿’̿ ̿ ̿̿ ̿̿ ̿̿"])
+        textfaces_emoji = set(['♥‿♥', '☼.☼', '≧☉_☉≦', '(°ロ°)☝', '(☞ﾟ∀ﾟ)☞', '☜(˚▽˚)☞', '☜(⌒▽⌒)☞', '(☞ຈل͜ຈ)☞', 'ヾ(⌐■_■)ノ♪'])
+        textfaces_wo_emoji = set(['=U', 'ಠ_ಠ', '◉_◉', 'ಥ_ಥ', ":')", 'ಠ⌣ಠ', 'ಠ~ಠ', 'ಠ_ಥ', 'ಠ‿↼', 'ʘ‿ʘ', 'ಠoಠ', 'ರ_ರ', '◔̯◔', '¬_¬', 'ب_ب', '°Д°', '^̮^', '^̮^', '^̮^', '>_>', '^̮^', '^̮^', 'ಠ╭╮ಠ', '(>ლ)', 'ʕ•ᴥ•ʔ', '(ಥ﹏ಥ)', '(ᵔᴥᵔ)', '(¬‿¬)', '⌐╦╦═─', '(•ω•)', '(¬_¬)', '｡◕‿◕｡', '(ʘ‿ʘ)', '٩◔̯◔۶', '(>人<)', '(~_^)', '(^̮^)', '(･.◤)', '(◕‿◕✿)', '｡◕‿‿◕｡', '(─‿‿─)', '(；一_一)', "(ʘᗩʘ')", '(✿´‿`)', 'ლ(ಠ益ಠლ)', '~(˘▾˘~)', '(~˘▾˘)~', '(｡◕‿◕｡)', '(っ˘ڡ˘ς)', 'ლ(´ڡ`ლ)', 'ƪ(˘⌣˘)ʃ', '(´・ω・`)', '(ღ˘⌣˘ღ)', '(▰˘◡˘▰)', '〆(・∀・＠)', '༼ʘ̚ل͜ʘ̚༽', 'ᕙ(⇀‸↼‶)ᕗ', 'ᕦ(ò_óˇ)ᕤ', '(｡◕‿‿◕｡)', 'ヽ༼ຈل͜ຈ༽ﾉ', '(ง°ل͜°)ง', '╚(ಠ_ಠ)=┐', '(´・ω・)っ由', 'Ƹ̵̡Ӝ̵̨̄Ʒ', '¯\\_(ツ)_/¯', '▄︻̷̿┻̿═━一', "(ง'̀-'́)ง", '¯\\(°_o)/¯', '｡゜(｀Д´)゜｡', '(づ｡◕‿‿◕｡)づ', '(;´༎ຶД༎ຶ`)', '(ノಠ益ಠ)ノ彡┻━┻', 'ლ,ᔑ•ﺪ͟͠•ᔐ.ლ', '(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧', '┬┴┬┴┤(･_├┬┴┬┴', '[̲̅$̲̅(̲̅5̲̅)̲̅$̲̅]'])
+        self.textfaces_space = re.compile(r"|".join([re.escape(_) for _ in sorted(textfaces_space, key=len, reverse=True)]))
+        self.textfaces_emoji = re.compile(r"|".join([re.escape(_) for _ in sorted(textfaces_emoji, key=len, reverse=True)]))
+        emoticon_list = sorted(emoticon_set | textfaces_wo_emoji, key=len, reverse=True)
         self.emoticon = re.compile(r"""(?:(?:[:;]|(?<!\d)8)           # a variety of eyes, alt.: [:;8]
                                         [-'oO]?                       # optional nose or tear
                                         (?: \)+ | \(+ | [*] | ([DPp])\1*(?!\w)))   # a variety of mouths
@@ -416,6 +437,7 @@ class Tokenizer():
 
     def _split_all_emojis(self, token_dll, token_class="emoticon"):
         """Replace all emoji sequences"""
+        self._split_all_matches(self.textfaces_emoji, token_dll, "emoticon")
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
@@ -523,7 +545,11 @@ class Tokenizer():
 
         # Emoji sequences can contain zero-width joiners. Get them out
         # of the way next
+        # First textfaces that contain whitespace:
+        self._split_all_matches(self.textfaces_space, token_dll, "emoticon")
+        # Then flags:
         self._split_all_matches(self.unicode_flags, token_dll, "emoticon")
+        # Then all other emojis
         self._split_all_emojis(token_dll, "emoticon")
 
         for t in token_dll:
