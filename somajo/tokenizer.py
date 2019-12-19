@@ -121,6 +121,8 @@ class Tokenizer():
                                    r"|" +
                                    r"(?:\b(?:D'?:|oO)\b)" +
                                    r"|" +
+                                   r"(?:(?<!\b\d{1,2}):\w+:(?!\d{2}\b))" +   # Textual representations of emojis: :smile:, etc. We don't want to match times: 08:30:00
+                                   r"|" +
                                    r"|".join([re.escape(_) for _ in emoticon_list]), re.VERBOSE)
         self.space_emoticon = re.compile(r'([:;])[ ]+([()])')
         # ^3 is an emoticon, unless it is preceded by a number (with
