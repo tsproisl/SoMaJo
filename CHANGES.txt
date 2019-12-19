@@ -2,12 +2,27 @@
 
 ## Version 2.0.0, ??? ##
 
+### New features and improvements ###
+
+- New API: Use new class SoMaJo instead of Tokenizer and
+  SentenceSplitter. As for now, the old API is still supported but
+  will issue deprecation warnings.
+- Speed-up: Due to a new internal representation of the input text
+  during processing (as a doubly linked list of Token objects),
+  tokenization is now two to three times faster.
+- Incremental and parallel processing of XML: If a sensible set of
+  eos_tags is specified, the XML input will be processed incrementally
+  (allowing for arbitrarily large XML input). In addition, if a
+  sensible set of eos_tags is specified, processing can also be
+  parallelized.
+- New option --strip-tags to suppress the output of XML tags
+
 ### Breaking changes ###
 
 - Removed the tokenizer script (deprecated since version 1.5.0
   released in October 2017). Use somajo-tokenizer instead.
-
-### Non-breaking changes ###
+- Language codes contain the tokenization guideline: "de_CMC" instead
+  of "de" and "en_PTB" instead of "en".
 
 ## Version 1.11.0, 2019-11-08 ##
 
