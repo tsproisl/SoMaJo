@@ -724,12 +724,12 @@ class Tokenizer():
 
     def tokenize(self, paragraph):
         """An alias for tokenize_paragraph"""
-        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         return self.tokenize_paragraph(paragraph)
 
     def tokenize_file(self, filename, parsep_empty_lines=True):
         """Tokenize utf-8-encoded text file and yield tokenized paragraphs."""
-        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_file() is deprecated. Please use somajo.SoMaJo.tokenize_text_file() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_file() is deprecated. Please use somajo.SoMaJo.tokenize_text_file() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         with open(filename, encoding="utf-8") as f:
             parsep = "single_newlines"
             if parsep_empty_lines:
@@ -747,7 +747,7 @@ class Tokenizer():
         social media.
 
         """
-        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_paragraph() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_paragraph() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         token_dll = doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
         tokens = self._tokenize(token_dll)
         return self._convert_to_legacy(tokens)
@@ -758,7 +758,7 @@ class Tokenizer():
         of computer-mediated communication / social media.
 
         """
-        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo#TODO")
+        logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         token_dlls = utils.xml_chunk_generator(xml, is_file, eos_tags)
         tokens = map(self._tokenize, token_dlls)
         tokens = map(utils.escape_xml_tokens, tokens)
