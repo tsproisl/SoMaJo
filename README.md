@@ -161,7 +161,7 @@ or chunks of XML. Every tokenized chunk of text is a list of `Token`
 objects.
 
 For more details, take a look at the [API
-documentation](docs/build/markdown/somajo.md).
+documentation](doc/build/markdown/somajo.md).
 
 Here is an example for tokenizing and sentence splitting two paragraphs:
 
