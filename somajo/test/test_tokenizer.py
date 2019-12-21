@@ -1000,18 +1000,24 @@ class OwnAdditions(TestTokenizer):
         self._equal("IP-Adresse des Routers: 192.0.2.42.", "IP-Adresse des Routers : 192.0.2.42 .")
 
     def test_own_104(self):
-        self._equal(")foo", ") foo")
+        self._equal("Wir suchen C#-Entwickler.", "Wir suchen C#-Entwickler .")
 
     def test_own_105(self):
-        self._equal(" )foo", ") foo")
+        self._equal("Programmiersprachen: C++, C#, F#, .Net", "Programmiersprachen : C++ , C# , F# , .Net")
 
     def test_own_106(self):
-        self._equal("machst du's?", "machst du's ?")
+        self._equal(")foo", ") foo")
 
     def test_own_107(self):
-        self._fail_means_improvement("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
+        self._equal(" )foo", ") foo")
 
     def test_own_108(self):
+        self._equal("machst du's?", "machst du's ?")
+
+    def test_own_109(self):
+        self._fail_means_improvement("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
+
+    def test_own_110(self):
         self._equal('foo "bar -> baz" qux "bar baz" qux', 'foo " bar -> baz " qux " bar baz " qux')
 
 
