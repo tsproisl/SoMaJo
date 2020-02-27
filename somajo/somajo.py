@@ -41,7 +41,7 @@ class SoMaJo:
     def _tokenize(self, token_dlls, *, parallel=1):
         if parallel > 1:
             pool = multiprocessing.Pool(min(parallel, multiprocessing.cpu_count()))
-            tokens = pool.imap(self.tokenizer._tokenize, token_dlls, 250)
+            tokens = pool.imap(self._tokenizer._tokenize, token_dlls, 250)
             # tokenized = map(self._tokenize, paragraphs)
             if self.split_sentences:
                 tokens = pool.imap(self._sentence_splitter._split_sentences, tokens, 250)
