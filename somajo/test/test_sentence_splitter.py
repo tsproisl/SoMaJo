@@ -121,14 +121,18 @@ class TestXMLPretokenized(TestSentenceSplitterPretokenized):
 
 class TestXMLBoundaries(TestSentenceSplitter):
     """"""
+    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_01(self):
         self._equal_xml("<foo>Foo bar. Foo bar.</foo>", ["<foo> <s> Foo bar . </s>", "<s> Foo bar . </s> </foo>"])
 
+    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_02(self):
         self._equal_xml("<foo><i>Foo bar</i>. Foo <i>bar.</i></foo>", ["<foo> <s> <i> Foo bar </i> . </s>", "<s> Foo <i> bar . </i> </s> </foo>"])
 
+    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_03(self):
         self._equal_xml("<foo><i>Foo bar.</i> Foo bar.</foo>", ["<foo> <i> <s> Foo bar . </s> </i>", "<s> Foo bar . </s> </foo>"])
 
+    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_04(self):
         self._equal_xml("<foo>Foo <i>bar. Foo</i> bar.</foo>", ["<foo> <s> Foo <i> bar . </i> </s>", "<s> <i> Foo </i> bar . </s> </foo>"])
