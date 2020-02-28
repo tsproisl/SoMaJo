@@ -597,6 +597,7 @@ kath.
 kaufm.
 kaukas.
 kelt.
+kfm.
 Kgr.
 kindersprachl.
 kirchenlat.

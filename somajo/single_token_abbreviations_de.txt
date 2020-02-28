@@ -43,7 +43,6 @@ USt-IdNr.
 E/E
 B.Sc.
 M.Sc.
-kfm.
 
 # SAP Versions
 S/4
