@@ -35,26 +35,6 @@ class TestTokenizer(unittest.TestCase):
         complete = utils.escape_xml_tokens(complete)
         self.assertEqual([t.text for t in complete], tokenized)
 
-    def _fail_means_improvement(self, raw, tokenized):
-        """"""
-        if isinstance(tokenized, str):
-            tokenized = tokenized.split()
-        dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
-        tokens = self.tokenizer._tokenize(dll)
-        self.assertNotEqual([t.text for t in tokens], tokenized)
-
-    def _fail_means_improvement_xml(self, raw, tokenized):
-        """"""
-        if isinstance(tokenized, str):
-            tokenized = tokenized.split()
-        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
-        eos_tags = set(eos_tags)
-        token_dlls = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags)
-        chunks = map(self.tokenizer._tokenize, token_dlls)
-        complete = list(itertools.chain.from_iterable(chunks))
-        complete = utils.escape_xml_tokens(complete)
-        self.assertNotEqual([t.text for t in complete], tokenized)
-
 
 class TestEnglishTokenizer(TestTokenizer):
     """"""
@@ -116,8 +96,9 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_06(self):
         self._equal("des Virus'", "des Virus'")
 
+    @unittest.expectedFailure
     def test_punctuation_07(self):
-        self._fail_means_improvement("du bist echt ein a...", "du bist echt ein a...")
+        self._equal("du bist echt ein a...", "du bist echt ein a...")
 
     def test_punctuation_08(self):
         self._equal("Test.......", "Test .......")
@@ -183,8 +164,9 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_28(self):
         self._equal("Avril_Lavigne", "Avril_Lavigne")
 
+    @unittest.expectedFailure
     def test_punctuation_29(self):
-        self._fail_means_improvement("+s", "+s")
+        self._equal("+s", "+s")
 
     def test_punctuation_30(self):
         self._equal("-v", "-v")
@@ -324,8 +306,9 @@ class TestTimeDate(TestTokenizer):
     def test_time_24(self):
         self._equal("24-stündig", "24-stündig")
 
+    @unittest.expectedFailure
     def test_time_25(self):
-        self._fail_means_improvement("Punkte 2-4. Das System", "Punkte 2 - 4 . Das System")
+        self._equal("Punkte 2-4. Das System", "Punkte 2 - 4 . Das System")
 
 
 class TestAbbreviations(TestTokenizer):
@@ -384,8 +367,9 @@ class TestTypos(TestTokenizer):
     def test_typos_04(self):
         self._equal("Anna,kannst du mal", "Anna , kannst du mal")
 
+    @unittest.expectedFailure
     def test_typos_05(self):
-        self._fail_means_improvement("handfest un direkt- so sind se...die Pottler", "handfest un direkt - so sind se ... die Pottler")
+        self._equal("handfest un direkt- so sind se...die Pottler", "handfest un direkt - so sind se ... die Pottler")
 
     def test_typos_06(self):
         self._equal("Warst du vom Zeugnis überraschtß", "Warst du vom Zeugnis überraschtß")
@@ -474,11 +458,13 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_10(self):
         self._equal("http://www.sueddeutsche.de/bla/test_(geheim)", "http://www.sueddeutsche.de/bla/test_(geheim)")
 
+    @unittest.expectedFailure
     def test_emails_urls_11(self):
-        self._fail_means_improvement("bla (http://www.sueddeutsche.de/bla/test_(geheim).html) foo", "bla ( http://www.sueddeutsche.de/bla/test_(geheim).html ) foo")
+        self._equal("bla (http://www.sueddeutsche.de/bla/test_(geheim).html) foo", "bla ( http://www.sueddeutsche.de/bla/test_(geheim).html ) foo")
 
+    @unittest.expectedFailure
     def test_emails_urls_12(self):
-        self._fail_means_improvement("bla (http://www.sueddeutsche.de/bla/test_(geheim)) foo", "bla ( http://www.sueddeutsche.de/bla/test_(geheim) ) foo")
+        self._equal("bla (http://www.sueddeutsche.de/bla/test_(geheim)) foo", "bla ( http://www.sueddeutsche.de/bla/test_(geheim) ) foo")
 
     def test_emails_urls_13(self):
         self._equal("vorname_nachname@provider.eu", "vorname_nachname@provider.eu")
@@ -747,8 +733,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_21(self):
         self._equal("WS15/16", "WS 15/16")
 
+    @unittest.expectedFailure
     def test_own_22(self):
-        self._fail_means_improvement("das dauert nur 15m. hoffe ich", "das dauert nur 15 m. hoffe ich")
+        self._equal("das dauert nur 15m. hoffe ich", "das dauert nur 15 m. hoffe ich")
 
     def test_own_23(self):
         self._equal("der Student/die Studentin", "der Student / die Studentin")
@@ -762,8 +749,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_26(self):
         self._equal("`Wort'", "` Wort '")
 
+    @unittest.expectedFailure
     def test_own_27(self):
-        self._fail_means_improvement("c&c.", "c & c .")
+        self._equal("c&c.", "c & c .")
 
     def test_own_28(self):
         self._equal("andere &c.", "andere &c.")
@@ -864,14 +852,17 @@ class OwnAdditions(TestTokenizer):
     def test_own_60(self):
         self._equal("Ich lese IhreAnnäherungen,Beobachtungen,Vergleiche", "Ich lese Ihre Annäherungen , Beobachtungen , Vergleiche")
 
+    @unittest.expectedFailure
     def test_own_61(self):
-        self._fail_means_improvement("und auchE-Mail", "und auch E-Mail")
+        self._equal("und auchE-Mail", "und auch E-Mail")
 
+    @unittest.expectedFailure
     def test_own_62(self):
-        self._fail_means_improvement('"bla bla"-Taktik', '" bla bla " - Taktik')
+        self._equal('"bla bla"-Taktik', '" bla bla " - Taktik')
 
+    @unittest.expectedFailure
     def test_own_63(self):
-        self._fail_means_improvement('"bla"-Taktik', '"bla"-Taktik')
+        self._equal('"bla"-Taktik', '"bla"-Taktik')
 
     def test_own_64(self):
         self._equal("derVgl. hinkt", "der Vgl. hinkt")
@@ -882,8 +873,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_66(self):
         self._equal("d.eigenenUnters", "d. eigenen Unters")
 
+    @unittest.expectedFailure
     def test_own_67a(self):
-        self._fail_means_improvement("..i.d.Regel", ".. i. d. Regel")
+        self._equal("..i.d.Regel", ".. i. d. Regel")
 
     def test_own_67b(self):
         self._equal("i.d.Regel", "i. d. Regel")
@@ -906,11 +898,13 @@ class OwnAdditions(TestTokenizer):
     def test_own_72(self):
         self._equal("Industrie4.0", "Industrie4.0")
 
+    @unittest.expectedFailure
     def test_own_73(self):
-        self._fail_means_improvement("Das ist ab 18+", "Das ist ab 18+")
+        self._equal("Das ist ab 18+", "Das ist ab 18+")
 
+    @unittest.expectedFailure
     def test_own_74(self):
-        self._fail_means_improvement("Wir haben 500+ Gäste", "Wir haben 500+ Gäste")
+        self._equal("Wir haben 500+ Gäste", "Wir haben 500+ Gäste")
 
     def test_own_75(self):
         self._equal("toll +1", "toll +1")
@@ -933,14 +927,17 @@ class OwnAdditions(TestTokenizer):
     def test_own_81(self):
         self._equal("*<:-)", "*<:-)")
 
+    @unittest.expectedFailure
     def test_own_82(self):
-        self._fail_means_improvement("WP:DISK", "WP:DISK")
+        self._equal("WP:DISK", "WP:DISK")
 
+    @unittest.expectedFailure
     def test_own_83(self):
-        self._fail_means_improvement("WP:BNS", "WP:BNS")
+        self._equal("WP:BNS", "WP:BNS")
 
+    @unittest.expectedFailure
     def test_own_84(self):
-        self._fail_means_improvement("Bla:[2]", "Bla : [ 2 ]")
+        self._equal("Bla:[2]", "Bla : [ 2 ]")
 
     def test_own_85(self):
         self._equal("Herford–Lage–Detmold–Altenbeken–Paderborn", "Herford – Lage – Detmold – Altenbeken – Paderborn")
@@ -960,11 +957,13 @@ class OwnAdditions(TestTokenizer):
     def test_own_90(self):
         self._equal(":;-))", ":;-))")
 
+    @unittest.expectedFailure
     def test_own_91(self):
-        self._fail_means_improvement("1998/99", "1998 / 99")
+        self._equal("1998/99", "1998 / 99")
 
+    @unittest.expectedFailure
     def test_own_92(self):
-        self._fail_means_improvement("2009/2010", "2009 / 2010")
+        self._equal("2009/2010", "2009 / 2010")
 
     def test_own_93(self):
         self._equal("1970er", "1970er")
@@ -993,8 +992,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_101(self):
         self._equal("1.1 Allgemeines", "1.1 Allgemeines")
 
+    @unittest.expectedFailure
     def test_own_102(self):
-        self._fail_means_improvement("1.1. Allgemeines", "1.1. Allgemeines")
+        self._equal("1.1. Allgemeines", "1.1. Allgemeines")
 
     def test_own_103(self):
         self._equal("IP-Adresse des Routers: 192.0.2.42.", "IP-Adresse des Routers : 192.0.2.42 .")
@@ -1014,8 +1014,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_108(self):
         self._equal("machst du's?", "machst du's ?")
 
+    @unittest.expectedFailure
     def test_own_109(self):
-        self._fail_means_improvement("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
+        self._equal("foo 'bar -> baz' qux 'bar baz' qux", "foo ' bar -> baz ' qux ' bar baz ' qux")
 
     def test_own_110(self):
         self._equal('foo "bar -> baz" qux "bar baz" qux', 'foo " bar -> baz " qux " bar baz " qux')
@@ -1035,8 +1036,9 @@ class TestUnderline(TestTokenizer):
     def test_underline_04(self):
         self._equal("Achtung _sehr wichtig _!", "Achtung _sehr wichtig _ !")
 
+    @unittest.expectedFailure
     def test_underline_05(self):
-        self._fail_means_improvement("Wir _gehen ins _Sub_", "Wir _ gehen ins _Sub _")
+        self._equal("Wir _gehen ins _Sub_", "Wir _ gehen ins _Sub _")
 
     def test_underline_06(self):
         self._equal("Achtung _ sehr wichtig_!", "Achtung _ sehr wichtig_ !")
@@ -1092,8 +1094,9 @@ class TestXML(TestTokenizer):
     def test_xml_03(self):
         self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! <x>:</x>)</foo>", "<foo> der beste Betreuer ? -&gt; Prof Smith ! <x> : </x> ) </foo>")
 
+    @unittest.expectedFailure
     def test_xml_04(self):
-        self._fail_means_improvement_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
+        self._equal_xml("<foo>href in fett: &lt;a href='<b>href</b>'&gt;</foo>", ["<foo>", "href", "in", "fett", ":", "&lt;a href='", "<b>", "href", "</b>", "'&gt;", "</foo>"])
 
     def test_xml_05(self):
         self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
