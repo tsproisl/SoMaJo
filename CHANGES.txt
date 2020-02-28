@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version 2.0.3, 2020-02-27 ##
+
+- Skip tests for unimplemented features (some builds will fail if any
+  of the unit tests fail).
+
 ## Version 2.0.2, 2020-02-27 ##
 
 - Bugfix: Parallel tokenization (--parallel > 1) works again.
