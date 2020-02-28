@@ -316,7 +316,7 @@ Split the contents of an xml file into sequences of tokens.
     * **strip_tags** (*bool, (default=False)*) – Remove the XML tags from the output.
 
 
-    * **parallel** (*int**, (default=1)*) – Number of processes to use.
+    * **parallel** (*int, (default=1)*) – Number of processes to use.
 
 
 
