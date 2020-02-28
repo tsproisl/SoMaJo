@@ -40,6 +40,9 @@ Split paragraphs of text into sequences of tokens.
     * **paragraphs** (*iterable*) – An iterable of single paragraphs of text.
 
 
+    * **parallel** (*int, (default=1)*) – Number of processes to use.
+
+
 
 * **Yields**
 

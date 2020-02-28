@@ -268,6 +268,8 @@ class SoMaJo:
         ----------
         paragraphs : iterable
             An iterable of single paragraphs of text.
+        parallel : int, (default=1)
+            Number of processes to use.
 
         Yields
         ------
