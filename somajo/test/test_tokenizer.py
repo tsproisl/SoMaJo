@@ -1194,9 +1194,6 @@ class TestEnglish(TestEnglishTokenizer):
     def test_english_14(self):
         self._equal("People were encouraged to submit their designs online at www.flag.govt.nz and suggest what the flag should mean on www.standfor.co.nz.", "People were encouraged to submit their designs online at www.flag.govt.nz and suggest what the flag should mean on www.standfor.co.nz .")
 
-    def test_english_14(self):
-        self._equal("I prefer La Porte de l'Enfer to L'Éternelle idole", "I prefer La Porte de l'Enfer to L'Éternelle idole")
-
     def test_english_15(self):
         self._equal("bla 21st century", "bla 21st century")
 
@@ -1247,6 +1244,9 @@ class TestEnglish(TestEnglishTokenizer):
 
     def test_english_30(self):
         self._equal("my number:456-123-7654!", "my number : 456-123-7654 !")
+
+    def test_english_31(self):
+        self._equal("I prefer La Porte de l'Enfer to L'Éternelle idole", "I prefer La Porte de l'Enfer to L'Éternelle idole")
 
 
 class TestDeprecated(TestTokenizerDeprecated):
