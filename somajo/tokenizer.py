@@ -325,6 +325,8 @@ class Tokenizer():
         self.double_latex_quote = re.compile(r"(?:(?<!`)``(?!`))|(?:(?<!')''(?!'))")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(?P<left>`)(?P<middle>[^`']+)(?P<right>')(?!')")
         self.paired_single_quot_mark = re.compile(r"(?P<left>['‚‘’])(?P<middle>[^']+)(?P<right>['‘’])")
+        # Musical notes, two programming languages
+        self.letter_sharp = re.compile(r"\b[acdfg]#(?:-\p{L}+)?(?!\w)", re.IGNORECASE)
         self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')
         self.en_quotation_marks = re.compile(r'([„“”‚‘’"»«›‹])')
         self.en_other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*,;:+×÷±≤≥=&/–—-]+)')
@@ -684,6 +686,7 @@ class Tokenizer():
         self._split_paired(self.paired_single_quot_mark, token_dll, "symbol")
         # other punctuation symbols
         # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
+        self._split_all_matches(self.letter_sharp, token_dll, "regular")
         if self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.en_hyphen, token_dll, "symbol")
             self._split_all_matches(self.en_quotation_marks, token_dll, "symbol")

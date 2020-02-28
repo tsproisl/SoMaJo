@@ -39,7 +39,6 @@ Uni-Kl.
 USt-IdNr.
 
 # Custom Abbreviations
-C#
 .Net
 E/E
 B.Sc.
