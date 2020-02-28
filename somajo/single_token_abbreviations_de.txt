@@ -41,8 +41,6 @@ USt-IdNr.
 # Custom Abbreviations
 .Net
 E/E
-B.Sc.
-M.Sc.
 
 # SAP Versions
 S/4
