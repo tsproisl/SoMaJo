@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version 2.0.4, 2020-03-05 ##
+
+- Bugfix: Prevent race conditions between tokenizer and sentence
+  splitter in parallel processing (--parallel > 1).
+
 ## Version 2.0.3, 2020-02-27 ##
 
 - Skip tests for unimplemented features (some builds will fail if any
