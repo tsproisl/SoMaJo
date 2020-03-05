@@ -1,5 +1,7 @@
 # SoMaJo #
 
+[![PyPI](https://img.shields.io/pypi/v/SoMaJo)](https://pypi.org/project/SoMaJo/)
+
   * [Introduction](#introduction)
   * [Installation](#installation)
   * [Usage](#usage)
