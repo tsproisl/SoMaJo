@@ -146,7 +146,12 @@ class Tokenizer():
                                    r"(?:(?<!\b\d{1,2}):\w+:(?!\d{2}\b))" +   # Textual representations of emojis: :smile:, etc. We don't want to match times: 08:30:00
                                    r"|" +
                                    r"|".join([re.escape(_) for _ in emoticon_list]), re.VERBOSE)
-        self.space_emoticon = re.compile(r'([:;])[ ]+([()])')
+        # Avoid matching phone numbers like "Tel: ( 0049)" or "Tel: (+49)"
+        self.space_emoticon = re.compile(r"""([:;])                # eyes
+                                             [ ]                   # space between eyes and mouth
+                                             ([()])                # mouths
+                                             (?![ ]?(?:00|[+])\d)  # not followed by, e.g., 0049 or +49 (issue #12)
+                                          """, re.VERBOSE)
         # ^3 is an emoticon, unless it is preceded by a number (with
         # optional whitespace between number and ^3)
         # ^\^3    # beginning of line, no leading characters

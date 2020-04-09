@@ -361,6 +361,10 @@ class TestTypos(TestTokenizer):
     def test_typos_02(self):
         self._equal("tag quaki : )", "tag quaki :)")
 
+    def test_typos_02a(self):
+        # not all occurrences of : ( are a smiley
+        self._equal("Tel: ( 0049) Tel: (+49 123 4567)", "Tel : ( 0049 ) Tel : ( +49 123 4567 )")
+
     def test_typos_03(self):
         self._equal("Ich hab da noch maldrüber nachgedacht", "Ich hab da noch maldrüber nachgedacht")
 
