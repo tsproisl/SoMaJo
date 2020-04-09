@@ -946,7 +946,7 @@ class OwnAdditions(TestTokenizer):
         self._equal("directory/image.png", "directory/image.png")
 
     def test_own_87(self):
-        self._equal("name [at] provider [dot] com", ["name [at] provider [dot] com"])
+        self._equal("name [at] provider [dot] com", ["name[at]provider[dot]com"])
 
     def test_own_88(self):
         self._equal(":!:", ":!:")
