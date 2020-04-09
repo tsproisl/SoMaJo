@@ -83,7 +83,8 @@ class Tokenizer():
         # regex for email addresses taken from:
         # http://www.regular-expressions.info/email.html
         # self.email = re.compile(r"\b[\w.%+-]+@[\w.-]+\.\p{L}{2,}\b")
-        self.email = re.compile(r"\b[\w.%+-]+(?:@| \[at\] )[\w.-]+(?:\.| \[?dot\]? )\p{L}{2,}\b")
+        # (?|…) is a branch reset group (https://www.regular-expressions.info/branchreset.html)
+        self.email = re.compile(r"\b([\w.%+-]+)(?|(@)| (\[at\]) )([\w.-]+)(?|(\.)| (\[?dot\]?) )(\p{L}{2,})\b")
         # simple regex for urls that start with http or www
         # TODO: schließende Klammer am Ende erlauben, wenn nach http etc. eine öffnende kam
         self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+?\(\S*?\)\S*(?=$|[\'. "!?,;])', re.IGNORECASE)
@@ -542,8 +543,6 @@ class Tokenizer():
         # - XML tags
         self._split_all_matches(self.xml_declaration, token_dll, "XML_tag")
         self._split_all_matches(self.tag, token_dll, "XML_tag")
-        # - email address obfuscation may involve spaces
-        self._split_all_matches(self.email, token_dll, "email_address")
 
         # Emoji sequences can contain zero-width joiners. Get them out
         # of the way next
@@ -567,6 +566,8 @@ class Tokenizer():
 
         # Some emoticons contain erroneous spaces. We fix this.
         self._split_all_matches(self.space_emoticon, token_dll, "emoticon", repl=r'\1\2')
+        # obfuscated email addresses can contain spaces
+        self._split_all_matches(self.email, token_dll, "email_address", repl=r'\1\2\3\4\5')
 
         # urls
         self._split_all_matches(self.simple_url_with_brackets, token_dll, "URL")
