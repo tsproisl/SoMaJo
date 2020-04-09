@@ -16,10 +16,14 @@ class SentenceSplitter():
         # full stop, ellipsis, exclamation and question marks
         self.sentence_ending_punct = re.compile(r"^(?:\.+|…+\.*|[!?]+)$")
         self.opening_punct = re.compile(r"^(?:['\"¿¡\p{Pi}\p{Ps}–—]|-{2,})$")
+        self.closing_punct = re.compile(r"^(?:['\"\p{Pf}\p{Pe}])$")
+        # International quotes: «» “” ‹› ‘’
+        # German quotes: »« „“ ›‹ ‚‘
+        self.problematic_quotes = set(['"'])
         if language == "de" or language == "de_CMC":
-            self.closing_punct = re.compile(r"^(?:['\"“\p{Pf}\p{Pe}])$")
-        else:
-            self.closing_punct = re.compile(r"^(?:['\"\p{Pf}\p{Pe}])$")
+            # German opening quotes [»›] have category Pf
+            # German closing quotes [“‘«‹] have category Pi
+            self.problematic_quotes = set(['"', "»", "«", "›", "‹", "“", "‘"])
         self.eos_abbreviations = utils.read_abbreviation_file("eos_abbreviations.txt")
 
     def _get_sentence_boundaries(self, tokens):
@@ -110,15 +114,24 @@ class SentenceSplitter():
                     tok_j = tokens[j]
                     if tok_j.markup:
                         continue
+                    opening, closing = False, False
                     if first_token_in_sentence is None:
                         first_token_in_sentence = tok_j
-                    if tok_j.text[0].isupper():
+                    # Heuristically disambiguate problematic quotes:
+                    if tok_j.text in self.problematic_quotes:
+                        # opening: preceded by space or opening
+                        if tokens[j - 1].space_after or self.opening_punct.search(tokens[j - 1].text):
+                            opening = True
+                        # closing: last token or followed by space or closing
+                        elif j == n - 1 or tok_j.space_after or self.closing_punct.search(tokens[j + 1].text):
+                            closing = True
+                    if tok_j.text[0].isupper() or tok_j.text.isnumeric():
                         last_token_in_sentence.last_in_sentence = True
                         first_token_in_sentence.first_in_sentence = True
                         break
-                    elif self.opening_punct.search(tok_j.text) and tok_j.text != "“":
+                    elif opening or (self.opening_punct.search(tok_j.text) and not closing):
                         last = "opening"
-                    elif self.closing_punct.search(tok_j.text) and last != "opening":
+                    elif closing or (self.closing_punct.search(tok_j.text) and not opening) and last != "opening":
                         last_token_in_sentence = tok_j
                         first_token_in_sentence = None
                         last = "closing"
