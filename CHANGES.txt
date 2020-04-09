@@ -1,5 +1,12 @@
 # CHANGELOG #
 
+## Version 2.0.5, 2020-04-09 ##
+
+- Add heuristics for ambiguous quotation marks (issue #11).
+- Avoid false positives for emoticons that contain a space (issue #12).
+- Correctly tokenize obfuscated email addresses that contain spaces.
+- Do not split tl;dr and its German variant zl;ng.
+
 ## Version 2.0.4, 2020-03-05 ##
 
 - Bugfix: Prevent race conditions between tokenizer and sentence
