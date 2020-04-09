@@ -352,6 +352,9 @@ class TestAbbreviations(TestTokenizer):
     def test_abbreviations_13(self):
         self._equal("Bruce Springsteen aka The Boss", "Bruce Springsteen aka The Boss")
 
+    def test_abbreviations_14(self):
+        self._equal("Englisch: tl;dr. Deutsch: zl;ng.", "Englisch : tl;dr . Deutsch : zl;ng .")
+
 
 class TestTypos(TestTokenizer):
     """"""

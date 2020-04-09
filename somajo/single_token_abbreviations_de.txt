@@ -38,9 +38,11 @@ röm.-kath.
 Uni-Kl.
 USt-IdNr.
 
-# Custom Abbreviations
+# These should be moved to another file:
 .Net
 E/E
+tl;dr
+zl;ng
 
 # SAP Versions
 S/4
