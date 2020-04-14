@@ -83,8 +83,7 @@ class Tokenizer():
         # regex for email addresses taken from:
         # http://www.regular-expressions.info/email.html
         # self.email = re.compile(r"\b[\w.%+-]+@[\w.-]+\.\p{L}{2,}\b")
-        # (?|…) is a branch reset group (https://www.regular-expressions.info/branchreset.html)
-        self.email = re.compile(r"\b([\w.%+-]+)(?|(@)| (\[at\]) )([\w.-]+)(?|(\.)| (\[?dot\]?) )(\p{L}{2,})\b")
+        self.email = re.compile(r"\b[\w.%+-]+(?:@| \[at\] )[\w.-]+(?:\.| \[?dot\]? )\p{L}{2,}\b")
         # simple regex for urls that start with http or www
         # TODO: schließende Klammer am Ende erlauben, wenn nach http etc. eine öffnende kam
         self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+?\(\S*?\)\S*(?=$|[\'. "!?,;])', re.IGNORECASE)
@@ -265,9 +264,7 @@ class Tokenizer():
         # PUNCTUATION
         self.quest_exclam = re.compile(r"([!?]+)")
         # arrows
-        self.space_right_arrow = re.compile(r'(-+)\s+(>)')
-        self.space_left_arrow = re.compile(r'(<)\s+(-+)')
-        self.arrow = re.compile(r'(-+>|<-+|[\u2190-\u21ff])')
+        self.arrow = re.compile(r'(-+[ ]?>|<[ ]?-+|[\u2190-\u21ff])')
         # parens
         self.all_parens = re.compile(r"""(
                                       (?:(?<=\w)        # alphanumeric character
@@ -578,7 +575,7 @@ class Tokenizer():
         # Some emoticons contain erroneous spaces. We fix this.
         self._split_all_matches(self.space_emoticon, token_dll, "emoticon", repl=r'\1\2')
         # obfuscated email addresses can contain spaces
-        self._split_all_matches(self.email, token_dll, "email_address", repl=r'\1\2\3\4\5')
+        self._split_all_matches(self.email, token_dll, "email_address", delete_whitespace=True)
 
         # urls
         self._split_all_matches(self.simple_url_with_brackets, token_dll, "URL")
@@ -679,9 +676,7 @@ class Tokenizer():
         # (clusters of) question marks and exclamation marks
         self._split_all_matches(self.quest_exclam, token_dll, "symbol")
         # arrows
-        self._split_all_matches(self.space_right_arrow, token_dll, "symbol", repl=r'\1\2')
-        self._split_all_matches(self.space_left_arrow, token_dll, "symbol", repl=r'\1\2')
-        self._split_all_matches(self.arrow, token_dll, "symbol")
+        self._split_all_matches(self.arrow, token_dll, "symbol", delete_whitespace=True)
         # parens
         self._split_all_matches(self.all_parens, token_dll, "symbol")
         # slash
