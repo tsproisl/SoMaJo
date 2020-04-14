@@ -90,6 +90,35 @@ class Tokenizer():
         self.simple_url = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)\S+[^\'. "!?,;:)]', re.IGNORECASE)
         self.doi = re.compile(r'\bdoi:10\.\d+/\S+', re.IGNORECASE)
         self.doi_with_space = re.compile(r'(?<=\bdoi: )10\.\d+/\S+', re.IGNORECASE)
+        # regex for ISBNs adapted from:
+        # https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s13.html
+        self.isbn = re.compile(r"""\b
+                                   (?:(?<![0-9][ -])            # If there is no ISBN identifier, the number should not be preceded by [0-9][ -]
+                                    |
+                                    (?:(?P<isbn>ISBN(?:-1[03])?)(?P<colon>:)?[ ]?)  # Optional ISBN/ISBN-10/ISBN-13 identifier.
+                                   )
+                                   (?=(?:                       # Basic format pre-checks (lookahead):
+                                     [0-9X]{10}                 #   Require 10 digits/Xs (no separators).
+                                    |                           #  Or:
+                                     (?=(?:[0-9]+[ ]){3})       #   Require 3 separators (spaces)
+                                     [0-9X ]{13}                #     out of 13 characters total.
+                                    |                           #  Or:
+                                     (?=(?:[0-9]+-){3})         #   Require 3 separators (dashes)
+                                     [0-9X-]{13}                #     out of 13 characters total.
+                                    |                           #  Or:
+                                     97[89][0-9]{10}            #   978/979 plus 10 digits (13 total).
+                                    |                           #  Or:
+                                     (?=(?:[0-9]+[ ]){4})       #   Require 4 separators (spaces)
+                                     [0-9 ]{17}                 #     out of 17 characters total.
+                                    |                           #  Or:
+                                     (?=(?:[0-9]+-){4})         #   Require 4 separators (dashes)
+                                     [0-9-]{17}                 #     out of 17 characters total.
+                                   )(?!\w|[ -][0-9]))           # End format pre-checks.
+                                   (?P<number>(?:97[89][ -]?)?  # Optional ISBN-13 prefix.
+                                   [0-9]{1,5}[ -]?              # 1-5 digit group identifier.
+                                   [0-9]+[ -]?[0-9]+[ -]?       # Publisher and title identifiers.
+                                   [0-9X])                      # Check digit.
+                                   (?![\w]|[ -][0-9])""", re.VERBOSE | re.IGNORECASE)
         # we also allow things like tagesschau.de-App
         self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|org|net|edu|info|gov|jpg|png|gif|log|txt|xlsx?|docx?|pptx?|pdf)(?:-\w+)?\b', re.IGNORECASE)
         self.reddit_links = re.compile(r'(?<!\w)/?[rlu](?:/\w+)+/?(?!\w)', re.IGNORECASE)
@@ -638,6 +667,7 @@ class Tokenizer():
         self._split_abbreviations(token_dll, split_multipart_abbrevs=split_abbreviations)
 
         # DATES AND NUMBERS
+        self._split_all_matches(self.isbn, token_dll, "ISBN", delete_whitespace=True)
         # dates
         split_dates = False if self.language == "en" or self.language == "en_PTB" else True
         self._split_all_matches(self.three_part_date_year_first, token_dll, "date", split_named_subgroups=split_dates)
