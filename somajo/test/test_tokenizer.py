@@ -1028,6 +1028,30 @@ class OwnAdditions(TestTokenizer):
     def test_own_110(self):
         self._equal('foo "bar -> baz" qux "bar baz" qux', 'foo " bar -> baz " qux " bar baz " qux')
 
+    def test_own_111(self):
+        self._equal("ISBN 978-0-596-52068-7", "ISBN 978-0-596-52068-7")
+
+    def test_own_112(self):
+        self._equal("ISBN-13: 978-0-596-52068-7", "ISBN-13 : 978-0-596-52068-7")
+
+    def test_own_113(self):
+        self._equal("978 0 596 52068 7", "9780596520687")
+
+    def test_own_114(self):
+        self._equal("9780596520687", "9780596520687")
+
+    def test_own_115(self):
+        self._equal("ISBN-10 0-596-52068-9", "ISBN-10 0-596-52068-9")
+
+    def test_own_116(self):
+        self._equal("0-596-52068-9", "0-596-52068-9")
+
+    def test_own_117(self):
+        self._equal("ISBN 3-570-02690-6.", "ISBN 3-570-02690-6 .")
+
+    def test_own_118(self):
+        self._equal("ISBN 978-0-596-52068-7: Foo", "ISBN 978-0-596-52068-7 : Foo")
+
 
 class TestUnderline(TestTokenizer):
     """"""
