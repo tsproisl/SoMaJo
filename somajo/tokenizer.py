@@ -342,7 +342,7 @@ class Tokenizer():
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
 
-    def _split_on_boundaries(self, node, boundaries, token_class, lock_match=True):
+    def _split_on_boundaries(self, node, boundaries, token_class, *, lock_match=True, delete_whitespace=False):
         """"""
         n = len(boundaries)
         if n == 0:
@@ -369,6 +369,12 @@ class Tokenizer():
             left = left.strip()
             match = match.strip()
             right = right.strip()
+            if delete_whitespace:
+                match_wo_spaces = match.replace(" ", "")
+                if match_wo_spaces != match:
+                    if original_spelling is None:
+                        original_spelling = match
+                    match = match_wo_spaces
             first_in_sentence, match_last_in_sentence, right_last_in_sentence = False, False, False
             if i == 0:
                 first_in_sentence = node.value.first_in_sentence
@@ -391,7 +397,7 @@ class Tokenizer():
                 token_dll.insert_left(Token(right, token_class="regular", space_after=node.value.space_after, last_in_sentence=right_last_in_sentence), node)
         token_dll.remove(node)
 
-    def _split_matches(self, regex, node, token_class="regular", repl=None, split_named_subgroups=True):
+    def _split_matches(self, regex, node, token_class="regular", repl=None, split_named_subgroups=True, delete_whitespace=False):
         boundaries = []
         split_groups = split_named_subgroups and len(regex.groupindex) > 0
         group_numbers = sorted(regex.groupindex.values())
@@ -405,7 +411,7 @@ class Tokenizer():
                     boundaries.append((m.start(), m.end(), None))
                 else:
                     boundaries.append((m.start(), m.end(), m.expand(repl)))
-        self._split_on_boundaries(node, boundaries, token_class)
+        self._split_on_boundaries(node, boundaries, token_class, delete_whitespace=delete_whitespace)
 
     def _split_emojis(self, node, token_class="emoticon"):
         boundaries = []
@@ -436,12 +442,12 @@ class Tokenizer():
             prev_end = m.start()
         self._split_on_boundaries(node, boundaries, token_class=None, lock_match=False)
 
-    def _split_all_matches(self, regex, token_dll, token_class="regular", repl=None, split_named_subgroups=True):
+    def _split_all_matches(self, regex, token_dll, token_class="regular", *, repl=None, split_named_subgroups=True, delete_whitespace=False):
         """Turn matches for the regex into tokens."""
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
-            self._split_matches(regex, t, token_class, repl, split_named_subgroups)
+            self._split_matches(regex, t, token_class, repl, split_named_subgroups, delete_whitespace)
 
     def _split_all_emojis(self, token_dll, token_class="emoticon"):
         """Replace all emoji sequences"""
