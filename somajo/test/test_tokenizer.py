@@ -1052,6 +1052,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_118(self):
         self._equal("ISBN 978-0-596-52068-7: Foo", "ISBN 978-0-596-52068-7 : Foo")
 
+    def test_own_119(self):
+        self._equal("Was für eine ISBN: ISBN-10, ISBN-13?", "Was für eine ISBN : ISBN-10 , ISBN-13 ?")
+
 
 class TestUnderline(TestTokenizer):
     """"""
