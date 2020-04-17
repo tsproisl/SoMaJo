@@ -58,6 +58,7 @@ class SoMaJo:
             tokens = map(self._tokenize, token_lists)
         if self.split_sentences:
             tokens = itertools.chain.from_iterable(tokens)
+            tokens = self._sentence_splitter._merge_empty_sentences(tokens)
         return tokens
 
     def tokenize_text_file(self, text_file, paragraph_separator, *, parallel=1):

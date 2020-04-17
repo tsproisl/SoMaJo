@@ -44,6 +44,23 @@ class SentenceSplitter():
             sentence_boundaries[-1] = n
         return sentence_boundaries
 
+    def _merge_empty_sentences(self, tokens):
+        """Merge empty sentences with preceding sentence"""
+        empty_first = True
+        previous = []
+        for sentence in tokens:
+            empty_sentence = not any([tok.first_in_sentence for tok in sentence])
+            if empty_first:
+                previous.extend(sentence)
+                empty_first = empty_sentence
+            else:
+                if empty_sentence:
+                    previous.extend(sentence)
+                else:
+                    yield previous
+                    previous = sentence
+        yield previous
+
     def _split_sentences(self, tokens):
         """Split list of Token objects into sentences."""
         tokens, sentence_boundaries = self._split_token_objects(tokens)
