@@ -38,23 +38,24 @@ class SoMaJo:
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
 
-    def _tokenize(self, token_dll):
+    def _tokenize(self, token_list):
         """Tokenize and sentence split a single token_dll."""
+        token_dll = doubly_linked_list.DLL(token_list)
         tokens = self._tokenizer._tokenize(token_dll)
         if self.split_sentences:
             tokens = self._sentence_splitter._split_sentences(tokens)
         return tokens
 
-    def _parallel_tokenize(self, token_dlls, *, parallel=1):
+    def _parallel_tokenize(self, token_lists, *, parallel=1):
         """Tokenize and sentence split an iterable of token_dlls; optional
         parallelization.
 
         """
         if parallel > 1:
             pool = multiprocessing.Pool(min(parallel, multiprocessing.cpu_count()))
-            tokens = pool.imap(self._tokenize, token_dlls, 250)
+            tokens = pool.imap(self._tokenize, token_lists, 250)
         else:
-            tokens = map(self._tokenize, token_dlls)
+            tokens = map(self._tokenize, token_lists)
         if self.split_sentences:
             tokens = itertools.chain.from_iterable(tokens)
         return tokens
@@ -137,8 +138,8 @@ class SoMaJo:
 
         """
         assert paragraph_separator in self.paragraph_separators
-        token_dlls = utils.get_paragraphs_dll(text_file, paragraph_separator)
-        tokens = self._parallel_tokenize(token_dlls, parallel=parallel)
+        token_lists = utils.get_paragraphs_list(text_file, paragraph_separator)
+        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
         return tokens
 
     def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1):
@@ -260,8 +261,8 @@ class SoMaJo:
         """
         if eos_tags is not None:
             eos_tags = set(eos_tags)
-        token_dlls = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags)
-        tokens = self._parallel_tokenize(token_dlls, parallel=parallel)
+        token_lists = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags)
+        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
         if strip_tags:
             tokens = ([t for t in par if not t.markup] for par in tokens)
         else:
@@ -343,8 +344,8 @@ class SoMaJo:
         ​
 
         """
-        token_dlls = (doubly_linked_list.DLL([Token(p, first_in_sentence=True, last_in_sentence=True)]) for p in paragraphs)
-        tokens = self._parallel_tokenize(token_dlls, parallel=parallel)
+        token_lists = ([Token(p, first_in_sentence=True, last_in_sentence=True)] for p in paragraphs)
+        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
         return tokens
 
     def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1):
@@ -437,9 +438,8 @@ class SoMaJo:
         """
         if eos_tags is not None:
             eos_tags = set(eos_tags)
-        token_dlls = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags)
-        tokens = self._parallel_tokenize(token_dlls, parallel=parallel)
-        tokens = list(tokens)
+        token_lists = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags)
+        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
         if strip_tags:
             tokens = ([t for t in par if not t.markup] for par in tokens)
         else:

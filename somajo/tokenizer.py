@@ -797,7 +797,7 @@ class Tokenizer():
 
         """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
-        token_dlls = utils.xml_chunk_generator(xml, is_file, eos_tags)
+        token_dlls = map(doubly_linked_list.DLL, utils.xml_chunk_generator(xml, is_file, eos_tags))
         tokens = map(self._tokenize, token_dlls)
         tokens = map(utils.escape_xml_tokens, tokens)
         tokens = map(self._convert_to_legacy, tokens)

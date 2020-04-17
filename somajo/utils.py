@@ -4,7 +4,6 @@ import os
 import regex as re
 import xml.sax
 
-from somajo import doubly_linked_list
 from somajo.token import Token
 
 
@@ -27,15 +26,15 @@ def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
             yield "".join(paragraph)
 
 
-def get_paragraphs_dll(text_file, paragraph_separator="empty_lines"):
+def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
     if isinstance(text_file, str):
         with open(text_file, encoding="utf-8") as fh:
             for paragraph in get_paragraphs_str(fh, paragraph_separator):
-                yield doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
+                yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)]
     else:
         for paragraph in get_paragraphs_str(text_file, paragraph_separator):
-            yield doubly_linked_list.DLL([Token(paragraph, first_in_sentence=True, last_in_sentence=True)])
+            yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)]
 
 
 def read_abbreviation_file(filename):
@@ -56,7 +55,7 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
     def __init__(self, eos_tags=None):
         super().__init__()
         self.eos_tags = eos_tags
-        self.token_dll = doubly_linked_list.DLL()
+        self.token_list = []
         self.content = ""
         self.sentence_start = True
 
@@ -66,11 +65,11 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
             sentence_boundary = True
         if self.content != "":
             content_token = Token(self.content, token_class="regular", first_in_sentence=self.sentence_start, last_in_sentence=sentence_boundary)
-            self.token_dll.append(content_token)
+            self.token_list.append(content_token)
             self.content = ""
             self.sentence_start = False
         token = Token(text, markup=True, markup_class=markup_class, markup_eos=sentence_boundary, locked=True)
-        self.token_dll.append(token)
+        self.token_list.append(token)
         if sentence_boundary:
             self.sentence_start = True
 
@@ -95,9 +94,9 @@ def incremental_xml_parser(f, eos_tags=None):
     parser.setContentHandler(handler)
     for line in f:
         parser.feed(line)
-        if len(handler.token_dll) > 0:
-            yield handler.token_dll
-            handler.token_dll = doubly_linked_list.DLL()
+        if len(handler.token_list) > 0:
+            yield handler.token_list
+            handler.token_list = []
     parser.close()
 
 
@@ -107,8 +106,8 @@ def _xml_chunk_generator(f, eos_tags=None):
 
     """
     non_whitespace = re.compile(r"\S")
-    token_dlls = incremental_xml_parser(f, eos_tags)
-    current = doubly_linked_list.DLL()
+    token_lists = incremental_xml_parser(f, eos_tags)
+    current = []
     bos, eos = True, False
     lexical_tokens = 0
     # yield chunks delimited by eos_tags
@@ -232,50 +231,50 @@ def _xml_chunk_generator(f, eos_tags=None):
                       +----------------------+
 """
     del algo_dot, algo_sketch
-    for token_dll in token_dlls:
-        for token in token_dll:
-            if token.value.markup:
+    for token_list in token_lists:
+        for token in token_list:
+            if token.markup:
                 # markup
-                if token.value.markup_eos:
+                if token.markup_eos:
                     bos = True
                     for t in reversed(current):
-                        if not t.value.markup:
-                            t.value.last_in_sentence = True
+                        if not t.markup:
+                            t.last_in_sentence = True
                             break
-                    if token.value.markup_class == "start":
+                    if token.markup_class == "start":
                         eos = False
                         if lexical_tokens > 0:
                             # remove trailing opening tags from current
-                            temp_dll = doubly_linked_list.DLL()
-                            while current.last.value.markup_class == "start" or (not non_whitespace.search(current.last.value.text)):
-                                temp_dll.append_left(current.pop())
+                            temp_list = []
+                            while current[-1].markup_class == "start" or (not non_whitespace.search(current[-1].text)):
+                                temp_list.append(current.pop())
                             yield current
-                            current = temp_dll
+                            current = temp_list[::-1]
                             lexical_tokens = 0
-                    elif token.value.markup_class == "end":
+                    elif token.markup_class == "end":
                         eos = True
                 else:
-                    if eos and token.value.markup_class == "start":
+                    if eos and token.markup_class == "start":
                         eos = False
                         if lexical_tokens > 0:
                             yield current
-                            current = doubly_linked_list.DLL()
+                            current = []
                             lexical_tokens = 0
             else:
                 # non-markup
                 whitespace = True
-                if non_whitespace.search(token.value.text):
+                if non_whitespace.search(token.text):
                     whitespace = False
                 if not whitespace:
                     if eos:
                         eos = False
                         if lexical_tokens > 0:
                             yield current
-                            current = doubly_linked_list.DLL()
+                            current = []
                             lexical_tokens = 0
                     if bos:
                         bos = False
-                        token.value.first_in_sentence = True
+                        token.first_in_sentence = True
                         lexical_tokens += 1
             current.append(token)
     if len(current) > 0:
