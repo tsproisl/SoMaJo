@@ -68,6 +68,13 @@ class DLL:
         self.last = element
         self.size += 1
 
+    def append_left(self, item):
+        element = DLLElement(item, None, self.first, self)
+        if self.last is None:
+            self.last = element
+        self.first = element
+        self.size += 1
+
     def extend(self, iterable):
         for item in iterable:
             self.append(item)
@@ -99,6 +106,16 @@ class DLL:
 
     def next_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
         self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
+
+    def pop(self):
+        if self.size == 0:
+            raise IndexError
+        element = self.last
+        self.last = element.prev
+        if element.prev is not None:
+            element.prev.next = None
+        self.size -= 1
+        return element.value
 
     def previous_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
         self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)
