@@ -245,8 +245,12 @@ def _xml_chunk_generator(f, eos_tags=None):
                     if token.value.markup_class == "start":
                         eos = False
                         if lexical_tokens > 0:
+                            # remove trailing opening tags from current
+                            temp_dll = doubly_linked_list.DLL()
+                            while current.last.value.markup_class == "start" or (not non_whitespace.search(current.last.value.text)):
+                                temp_dll.append_left(current.pop())
                             yield current
-                            current = doubly_linked_list.DLL()
+                            current = temp_dll
                             lexical_tokens = 0
                     elif token.value.markup_class == "end":
                         eos = True
