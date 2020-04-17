@@ -204,55 +204,55 @@ class TestXMLPretokenized(TestSentenceSplitterPretokenized):
 class TestXMLBoundaries(TestSentenceSplitterXMLBoundaries):
     """"""
     def test_xml_boundaries_01(self):
-        self._equal_xml("<foo>Foo bar. Foo bar.</foo>", "<foo> <s> Foo bar . </s> <s> Foo bar . </s> </foo>")
+        self._equal_xml("<foo>Hallo Susi. Hallo Peter.</foo>", "<foo> <s> Hallo Susi . </s> <s> Hallo Peter . </s> </foo>")
 
     def test_xml_boundaries_02(self):
-        self._equal_xml("<foo><i></i>Foo bar. Foo bar.</foo>", "<foo> <i> </i> <s> Foo bar . </s> <s> Foo bar . </s> </foo>")
+        self._equal_xml("<foo><i></i>Hallo Susi. Hallo Peter.</foo>", "<foo> <i> </i> <s> Hallo Susi . </s> <s> Hallo Peter . </s> </foo>")
 
     def test_xml_boundaries_03(self):
-        self._equal_xml("<foo><i>Foo bar</i>. Foo bar.</foo>", "<foo> <s> <i> Foo bar </i> . </s> <s> Foo bar . </s> </foo>")
+        self._equal_xml("<foo><i>Hallo Susi</i>. Hallo Peter.</foo>", "<foo> <s> <i> Hallo Susi </i> . </s> <s> Hallo Peter . </s> </foo>")
 
     def test_xml_boundaries_04(self):
-        self._equal_xml("<foo><i>Foo bar.</i> Foo bar.</foo>", "<foo> <i> <s> Foo bar . </s> </i> <s> Foo bar . </s> </foo>")
+        self._equal_xml("<foo><i>Hallo Susi.</i> Hallo Peter.</foo>", "<foo> <i> <s> Hallo Susi . </s> </i> <s> Hallo Peter . </s> </foo>")
 
     def test_xml_boundaries_05(self):
-        self._equal_xml("<foo><i>Foo bar. Foo</i> bar.</foo>", "<foo> <i> <s> Foo bar . </s> </i> <s> <i> Foo </i> bar . </s> </foo>")
+        self._equal_xml("<foo><i>Hallo Susi. Hallo</i> Peter.</foo>", "<foo> <i> <s> Hallo Susi . </s> </i> <s> <i> Hallo </i> Peter . </s> </foo>")
 
     def test_xml_boundaries_06(self):
-        self._equal_xml("<foo><i>Foo bar. Foo bar.</i></foo>", "<foo> <i> <s> Foo bar . </s> <s> Foo bar . </s> </i> </foo>")
+        self._equal_xml("<foo><i>Hallo Susi. Hallo Peter.</i></foo>", "<foo> <i> <s> Hallo Susi . </s> <s> Hallo Peter . </s> </i> </foo>")
 
     def test_xml_boundaries_07(self):
-        self._equal_xml("<foo><i>Foo bar. Foo bar. Foo</i> bar.</foo>", "<foo> <i> <s> Foo bar . </s> <s> Foo bar . </s> </i> <s> <i> Foo </i> bar . </s> </foo>")
+        self._equal_xml("<foo><i>Hallo Susi. Hallo Peter. Hallo</i> Thomas.</foo>", "<foo> <i> <s> Hallo Susi . </s> <s> Hallo Peter . </s> </i> <s> <i> Hallo </i> Thomas . </s> </foo>")
 
     def test_xml_boundaries_08(self):
-        self._equal_xml("<foo>Foo <i>bar</i>. Foo bar.</foo>", "<foo> <s> Foo <i> bar </i> . </s> <s> Foo bar . </s> </foo>")
+        self._equal_xml("<foo>Hallo <i>Susi</i>. Hallo Peter.</foo>", "<foo> <s> Hallo <i> Susi </i> . </s> <s> Hallo Peter . </s> </foo>")
 
     def test_xml_boundaries_09(self):
-        self._equal_xml("<foo>Foo <i>bar.</i> Foo bar.</foo>", "<foo> <s> Foo <i> bar . </i> </s> <s> Foo bar . </s> </foo>")
+        self._equal_xml("<foo>Hallo <i>Susi.</i> Hallo Peter.</foo>", "<foo> <s> Hallo <i> Susi . </i> </s> <s> Hallo Peter . </s> </foo>")
 
     def test_xml_boundaries_10(self):
-        self._equal_xml("<foo>Foo <i>bar. Foo bar. Foo</i> bar.</foo>", "<foo> <s> Foo <i> bar . </i> </s> <i> <s> Foo bar . </s> </i> <s> <i> Foo </i> bar . </s> </foo>")
+        self._equal_xml("<foo>Hallo <i>Susi. Hallo Peter. Hallo</i> Thomas.</foo>", "<foo> <s> Hallo <i> Susi . </i> </s> <i> <s> Hallo Peter . </s> </i> <s> <i> Hallo </i> Thomas . </s> </foo>")
 
     def test_xml_boundaries_11(self):
-        self._equal_xml("<foo>Foo <i>bar. Foo bar. Foo bar.</i></foo>", "<foo> <s> Foo <i> bar . </i> </s> <i> <s> Foo bar . </s> <s> Foo bar . </s> </i> </foo>")
+        self._equal_xml("<foo>Hallo <i>Susi. Hallo Peter. Hallo Thomas.</i></foo>", "<foo> <s> Hallo <i> Susi . </i> </s> <i> <s> Hallo Peter . </s> <s> Hallo Thomas . </s> </i> </foo>")
 
     def test_xml_boundaries_12(self):
-        self._equal_xml("<foo>Foo bar.<i> Foo</i> bar.</foo>", "<foo> <s> Foo bar . </s> <s> <i> Foo </i> bar . </s> </foo>")
+        self._equal_xml("<foo>Hallo Susi.<i> Hallo</i> Peter.</foo>", "<foo> <s> Hallo Susi . </s> <s> <i> Hallo </i> Peter . </s> </foo>")
 
     def test_xml_boundaries_13(self):
-        self._equal_xml("<foo><a><b>Foo <c>bar. <d>Foo bar. Foo</d></c></b> bar.</a></foo>", "<foo> <a> <b> <s> Foo <c> bar . </c> </s> <c> <d> <s> Foo bar . </s> </d> </c> </b> <s> <b> <c> <d> Foo </d> </c> </b> bar . </s> </a> </foo>")
+        self._equal_xml("<foo><a><b>Hallo <c>Susi. <d>Hallo Peter. Hallo</d></c></b> Thomas.</a></foo>", "<foo> <a> <b> <s> Hallo <c> Susi . </c> </s> <c> <d> <s> Hallo Peter . </s> </d> </c> </b> <s> <b> <c> <d> Hallo </d> </c> </b> Thomas . </s> </a> </foo>")
 
     def test_xml_boundaries_14(self):
-        self._equal_xml("<foo><i>Foo</i> bar<i>. Foo</i> bar<i>.</i></foo>", "<foo> <s> <i> Foo </i> bar <i> . </i> </s> <s> <i> Foo </i> bar <i> . </i> </s> </foo>")
+        self._equal_xml("<foo><i>Hallo</i> Susi<i>. Hallo</i> Peter<i>.</i></foo>", "<foo> <s> <i> Hallo </i> Susi <i> . </i> </s> <s> <i> Hallo </i> Peter <i> . </i> </s> </foo>")
 
     def test_xml_boundaries_15(self):
-        self._equal_xml("<foo>Foo <i><b>bar. Foo bar. Foo</b></i> bar.</foo>", "<foo> <s> Foo <i> <b> bar . </b> </i> </s> <i> <b> <s> Foo bar . </s> </b> </i> <s> <i> <b> Foo </b> </i> bar . </s> </foo>")
+        self._equal_xml("<foo>Hallo <i><b>Susi. Hallo Peter. Hallo</b></i> Thomas.</foo>", "<foo> <s> Hallo <i> <b> Susi . </b> </i> </s> <i> <b> <s> Hallo Peter . </s> </b> </i> <s> <i> <b> Hallo </b> </i> Thomas . </s> </foo>")
 
     def test_xml_boundaries_16(self):
-        self._equal_xml("<a>Foo <b><d>bar.</d> Foo</b> bar.</a>", "<a> <s> Foo <b> <d> bar . </d> </b> </s> <s> <b> Foo </b> bar . </s> </a>")
+        self._equal_xml("<a>Hallo <b><d>Susi.</d> Hallo</b> Peter.</a>", "<a> <s> Hallo <b> <d> Susi . </d> </b> </s> <s> <b> Hallo </b> Peter . </s> </a>")
 
     def test_xml_boundaries_17(self):
-        self._equal_xml("<a>Foo <b><c><d>bar.</d> Foo</c></b> bar.</a>", "<a> <s> Foo <b> <c> <d> bar . </d> </c> </b> </s> <s> <b> <c> Foo </c> </b> bar . </s> </a>")
+        self._equal_xml("<a>Hallo <b><c><d>Susi.</d> Hallo</c></b> Peter.</a>", "<a> <s> Hallo <b> <c> <d> Susi . </d> </c> </b> </s> <s> <b> <c> Hallo </c> </b> Peter . </s> </a>")
 
     def test_xml_boundaries_18(self):
-        self._equal_xml("<a>Foo bar.<br/> Foo bar.<br/></a>", "<a> <s> Foo bar . </s> <br> </br> <s> Foo bar . </s> <br> </br> </a>")
+        self._equal_xml("<a>Hallo Susi.<br/> Hallo Peter.<br/></a>", "<a> <s> Hallo Susi . </s> <br> </br> <s> Hallo Peter . </s> <br> </br> </a>")
