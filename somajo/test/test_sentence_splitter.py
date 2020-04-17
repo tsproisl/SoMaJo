@@ -27,6 +27,27 @@ class TestSentenceSplitter(unittest.TestCase):
         self.assertEqual(sentences, tokenized_sentences)
 
 
+class TestSentenceSplitterXMLBoundaries(unittest.TestCase):
+    """"""
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = SoMaJo("de_CMC", split_camel_case=True, split_sentences=True, xml_sentences="s")
+
+    def _equal(self, raw, tokenized_sentences):
+        """"""
+        sentences = self.tokenizer.tokenize_text([raw])
+        sentences = " ".join([" ".join([t.text for t in s]) for s in sentences])
+        self.assertEqual(sentences, tokenized_sentences)
+
+    def _equal_xml(self, raw, tokenized_sentences):
+        """"""
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        sentences = self.tokenizer.tokenize_xml(raw, eos_tags)
+        sentences = " ".join([" ".join([t.text for t in s]) for s in sentences])
+        self.assertEqual(sentences, tokenized_sentences)
+
+
 class TestSentenceSplitterEnglish(TestSentenceSplitter):
     """"""
     def setUp(self):
@@ -180,60 +201,58 @@ class TestXMLPretokenized(TestSentenceSplitterPretokenized):
         self._equal_xml("<foo> <p> foo bar </p> <p> foo bar </p> </foo>", ["<foo> <p> foo bar </p>", "<p> foo bar </p> </foo>"])
 
 
-class TestXMLBoundaries(TestSentenceSplitter):
+class TestXMLBoundaries(TestSentenceSplitterXMLBoundaries):
     """"""
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_01(self):
         self._equal_xml("<foo>Foo bar. Foo bar.</foo>", "<foo> <s> Foo bar . </s> <s> Foo bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_02(self):
         self._equal_xml("<foo><i></i>Foo bar. Foo bar.</foo>", "<foo> <i> </i> <s> Foo bar . </s> <s> Foo bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_03(self):
         self._equal_xml("<foo><i>Foo bar</i>. Foo bar.</foo>", "<foo> <s> <i> Foo bar </i> . </s> <s> Foo bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_04(self):
         self._equal_xml("<foo><i>Foo bar.</i> Foo bar.</foo>", "<foo> <i> <s> Foo bar . </s> </i> <s> Foo bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_05(self):
         self._equal_xml("<foo><i>Foo bar. Foo</i> bar.</foo>", "<foo> <i> <s> Foo bar . </s> </i> <s> <i> Foo </i> bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_06(self):
         self._equal_xml("<foo><i>Foo bar. Foo bar.</i></foo>", "<foo> <i> <s> Foo bar . </s> <s> Foo bar . </s> </i> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_07(self):
         self._equal_xml("<foo><i>Foo bar. Foo bar. Foo</i> bar.</foo>", "<foo> <i> <s> Foo bar . </s> <s> Foo bar . </s> </i> <s> <i> Foo </i> bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_08(self):
         self._equal_xml("<foo>Foo <i>bar</i>. Foo bar.</foo>", "<foo> <s> Foo <i> bar </i> . </s> <s> Foo bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_09(self):
         self._equal_xml("<foo>Foo <i>bar.</i> Foo bar.</foo>", "<foo> <s> Foo <i> bar . </i> </s> <s> Foo bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_10(self):
         self._equal_xml("<foo>Foo <i>bar. Foo bar. Foo</i> bar.</foo>", "<foo> <s> Foo <i> bar . </i> </s> <i> <s> Foo bar . </s> </i> <s> <i> Foo </i> bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_11(self):
         self._equal_xml("<foo>Foo <i>bar. Foo bar. Foo bar.</i></foo>", "<foo> <s> Foo <i> bar . </i> </s> <i> <s> Foo bar . </s> <s> Foo bar . </s> </i> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_12(self):
         self._equal_xml("<foo>Foo bar.<i> Foo</i> bar.</foo>", "<foo> <s> Foo bar . </s> <s> <i> Foo </i> bar . </s> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_13(self):
         self._equal_xml("<foo><a><b>Foo <c>bar. <d>Foo bar. Foo</d></c></b> bar.</a></foo>", "<foo> <a> <b> <s> Foo <c> bar . </c> </s> <c> <d> <s> Foo bar . </s> </d> </c> </b> <s> <b> <c> <d> Foo </d> </c> </b> bar . </s> </a> </foo>")
 
-    @unittest.skip("Not implemented, yet")
     def test_xml_boundaries_14(self):
-        self._equal_xml("<foo><i>Foo</i> bar<i>. Foo</i> bar<i>.</i></foo>", "<foo> <s> <i> Foo </i> bar <i> . </i> </s> <s> <i> Foo </i> bar . </s> </foo>")
+        self._equal_xml("<foo><i>Foo</i> bar<i>. Foo</i> bar<i>.</i></foo>", "<foo> <s> <i> Foo </i> bar <i> . </i> </s> <s> <i> Foo </i> bar <i> . </i> </s> </foo>")
+
+    def test_xml_boundaries_15(self):
+        self._equal_xml("<foo>Foo <i><b>bar. Foo bar. Foo</b></i> bar.</foo>", "<foo> <s> Foo <i> <b> bar . </b> </i> </s> <i> <b> <s> Foo bar . </s> </b> </i> <s> <i> <b> Foo </b> </i> bar . </s> </foo>")
+
+    def test_xml_boundaries_16(self):
+        self._equal_xml("<a>Foo <b><d>bar.</d> Foo</b> bar.</a>", "<a> <s> Foo <b> <d> bar . </d> </b> </s> <s> <b> Foo </b> bar . </s> </a>")
+
+    def test_xml_boundaries_17(self):
+        self._equal_xml("<a>Foo <b><c><d>bar.</d> Foo</c></b> bar.</a>", "<a> <s> Foo <b> <c> <d> bar . </d> </c> </b> </s> <s> <b> <c> Foo </c> </b> bar . </s> </a>")
+
+    def test_xml_boundaries_18(self):
+        self._equal_xml("<a>Foo bar.<br/> Foo bar.<br/></a>", "<a> <s> Foo bar . </s> <br> </br> <s> Foo bar . </s> <br> </br> </a>")
