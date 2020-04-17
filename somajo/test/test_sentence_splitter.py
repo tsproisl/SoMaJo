@@ -269,3 +269,6 @@ class TestXMLBoundaries(TestSentenceSplitterXMLBoundaries):
     # This one could also be done differently
     def test_xml_boundaries_20(self):
         self._equal_xml("<foo>Hallo <i>Susi.<x/> Hallo</i> Peter.</foo>", "<foo> <s> Hallo <i> Susi . </i> </s> <s> <i> <x> </x> Hallo </i> Peter . </s> </foo>")
+
+    def test_xml_boundaries_21(self):
+        self._equal_xml("<foo><p><b>Hallo</b> <i>Susi.<x/></i></p> Hallo Peter.</foo>", "<foo> <p> <s> <b> Hallo </b> <i> Susi . <x> </x> </i> </s> </p> <s> Hallo Peter . </s> </foo>")
