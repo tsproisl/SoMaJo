@@ -262,9 +262,10 @@ class SoMaJo:
             eos_tags = set(eos_tags)
         token_dlls = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags)
         tokens = self._parallel_tokenize(token_dlls, parallel=parallel)
-        tokens = map(utils.escape_xml_tokens, tokens)
         if strip_tags:
             tokens = ([t for t in par if not t.markup] for par in tokens)
+        else:
+            tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
 
     def tokenize_text(self, paragraphs, *, parallel=1):
@@ -439,7 +440,8 @@ class SoMaJo:
         token_dlls = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags)
         tokens = self._parallel_tokenize(token_dlls, parallel=parallel)
         tokens = list(tokens)
-        tokens = map(utils.escape_xml_tokens, tokens)
         if strip_tags:
             tokens = ([t for t in par if not t.markup] for par in tokens)
+        else:
+            tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
