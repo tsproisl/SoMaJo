@@ -305,4 +305,6 @@ def escape_xml_tokens(tokens):
     for t in tokens:
         if not t.markup:
             t.text = escape_xml(t.text)
+            if t.original_spelling is not None:
+                t.original_spelling = escape_xml(t.original_spelling)
     return tokens
