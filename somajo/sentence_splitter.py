@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import collections
 import regex as re
 
+from somajo import doubly_linked_list
 from somajo import token
 from somajo import utils
 
@@ -43,6 +45,104 @@ class SentenceSplitter():
         if sentence_boundaries[-1] != n:
             sentence_boundaries[-1] = n
         return sentence_boundaries
+
+    def _add_xml_tags(self, tokens, s_tag="s"):
+        """Mark sentence boundaries with XML tags."""
+        # Positions of XML tags w.r.t. the actual sentence:
+        start, inside, end, na = 1, 2, 3, 4
+        open_tags = collections.deque()
+        reopen_after_start = collections.deque()
+        reopen_after_end = collections.deque()
+        start_tag = re.compile(r"^<([^ ]+)[ ]?[^>]*>$")
+        end_tag = re.compile(r"^</(.+)>$")
+        for sentence in tokens:
+            # print([(t.text, t.first_in_sentence, t.last_in_sentence) for t in sentence])
+            sentence_dll = doubly_linked_list.DLL(sentence)
+            position = start
+            tags = collections.deque()
+            first_token, last_token = None, None
+            for tag in reversed(reopen_after_end):
+                top = open_tags.pop()
+                assert top is tag
+            while len(reopen_after_end) > 0:
+                tag = reopen_after_end.pop()
+                sentence_dll.insert_left(tag["start_token"], sentence_dll.first)
+            for tok in sentence_dll:
+                if tok.value.markup:
+                    # better store tag name in Token object
+                    if tok.value.markup_class == "start":
+                        m = start_tag.search(tok.value.text)
+                        assert m
+                        tag_name = m.group(1)
+                        tag = {"tag_name": tag_name, "start_token": tok, "end_token": None, "start": position, "end": na}
+                        open_tags.append(tag)
+                        tags.append(tag)
+                    elif tok.value.markup_class == "end":
+                        m = end_tag.search(tok.value.text)
+                        assert m
+                        tag_name = m.group(1)
+                        top = open_tags.pop()
+                        assert tag_name == top["tag_name"]
+                        top["end_token"] = tok
+                        top["end"] = position
+                        if top["start"] == na:
+                            tags.appendleft(top)
+                if tok.value.first_in_sentence:
+                    position = inside
+                    first_token = tok
+                if tok.value.last_in_sentence:
+                    position = end
+                    last_token = tok
+            if first_token is None:
+                yield sentence_dll.to_list()
+                continue
+            s_start = first_token  # left of first token
+            s_end = last_token     # right of last token
+            lot = sentence_dll.last
+            for tag in tags:
+                # print(tag)
+                if tag["start"] == na:
+                    if tag["end"] == inside:
+                        ft = sentence_dll.first
+                        # close tag
+                        closing_tag = token.Token("</%s>" % tag["tag_name"], markup=True, markup_class="end", markup_eos=False, locked=True)
+                        sentence_dll.insert_left(closing_tag, ft)
+                        # put starting s-tag to the right
+                        assert sentence_dll.is_right_of(s_start, ft.prev)
+                        # re-open tag
+                        reopen_after_start.append(tag)
+                elif tag["start"] == start:
+                    if tag["end"] == inside:
+                        # put starting s-tag to the left
+                        if not sentence_dll.is_left_of(s_start, tag["start_token"]):
+                            s_start = tag["start_token"]
+                elif tag["start"] == inside:
+                    if tag["end"] == end:
+                        # put ending s-tag to the right
+                        if not sentence_dll.is_right_of(s_end, tag["end_token"]):
+                            s_end = tag["end_token"]
+                    elif tag["end"] == na:
+                        # close tag
+                        closing_tag = token.Token("</%s>" % tag["tag_name"], markup=True, markup_class="end", markup_eos=False, locked=True)
+                        sentence_dll.insert_right(closing_tag, lot)
+                        # put ending s-tag
+                        if not sentence_dll.is_right_of(s_end, lot.next):
+                            # s_end = sentence_dll.last
+                            s_end = lot.next
+                        # re-open tag
+                        reopen_after_end.append(tag)
+            # starting s-tag
+            sentence_dll.insert_left(token.Token("<%s>" % s_tag, markup=True, markup_class="start", markup_eos=True, locked=True), s_start)
+            while len(reopen_after_start) > 0:
+                tag = reopen_after_start.popleft()
+                sentence_dll.insert_left(tag["start_token"], s_start)
+            # ending s-tag
+            sentence_dll.insert_right(token.Token("</%s>" % s_tag, markup=True, markup_class="end", markup_eos=True, locked=True), s_end)
+            # for all tags on the stack, change start to na
+            for tag in open_tags:
+                tag["start"] = na
+            yield sentence_dll.to_list()
+        assert len(open_tags) == 0
 
     def _merge_empty_sentences(self, tokens):
         """Merge empty sentences with preceding sentence"""

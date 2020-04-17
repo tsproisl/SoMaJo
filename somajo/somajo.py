@@ -29,11 +29,12 @@ class SoMaJo:
     paragraph_separators = set(["empty_lines", "single_newlines"])
     _default_parsep = "empty_lines"
 
-    def __init__(self, language, *, split_camel_case=False, split_sentences=True):
+    def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None):
         assert language in self.supported_languages
         self.language = language
         self.split_camel_case = split_camel_case
         self.split_sentences = split_sentences
+        self.xml_sentences = xml_sentences
         self._tokenizer = Tokenizer(split_camel_case=self.split_camel_case, language=self.language)
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
@@ -59,6 +60,8 @@ class SoMaJo:
         if self.split_sentences:
             tokens = itertools.chain.from_iterable(tokens)
             tokens = self._sentence_splitter._merge_empty_sentences(tokens)
+            if self.xml_sentences is not None:
+                tokens = self._sentence_splitter._add_xml_tags(tokens, s_tag=self.xml_sentences)
         return tokens
 
     def tokenize_text_file(self, text_file, paragraph_separator, *, parallel=1):
