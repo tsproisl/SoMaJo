@@ -79,6 +79,24 @@ class DLL:
             self.first = element
         self.size += 1
 
+    def insert_right(self, item, ref_element):
+        element = DLLElement(item, ref_element, ref_element.next, self)
+        ref_element.next = element
+        if self.last is ref_element:
+            self.last = element
+        self.size += 1
+
+    def is_left_of(self, element, ref_element):
+        current = ref_element
+        while current is not self.first:
+            current = current.prev
+            if current is element:
+                return True
+        return False
+
+    def is_right_of(self, element, ref_element):
+        return self.is_left_of(ref_element, element)
+
     def next_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
         self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
 
