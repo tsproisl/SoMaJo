@@ -96,6 +96,11 @@ class SentenceSplitter():
 
     def _split_token_objects(self, tokens):
         n = len(tokens)
+        # the first non-markup token is first_in_sentence
+        for tok in tokens:
+            if not tok.markup:
+                tok.first_in_sentence = True
+                break
         # the last non-markup token is last_in_sentence
         for tok in reversed(tokens):
             if not tok.markup:
