@@ -45,7 +45,7 @@ class SentenceSplitter():
         return sentence_boundaries
 
     def _split_sentences(self, tokens):
-        """Split list of Token objects into sentences"""
+        """Split list of Token objects into sentences."""
         tokens, sentence_boundaries = self._split_token_objects(tokens)
         return [tokens[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
