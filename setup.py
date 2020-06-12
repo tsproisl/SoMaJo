@@ -1,5 +1,6 @@
 # 1. Upload to PyPI:
-# python3 setup.py sdist
+# (Note: Building 'bdist_wheel' requires package 'wheel')
+# python3 setup.py sdist bdist_wheel
 # twine upload dist/*
 #
 # 2. Check if everything looks all right: https://pypi.python.org/pypi/SoMaJo
