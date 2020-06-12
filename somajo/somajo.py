@@ -348,6 +348,8 @@ class SoMaJo:
         ​
 
         """
+        if isinstance(paragraphs, str):
+            raise TypeError("``paragraphs`` must be an iterable of strings, not a string!")
         token_lists = ([Token(p, first_in_sentence=True, last_in_sentence=True)] for p in paragraphs)
         tokens = self._parallel_tokenize(token_lists, parallel=parallel)
         return tokens

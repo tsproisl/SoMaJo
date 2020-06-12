@@ -58,6 +58,9 @@ class TestText(TestSoMaJo):
     def test_text_03(self):
         self._equal_text_file_single_newlines(["Foo bar. Baz qux", "alpha. Beta gamma"], ["Foo bar .", "Baz qux", "alpha .", "Beta gamma"])
 
+    def test_text_04(self):
+        self.assertRaises(TypeError, self.tokenizer.tokenize_text, "Foo bar. Baz qux")
+
 
 class TestTextParallel(TestSoMaJo):
     def test_text_01(self):
