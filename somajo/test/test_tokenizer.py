@@ -529,10 +529,10 @@ class TestEmoticons(TestTokenizer):
         self._equal("oO", "oO")
 
     def test_emoticons_12(self):
-        self._equal("\O/", "\O/")
+        self._equal("\\O/", "\\O/")
 
     def test_emoticons_13(self):
-        self._equal("\m/", "\m/")
+        self._equal("\\m/", "\\m/")
 
     def test_emoticons_14(self):
         self._equal(":;))", ":;))")
