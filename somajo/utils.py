@@ -3,6 +3,7 @@
 import os
 import regex as re
 import xml.sax
+import xml.sax.saxutils
 
 from somajo.token import Token
 
