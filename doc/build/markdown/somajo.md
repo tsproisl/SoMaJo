@@ -12,7 +12,7 @@
 ## somajo.somajo module
 
 
-### class somajo.somajo.SoMaJo(language, \*, split_camel_case=False, split_sentences=True)
+### class somajo.somajo.SoMaJo(language, \*, split_camel_case=False, split_sentences=True, xml_sentences=None)
 Bases: `object`
 
 Tokenization and sentence splitting.
@@ -24,11 +24,15 @@ Tokenization and sentence splitting.
     * **language** (*{'de_CMC', 'en_PTB'}*) – Language-specific tokenization rules.
 
 
-    * **split_camel_case** (*bool, (default=False)*) – Split words written in camelCase (excluding established names and terms).
+    * **split_camel_case** (*bool, (default=False)*) – Split words written in camelCase (excluding established names
+    and terms).
 
 
     * **split_sentences** (*bool, (default=True)*) – Perform sentence splitting in addition to tokenization.
 
+
+    * **xml_sentences** (*str, (default=None)*) – Delimit sentences by XML tags of this name
+    (`xml_sentences='s'` → <s>…</s>).
 
 
 #### tokenize_text(paragraphs, \*, parallel=1)
@@ -90,11 +94,6 @@ after each sentence:
 ...         print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
 ...     print()
 ...
->>> for sentence in sentences:
-...     for token in sentence:
-...         print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
-...     print()
-...
 Heyi    regular SpaceAfter=No
 :)      emoticon
 ​
@@ -111,6 +110,37 @@ Film    regular SpaceAfter=No
 ?       symbol  SpaceAfter=No
 ;-)     emoticon
 ​
+```
+
+Tokenization and sentence splitting; print one token per line
+and delimit sentences with XML tags:
+
+```python
+>>> tokenizer = SoMaJo("de_CMC", xml_sentences="s")
+>>> sentences = tokenizer.tokenize_text(paragraphs)
+>>> for sentence in sentences:
+...     for token in sentence:
+...         print(token.text)
+...
+<s>
+Heyi
+:)
+</s>
+<s>
+Was
+machst
+du
+morgen
+Abend
+?!
+</s>
+<s>
+Lust
+auf
+Film
+?
+;-)
+</s>
 ```
 
 
@@ -295,6 +325,48 @@ Only tokenization; print one chunk of XML (delimited by
 ...
 <html> <body> <p> Heyi :) </p>
 <p> Was machst du morgen Abend ?! Lust auf Film ? ;-) </p> </body> </html>
+```
+
+Tokenization and sentence splitting; print one token per line
+and delimit sentences with XML tags:
+
+```python
+>>> xml = "<html><body><p>Heyi:)</p><p>Was machst du morgen Abend?! Lust auf Film?;-)</p></body></html>"
+>>> eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+>>> tokenizer = SoMaJo("de_CMC", xml_sentences="s")
+>>> sentences = tokenizer.tokenize_xml(xml, eos_tags)
+>>> for sentence in sentences:
+...     for token in sentence:
+...         print(token.text)
+...     print()
+...
+<html>
+<body>
+<p>
+<s>
+Heyi
+:)
+</s>
+</p>
+<p>
+<s>
+Was
+machst
+du
+morgen
+Abend
+?!
+</s>
+<s>
+Lust
+auf
+Film
+?
+;-)
+</s>
+</p>
+</body>
+</html>
 ```
 
 
@@ -492,4 +564,3 @@ String representation of extra information.
 >>> print(tok.extra_info)
 SpaceAfter=No, OriginalSpelling=": )"
 ```
-
