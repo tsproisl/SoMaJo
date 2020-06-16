@@ -26,6 +26,14 @@ class TestSentenceSplitter(unittest.TestCase):
         sentences = [" ".join([t.text for t in s]) for s in sentences]
         self.assertEqual(sentences, tokenized_sentences)
 
+    def _equal_xml_strip(self, raw, tokenized_sentences):
+        """"""
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        sentences = self.tokenizer.tokenize_xml(raw, eos_tags, strip_tags=True)
+        sentences = [" ".join([t.text for t in s]) for s in sentences]
+        self.assertEqual(sentences, tokenized_sentences)
+
 
 class TestSentenceSplitterXMLBoundaries(unittest.TestCase):
     """"""
@@ -45,6 +53,14 @@ class TestSentenceSplitterXMLBoundaries(unittest.TestCase):
         eos_tags = set(eos_tags)
         sentences = self.tokenizer.tokenize_xml(raw, eos_tags)
         sentences = " ".join([" ".join([t.text for t in s]) for s in sentences])
+        self.assertEqual(sentences, tokenized_sentences)
+
+    def _equal_xml_strip(self, raw, tokenized_sentences):
+        """"""
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        sentences = self.tokenizer.tokenize_xml(raw, eos_tags, strip_tags=True)
+        sentences = [" ".join([t.text for t in s]) for s in sentences]
         self.assertEqual(sentences, tokenized_sentences)
 
 
@@ -167,6 +183,9 @@ class TestXML(TestSentenceSplitter):
     def test_xml_08(self):
         self._equal_xml("<foo>Hallo Susi. Hallo Peter.<br/></foo>", ["<foo> Hallo Susi .", "Hallo Peter . <br> </br> </foo>"])
 
+    def test_xml_09(self):
+        self._equal_xml_strip("<foo><p>hallo</p>du</foo>", ["hallo", "du"])
+
 
 class TestMiscPretokenized(TestSentenceSplitterPretokenized):
     """"""
@@ -272,3 +291,9 @@ class TestXMLBoundaries(TestSentenceSplitterXMLBoundaries):
 
     def test_xml_boundaries_21(self):
         self._equal_xml("<foo><p><b>Hallo</b> <i>Susi.<x/></i></p> Hallo Peter.</foo>", "<foo> <p> <s> <b> Hallo </b> <i> Susi . <x> </x> </i> </s> </p> <s> Hallo Peter . </s> </foo>")
+
+    def test_xml_boundaries_22(self):
+        self._equal("Hallo Susi. Hallo Peter & Thomas.", "<s> Hallo Susi . </s> <s> Hallo Peter &amp; Thomas . </s>")
+
+    def test_xml_boundaries_23(self):
+        self._equal_xml_strip("<foo><p>hallo</p>du</foo>", ["<s> hallo </s>", "<s> du </s>"])
