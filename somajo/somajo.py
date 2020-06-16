@@ -47,7 +47,7 @@ class SoMaJo:
             tokens = self._sentence_splitter._split_sentences(tokens)
         return tokens
 
-    def _parallel_tokenize(self, token_lists, *, parallel=1):
+    def _parallel_tokenize(self, token_lists, *, parallel=1, strip_tags=False):
         """Tokenize and sentence split an iterable of token_dlls; optional
         parallelization.
 
@@ -60,8 +60,10 @@ class SoMaJo:
         if self.split_sentences:
             tokens = itertools.chain.from_iterable(tokens)
             tokens = self._sentence_splitter._merge_empty_sentences(tokens)
-            if self.xml_sentences is not None:
-                tokens = self._sentence_splitter._add_xml_tags(tokens, s_tag=self.xml_sentences)
+        if strip_tags:
+            tokens = ([t for t in par if not t.markup] for par in tokens)
+        if self.split_sentences and (self.xml_sentences is not None):
+            tokens = self._sentence_splitter._add_xml_tags(tokens, s_tag=self.xml_sentences)
         return tokens
 
     def tokenize_text_file(self, text_file, paragraph_separator, *, parallel=1):
@@ -266,10 +268,8 @@ class SoMaJo:
         if eos_tags is not None:
             eos_tags = set(eos_tags)
         token_lists = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags)
-        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
-        if strip_tags:
-            tokens = ([t for t in par if not t.markup] for par in tokens)
-        else:
+        tokens = self._parallel_tokenize(token_lists, parallel=parallel, strip_tags=strip_tags)
+        if not (strip_tags and self.xml_sentences is None):
             tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
 
@@ -445,9 +445,7 @@ class SoMaJo:
         if eos_tags is not None:
             eos_tags = set(eos_tags)
         token_lists = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags)
-        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
-        if strip_tags:
-            tokens = ([t for t in par if not t.markup] for par in tokens)
-        else:
+        tokens = self._parallel_tokenize(token_lists, parallel=parallel, strip_tags=strip_tags)
+        if not (strip_tags and self.xml_sentences is None):
             tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
