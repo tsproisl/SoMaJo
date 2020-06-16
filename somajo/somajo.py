@@ -146,6 +146,8 @@ class SoMaJo:
         assert paragraph_separator in self.paragraph_separators
         token_lists = utils.get_paragraphs_list(text_file, paragraph_separator)
         tokens = self._parallel_tokenize(token_lists, parallel=parallel)
+        if self.xml_sentences:
+            tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
 
     def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1):
@@ -352,6 +354,8 @@ class SoMaJo:
             raise TypeError("``paragraphs`` must be an iterable of strings, not a string!")
         token_lists = ([Token(p, first_in_sentence=True, last_in_sentence=True)] for p in paragraphs)
         tokens = self._parallel_tokenize(token_lists, parallel=parallel)
+        if self.xml_sentences:
+            tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
 
     def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1):
