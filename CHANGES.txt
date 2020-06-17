@@ -1,5 +1,19 @@
 # CHANGELOG #
 
+## Version 2.1.0, 2020-06-17 ##
+
+- New feature: Delimit sentences with XML tags (via the command line
+  option --sentence-tag TAGNAME or by passing xml_sentences="TAGNAME"
+  to the constructor). When using this option with XML input, SoMaJo
+  tries hard to produce well-formed XML as output. To achieve this,
+  some tags will need to be closed and re-opened at sentence
+  boundaries. In this paragraph, for example, the italic region
+  contains a sentence boundary:
+  <p>Hi <i>there! How</i> are you?</p>
+  SoMaJo will close the i tag before the end of the sentence and
+  re-open it afterwards:
+  <p> <s> Hi <i> there ! </i> </s> <s> <i> How </i> are you ? </s> </p>
+
 ## Version 2.0.6, 2020-06-12 ##
 
 - Support all textual smileys and textfaces from Signal messenger.
