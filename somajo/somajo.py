@@ -24,7 +24,10 @@ class SoMaJo:
         Perform sentence splitting in addition to tokenization.
     xml_sentences : str, (default=None)
         Delimit sentences by XML tags of this name
-        (``xml_sentences='s'`` → <s>…</s>).
+        (``xml_sentences='s'`` → <s>…</s>). When used with XML input,
+        this might lead to minor changes to the original tags to
+        guarantee well-formed output (tags might need to be closed and
+        re-opened at sentence boundaries).
 
     """
 
