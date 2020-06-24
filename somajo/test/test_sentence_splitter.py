@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
+import io
 import unittest
 
 from somajo import SentenceSplitter
 from somajo import SoMaJo
+from somajo import Tokenizer
 
 
 class TestSentenceSplitter(unittest.TestCase):
@@ -44,6 +46,12 @@ class TestSentenceSplitterXMLBoundaries(unittest.TestCase):
     def _equal(self, raw, tokenized_sentences):
         """"""
         sentences = self.tokenizer.tokenize_text([raw])
+        sentences = " ".join([" ".join([t.text for t in s]) for s in sentences])
+        self.assertEqual(sentences, tokenized_sentences)
+
+    def _equal_text_file_single_newlines(self, raw, tokenized_sentences):
+        pseudofile = io.StringIO(raw)
+        sentences = self.tokenizer.tokenize_text_file(pseudofile, paragraph_separator="single_newlines")
         sentences = " ".join([" ".join([t.text for t in s]) for s in sentences])
         self.assertEqual(sentences, tokenized_sentences)
 
@@ -88,6 +96,28 @@ class TestSentenceSplitterPretokenized(unittest.TestCase):
         eos_tags = set(eos_tags)
         sentences = self.sentence_splitter.split_xml(tokens.split(), eos_tags)
         self.assertEqual(sentences, [ts.split() for ts in tokenized_sentences])
+
+
+class TestSentenceSplitterTuple(unittest.TestCase):
+    """"""
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = Tokenizer(language="de_CMC", token_classes=True, extra_info=True)
+        self.sentence_splitter = SentenceSplitter(language="de_CMC", is_tuple=True)
+
+    def _equal(self, raw, tokenized_sentences):
+        """"""
+        tokens = self.tokenizer.tokenize_paragraph(raw)
+        sentences = self.sentence_splitter.split(tokens)
+        self.assertEqual(sentences, tokenized_sentences)
+
+    def _equal_xml(self, raw, tokenized_sentences):
+        """"""
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        tokens = self.tokenizer.tokenize_xml(raw, is_file=False)
+        sentences = self.sentence_splitter.split_xml(tokens, eos_tags)
+        self.assertEqual(sentences, tokenized_sentences)
 
 
 class TestMisc(TestSentenceSplitter):
@@ -226,6 +256,15 @@ class TestXMLPretokenized(TestSentenceSplitterPretokenized):
         self._equal_xml("<foo> <p> foo bar </p> <p> foo bar </p> </foo>", ["<foo> <p> foo bar </p>", "<p> foo bar </p> </foo>"])
 
 
+class TestMiscTuple(TestSentenceSplitterTuple):
+    """"""
+    def test_misc_pretok_01(self):
+        self._equal("Hallo Susi. Hallo Peter.", [[('Hallo', 'regular', ''), ('Susi', 'regular', 'SpaceAfter=No'), ('.', 'symbol', '')], [('Hallo', 'regular', ''), ('Peter', 'regular', 'SpaceAfter=No'), ('.', 'symbol', '')]])
+
+    def test_misc_pretok_02(self):
+        self._equal_xml("<foo><p>Hallo</p> Susi. Hallo Peter.</foo>", [[('<foo>', None, ''), ('<p>', None, ''), ('Hallo', 'regular', ''), ('</p>', None, '')], [('Susi', 'regular', 'SpaceAfter=No'), ('.', 'symbol', '')], [('Hallo', 'regular', ''), ('Peter', 'regular', 'SpaceAfter=No'), ('.', 'symbol', ''), ('</foo>', None, '')]])
+
+
 class TestXMLBoundaries(TestSentenceSplitterXMLBoundaries):
     """"""
     def test_xml_boundaries_01(self):
@@ -297,3 +336,9 @@ class TestXMLBoundaries(TestSentenceSplitterXMLBoundaries):
 
     def test_xml_boundaries_23(self):
         self._equal_xml_strip("<foo><p>hallo</p>du</foo>", ["<s> hallo </s>", "<s> du </s>"])
+
+    def test_xml_boundaries_24(self):
+        self._equal_text_file_single_newlines("Hallo Susi. Hallo Peter & Thomas.", "<s> Hallo Susi . </s> <s> Hallo Peter &amp; Thomas . </s>")
+
+    def test_xml_boundaries_25(self):
+        self._equal_xml("<foo><p>Hallo Susi.</p> <p></p> <p>Hallo Peter.</p></foo>", "<foo> <p> <s> Hallo Susi . </s> </p> <p> </p> <p> <s> Hallo Peter . </s> </p> </foo>")

@@ -1162,6 +1162,9 @@ class TestXML(TestTokenizer):
     def test_xml_10(self):
         self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", "<foo> <p> foo bar </p> <p> foo bar </p> </foo>")
 
+    def test_xml_11(self):
+        self._equal_xml("<foo bar='baz'>Foo</foo>", ['<foo bar="baz">', 'Foo', '</foo>'])
+
 
 class TestMisc(TestTokenizer):
     """"""
