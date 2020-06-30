@@ -360,7 +360,7 @@ class Tokenizer():
         self.letter_apostrophe_word = re.compile(r"\b([dlo]['’]\p{L}+)\b", re.IGNORECASE)
         self.double_latex_quote = re.compile(r"(?:(?<!`)``(?!`))|(?:(?<!')''(?!'))")
         self.paired_single_latex_quote = re.compile(r"(?<!`)(?P<left>`)(?P<middle>[^`']+)(?P<right>')(?!')")
-        self.paired_single_quot_mark = re.compile(r"(?P<left>['‚‘’])(?P<middle>[^']+)(?P<right>['‘’])")
+        self.paired_single_quot_mark = re.compile(r"(?<!\p{L})(?P<left>['])(?P<middle>[^']+)(?P<right>['])(?!\p{L})")
         # Musical notes, two programming languages
         self.letter_sharp = re.compile(r"\b[acdfg]#(?:-\p{L}+)?(?!\w)", re.IGNORECASE)
         self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')

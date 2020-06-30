@@ -226,6 +226,15 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_47(self):
         self._equal("Student_Innen", "Student_Innen")
 
+    def test_punctuation_48(self):
+        self._equal("Durch's Haselholz in's Thal hinab,", "Durch's Haselholz in's Thal hinab ,")
+
+    def test_punctuation_49(self):
+        self._equal("Acht Kegel hinter'm Brett herauf,", "Acht Kegel hinter'm Brett herauf ,")
+
+    def test_punctuation_50(self):
+        self._equal("Am Ende säh' ich selber mich,", "Am Ende säh' ich selber mich ,")
+
 
 class TestTimeDate(TestTokenizer):
     """"""
