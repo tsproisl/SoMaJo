@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version 2.1.1, 2020-06-30 ##
+
+- Detection of quotes delimited by apostrophes ('…') is more
+  conservative, now (issue #16).
+
 ## Version 2.1.0, 2020-06-17 ##
 
 - New feature: Delimit sentences with XML tags (via the command line
