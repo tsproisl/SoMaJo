@@ -1070,6 +1070,33 @@ class OwnAdditions(TestTokenizer):
     def test_own_119(self):
         self._equal("Was für eine ISBN: ISBN-10, ISBN-13?", "Was für eine ISBN : ISBN-10 , ISBN-13 ?")
 
+    @unittest.expectedFailure
+    def test_own_120(self):
+        self._equal("Das ist großartig… /s", "Das ist großartig … /s")
+
+    @unittest.expectedFailure
+    def test_own_121(self):
+        self._equal("Dagegen sollte man endlich etwas tun! /rant", "Dagegen sollte man endlich etwas tun ! /rant")
+
+    @unittest.expectedFailure
+    def test_own_122(self):
+        self._equal("Verd****e Sonnenmilch ist nichts f**king weiter als sch**ß Sonnenschutzlotion zur H**le.", "Verd****e Sonnenmilch ist nichts f**king weiter als sch**ß Sonnenschutzlotion zur H**le .")
+
+    @unittest.expectedFailure
+    def test_own_123(self):
+        self._equal("Ooh, wie süüß <3!", "Ooh, wie süüß <3 !")
+
+    @unittest.expectedFailure
+    def test_own_124(self):
+        self._equal("Was gibt 7x4?", "Was gibt 7 x 4 ?")
+
+    def test_own_125(self):
+        self._equal("Was gibt 7×4? Und 3*9?", "Was gibt 7 × 4 ? Und 3 * 9 ?")
+
+    @unittest.expectedFailure
+    def test_own_126(self):
+        self._equal("☆☆☆Wir", "☆ ☆ ☆ Wir")
+
 
 class TestUnderline(TestTokenizer):
     """"""
