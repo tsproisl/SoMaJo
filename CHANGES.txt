@@ -1,5 +1,11 @@
 # CHANGELOG #
 
+## Version 2.1.2, ??? ##
+
+- Allow hyphens in hashtags. While hyphens cannot be part of Twitter
+  hashtags, we do not want to split compounds like
+  “#Refugeeswelcome-Bewegung”.
+
 ## Version 2.1.1, 2020-06-30 ##
 
 - Detection of quotes delimited by apostrophes ('…') is more
