@@ -674,6 +674,9 @@ class TestHashtags(TestTokenizer):
     def test_hashtags_02(self):
         self._equal("#SPD", "#SPD")
 
+    def test_hashtags_03(self):
+        self._equal("#Refugeeswelcome-Bewegung", "#Refugeeswelcome-Bewegung")
+
 
 class OwnAdditions(TestTokenizer):
     """"""

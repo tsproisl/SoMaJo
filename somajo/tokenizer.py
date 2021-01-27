@@ -255,7 +255,7 @@ class Tokenizer():
 
         # MENTIONS, HASHTAGS, ACTION WORDS, UNDERLINE
         self.mention = re.compile(r'[@]\w+(?!\w)')
-        self.hashtag = re.compile(r'(?<!\w)[#]\w+(?!\w)')
+        self.hashtag = re.compile(r'(?<!\w)[#]\w(?:[\w-]*\w)?(?!\w)')
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
         # a pair of underscores can be used to "underline" some text
         self.underline = re.compile(r"(?<!\w)(?P<left>_)(?P<middle>\w[^_]+\w)(?P<right>_)(?!\w)")
