@@ -1,6 +1,6 @@
 # CHANGELOG #
 
-## Version 2.1.2, ??? ##
+## Version 2.1.2, 2021-01-29 ##
 
 - Allow hyphens in hashtags. While hyphens cannot be part of Twitter
   hashtags, we do not want to split compounds like
