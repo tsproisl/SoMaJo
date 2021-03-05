@@ -186,11 +186,12 @@ class Tokenizer():
                                           """, re.VERBOSE)
         # ^3 is an emoticon, unless it is preceded by a number (with
         # optional whitespace between number and ^3)
-        # ^\^3    # beginning of line, no leading characters
-        # ^\D^3   # beginning of line, one leading character
-        # (?<=\D[ ])^3   # two leading characters, non-number + space
-        # (?<=.[^\d ])^3   # two leading characters, x + non-space-non-number
-        self.heart_emoticon = re.compile(r"(?:^|^\D|(?<=\D[ ])|(?<=.[^\d ]))[<^]3")
+        # ^\^3               # beginning of line, no leading characters
+        # ^\D\^3             # beginning of line, one leading character
+        # (?<=\D[ ])\^3      # two leading characters, non-number + space
+        # (?<=.[^\d ])\^3    # two leading characters, x + non-space-non-number
+        # (?<=[<^]3[ ]?)\^3  # leading heart with optional space
+        self.heart_emoticon = re.compile(r"(?:^|^\D|(?<=\D[ ])|(?<=.[^\d ])|(?<=[<^]3[ ]?))[<^]3(?!\d)")
         # U+2600..U+26FF	Miscellaneous Symbols
         # U+2700..U+27BF	Dingbats
         # U+FE0E..U+FE0F        text and emoji variation selectors

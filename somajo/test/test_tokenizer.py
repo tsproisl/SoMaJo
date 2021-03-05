@@ -1089,6 +1089,18 @@ class OwnAdditions(TestTokenizer):
     def test_own_123(self):
         self._equal("Ooh, wie süüß <3!", "Ooh , wie süüß <3 !")
 
+    def test_own_123a(self):
+        self._equal("Ooh, wie süüß <3 <3 <3!", "Ooh , wie süüß <3 <3 <3 !")
+
+    def test_own_123b(self):
+        self._equal("Ooh, wie süüß <3<3<3!", "Ooh , wie süüß <3 <3 <3 !")
+
+    def test_own_123c(self):
+        self._equal("Es gilt 2<3!", "Es gilt 2 < 3 !")
+
+    def test_own_123d(self):
+        self._equal("Das kostet <300", "Das kostet < 300")
+
     def test_own_124(self):
         self._equal("Was gibt 7x4?", "Was gibt 7 x 4 ?")
 
