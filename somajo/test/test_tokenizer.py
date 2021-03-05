@@ -1089,7 +1089,6 @@ class OwnAdditions(TestTokenizer):
     def test_own_123(self):
         self._equal("Ooh, wie süüß <3!", "Ooh , wie süüß <3 !")
 
-    @unittest.expectedFailure
     def test_own_124(self):
         self._equal("Was gibt 7x4?", "Was gibt 7 x 4 ?")
 

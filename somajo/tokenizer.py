@@ -275,6 +275,7 @@ class Tokenizer():
         self.english_ordinal = re.compile(r'\b(?:\d+(?:,\d+)*)?(?:1st|2nd|3rd|\dth)\b')
         self.english_decades = re.compile(r"\b(?:[12]\d)?\d0['’]?s\b")
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
+        self.calculation = re.compile(r"(?P<arg1>\d+(?:[,.]\d+)?)(?P<op>[+*x×÷−])(?P<arg2>\d+(?:[,.]\d+)?)")
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
         self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|gbit/s|ghz|h|hz|kg|l|lb|mbit/s|min|ml|qm|s|sek)(?!\w)', re.IGNORECASE)
@@ -696,6 +697,8 @@ class Tokenizer():
             self._split_all_matches(self.english_ordinal, token_dll, "ordinal")
         # fractions
         self._split_all_matches(self.fraction, token_dll, "number")
+        # calculations
+        self._split_all_matches(self.calculation, token_dll, "number")
         # amounts (1.000,-)
         self._split_all_matches(self.amount, token_dll, "amount")
         # semesters
