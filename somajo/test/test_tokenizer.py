@@ -874,6 +874,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_59(self):
         self._equal("Stefan-Evert-Str. 2", "Stefan-Evert-Str. 2")
 
+    def test_own_59a(self):
+        self._equal("Parkstr. 2", "Parkstr. 2")
+
     def test_own_60(self):
         self._equal("Ich lese IhreAnnäherungen,Beobachtungen,Vergleiche", "Ich lese Ihre Annäherungen , Beobachtungen , Vergleiche")
 

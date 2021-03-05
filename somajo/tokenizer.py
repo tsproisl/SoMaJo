@@ -231,7 +231,7 @@ class Tokenizer():
         # ABBREVIATIONS
         self.single_letter_ellipsis = re.compile(r"(?<![\w.])(?P<a_letter>\p{L})(?P<b_ellipsis>\.{3})(?!\.)")
         self.and_cetera = re.compile(r"(?<![\w.&])&c\.(?!\p{L}{1,3}\.)")
-        self.str_abbreviations = re.compile(r'(?<![\w.])([\p{L}-]+-Str\.)(?!\p{L})', re.IGNORECASE)
+        self.str_abbreviations = re.compile(r'(?<![\w.])([\p{L}-]+str\.)(?!\p{L})', re.IGNORECASE)
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?!\p{L}{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])\p{L}\.(?!\p{L}{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
