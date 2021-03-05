@@ -1103,6 +1103,16 @@ class OwnAdditions(TestTokenizer):
     def test_own_127(self):
         self._equal("Hey Mr. Schlauberger", "Hey Mr. Schlauberger")
 
+    @unittest.expectedFailure
+    def test_own_128(self):
+        self._equal("Wir suchen eine/n Mitarbeiter/in", "Wir suchen eine/n Mitarbeiter/in")
+
+    @unittest.expectedFailure
+    def test_own_129(self):
+        self._equal("Mitarbeiter:in", "Mitarbeiter:in")
+
+    def test_own_130(self):
+        self._equal("Mitarbeiter*in", "Mitarbeiter*in")
 
     def test_own_131(self):
         self._equal("100 Mbit/s", "100 Mbit/s")
