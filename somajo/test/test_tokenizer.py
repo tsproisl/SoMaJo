@@ -1100,6 +1100,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_126(self):
         self._equal("☆☆☆Wir", "☆ ☆ ☆ Wir")
 
+    def test_own_127(self):
+        self._equal("Hey Mr. Schlauberger", "Hey Mr. Schlauberger")
+
 
     def test_own_131(self):
         self._equal("100 Mbit/s", "100 Mbit/s")

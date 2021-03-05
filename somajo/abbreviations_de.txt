@@ -710,8 +710,11 @@ mnl.
 Mo.
 mod.
 mong.
+Mr.
 Mrd.
+Mrs.
 Mrz.
+Ms.
 Mschr.
 Msgr.
 Msp.
