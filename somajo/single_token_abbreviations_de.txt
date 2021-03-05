@@ -43,6 +43,8 @@ USt-IdNr.
 /rant
 /s
 E/E
+GBit/s
+MBit/s
 tl;dr
 zl;ng
 

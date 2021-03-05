@@ -1101,6 +1101,10 @@ class OwnAdditions(TestTokenizer):
         self._equal("☆☆☆Wir", "☆ ☆ ☆ Wir")
 
 
+    def test_own_131(self):
+        self._equal("100 Mbit/s", "100 Mbit/s")
+
+
 class TestUnderline(TestTokenizer):
     """"""
     def test_underline_01(self):
