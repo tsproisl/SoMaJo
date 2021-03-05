@@ -236,7 +236,7 @@ class Tokenizer():
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])\p{L}\.(?!\p{L}{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
         single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language[:2])
-        self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?!\p{L}{1,3}\.)', re.IGNORECASE)
+        self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?!\p{L})', re.IGNORECASE)
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:\p{L}+\.){2,}')
         # only abbreviations that are not matched by (?:\p{L}\.)+

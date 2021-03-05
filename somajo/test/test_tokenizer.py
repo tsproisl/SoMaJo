@@ -1076,11 +1076,9 @@ class OwnAdditions(TestTokenizer):
     def test_own_119(self):
         self._equal("Was für eine ISBN: ISBN-10, ISBN-13?", "Was für eine ISBN : ISBN-10 , ISBN-13 ?")
 
-    @unittest.expectedFailure
     def test_own_120(self):
         self._equal("Das ist großartig… /s", "Das ist großartig … /s")
 
-    @unittest.expectedFailure
     def test_own_121(self):
         self._equal("Dagegen sollte man endlich etwas tun! /rant", "Dagegen sollte man endlich etwas tun ! /rant")
 

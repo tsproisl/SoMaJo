@@ -40,6 +40,8 @@ USt-IdNr.
 
 # These should be moved to another file:
 .Net
+/rant
+/s
 E/E
 tl;dr
 zl;ng
