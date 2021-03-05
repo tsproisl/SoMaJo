@@ -1096,7 +1096,6 @@ class OwnAdditions(TestTokenizer):
     def test_own_125(self):
         self._equal("Was gibt 7×4? Und 3*9?", "Was gibt 7 × 4 ? Und 3 * 9 ?")
 
-    @unittest.expectedFailure
     def test_own_126(self):
         self._equal("☆☆☆Wir", "☆ ☆ ☆ Wir")
 

@@ -200,6 +200,7 @@ class Tokenizer():
         # U+1F680..U+1F6FF	Transport and Map Symbols
         # U+1F900..U+1F9FF	Supplemental Symbols and Pictographs
         # self.unicode_symbols = re.compile(r"[\u2600-\u27BF\uFE0E\uFE0F\U0001F300-\U0001f64f\U0001F680-\U0001F6FF\U0001F900-\U0001F9FF]")
+        self.symbols_and_dingbats = re.compile(r"[\u2600-\u27BF]")
         self.unicode_flags = re.compile(r"\p{Regional_Indicator}{2}\uFE0F?")
 
         # special tokens containing + or &
@@ -624,6 +625,7 @@ class Tokenizer():
         # emoticons
         self._split_all_matches(self.heart_emoticon, token_dll, "emoticon")
         self._split_all_matches(self.emoticon, token_dll, "emoticon")
+        self._split_all_matches(self.symbols_and_dingbats, token_dll, "emoticon")
 
         # mentions, hashtags
         self._split_all_matches(self.mention, token_dll, "mention")
