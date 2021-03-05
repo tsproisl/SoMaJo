@@ -226,8 +226,8 @@ class Tokenizer():
         self.in_and_innen = re.compile(r'\b\p{L}+\p{Ll}In(?:nen)?\p{Ll}*\b')
         self.camel_case = re.compile(r'(?<=\p{Ll}{2})(\p{Lu})(?!\p{Lu}|\b)')
 
-        # GENDER STAR
-        self.gender_star = re.compile(r'\b\p{L}+\*in(?:nen)?\p{Ll}*\b', re.IGNORECASE)
+        # GENDER MARKER
+        self.gender_marker = re.compile(r'\b\p{L}+[*:/]in(?:nen)?\p{Ll}*\b', re.IGNORECASE)
 
         # ABBREVIATIONS
         self.single_letter_ellipsis = re.compile(r"(?<![\w.])(?P<a_letter>\p{L})(?P<b_ellipsis>\.{3})(?!\.)")
@@ -648,8 +648,8 @@ class Tokenizer():
             self._split_all_matches(self.in_and_innen, token_dll)
             self._split_all_left(self.camel_case, token_dll)
 
-        # gender star
-        self._split_all_matches(self.gender_star, token_dll)
+        # gender marker
+        self._split_all_matches(self.gender_marker, token_dll)
 
         # English possessive and contracted forms
         if self.language == "en" or self.language == "en_PTB":

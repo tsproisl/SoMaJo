@@ -1106,7 +1106,6 @@ class OwnAdditions(TestTokenizer):
     def test_own_128(self):
         self._equal("Wir suchen eine/n Mitarbeiter/in", "Wir suchen eine/n Mitarbeiter/in")
 
-    @unittest.expectedFailure
     def test_own_129(self):
         self._equal("Mitarbeiter:in", "Mitarbeiter:in")
 
