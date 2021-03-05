@@ -276,7 +276,7 @@ class Tokenizer():
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
-        self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|ghz|h|hz|kg|l|lb|min|ml|qm|s|sek)(?!\w)', re.IGNORECASE)
+        self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|gbit/s|ghz|h|hz|kg|l|lb|mbit/s|min|ml|qm|s|sek)(?!\w)', re.IGNORECASE)
         # auch Web2.0
         self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[\p{L}@][\p{L}@-]* | [\p{L}@][\p{L}@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
         self.number = re.compile(r"""(?<!\w|\d[.,]?)
