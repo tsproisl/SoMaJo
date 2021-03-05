@@ -239,9 +239,7 @@ Bz.
 bzb.
 bzgl.
 bzw.
-bzw.
 Börsenw.
-ca.
 ca.
 Carp.
 cf.
@@ -253,11 +251,9 @@ Chem.
 chilen.
 chin.
 Chr.
-Chr.
 christl.
 chron.
 Chron.
-Co.
 Co.
 cresc.
 d.Gr.
@@ -279,7 +275,6 @@ dominikan.
 dor.
 Doz.
 Dr.
-Dr.
 Dr.des.
 Dr.h.c.
 Dr.phil.
@@ -289,7 +284,6 @@ Drcks.
 Dres.
 Drs.
 Drucks.
-dt.
 dt.
 Dtl.
 dto.
@@ -314,7 +308,6 @@ Elektrot.
 elektrotechn.
 em.
 engl.
-engl.
 entspr.
 erb.
 erf.
@@ -330,16 +323,13 @@ erzgeb.
 eskim.
 estn.
 etc.
-etc.
 Etg.
 etrusk.
-etw.
 etw.
 eur.
 europ.
 ev.
 evang.
-evtl.
 evtl.
 Ew.
 ewen.
@@ -347,7 +337,6 @@ ewenk.
 exkl.
 Expl.
 Ez.
-Fa.
 Fa.
 Face2face-Komm.
 fachspr.
@@ -381,7 +370,6 @@ friesl.
 Frl.
 frnhd.
 frz.
-frz.
 fränk.
 frühnhd.
 Fsm.
@@ -394,7 +382,6 @@ Gart.
 gaskogn.
 Gbf.
 geb.
-geb.
 gebr.
 Gebr.
 ged.
@@ -406,7 +393,6 @@ geisteswissenschaftl.
 gek.
 gel.
 geleg.
-gem.
 gem.
 gemeingerm.
 geod.
@@ -426,7 +412,6 @@ gesch.
 geschr.
 gespr.
 gest.
-gest.
 get.
 gew.
 Gew.
@@ -437,7 +422,6 @@ gg.
 ggb.
 ggbfs.
 ggez.
-ggf.
 ggf.
 ggfs.
 Ggs.
@@ -486,7 +470,6 @@ hinr.
 hins.
 Hinw.
 hist.
-hist.
 HJber.
 Hkl.
 hl.
@@ -499,7 +482,6 @@ Hptst.
 HQu.
 Hr.
 Hrn.
-Hrsg.
 Hrsg.
 Hs.
 Hubbr.
@@ -537,7 +519,6 @@ Inf.
 Ing.
 Inh.
 inkl.
-inkl.
 inn.
 insb.
 insbes.
@@ -560,8 +541,6 @@ jdn.
 jem.
 jemen.
 Jg.
-Jg.
-Jh.
 Jh.
 Jhd.
 Jhdt.
@@ -569,7 +548,6 @@ Jhs.
 jidd.
 jmd.
 jmdm.
-jmdn.
 jmdn.
 jmds.
 jn.
@@ -708,7 +686,6 @@ mgl.
 Mgl.
 mglw.
 mhd.
-mhd.
 mhdt.
 Mia.
 mihd.
@@ -718,7 +695,6 @@ Min.
 min.
 Min.
 mind.
-Mio.
 Mio.
 Mitgl.
 mitteld.
@@ -762,7 +738,6 @@ neunorweg.
 neutest.
 neutr.
 nhd.
-nhd.
 niederd.
 niederdt.
 niederl.
@@ -783,7 +758,6 @@ norw.
 norweg.
 Nov.
 Nr.
-Nr.
 ntw.
 Ntw.
 Nutzfl.
@@ -797,7 +771,6 @@ oberlaus.
 obers.
 obersächs.
 obj.
-od.
 od.
 offiz.
 Offz.
@@ -844,7 +817,6 @@ Pos.
 pp.
 ppa.
 preuß.
-Prof.
 Prof.
 prot.
 Prot.
@@ -912,7 +884,6 @@ scherzh.
 schles.
 schr.
 schriftl.
-schriftl.
 schwed.
 schwäb.
 Sdp.
@@ -936,7 +907,6 @@ slowen.
 sod.
 sof.
 sog.
-sog.
 sogen.
 sogl.
 soldatenspr.
@@ -958,9 +928,7 @@ spätmhd.
 Sr.
 ssp.
 St.
-St.
 staatl.
-Std.
 Std.
 stdl.
 stellv.
@@ -1028,7 +996,6 @@ urspr.
 ursprüngl.
 usf.
 usw.
-usw.
 va.
 Verf.
 Verg.
@@ -1036,7 +1003,6 @@ vergl.
 Vergl.
 verh.
 Vfg.
-vgl.
 vgl.
 vh.
 viell.
@@ -1046,7 +1012,6 @@ vllt.
 vlt.
 volkst.
 Vors.
-vs.
 vs.
 vsl.
 vt.
