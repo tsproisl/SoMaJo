@@ -1088,9 +1088,8 @@ class OwnAdditions(TestTokenizer):
     def test_own_122(self):
         self._equal("Verd****e Sonnenmilch ist nichts f**king weiter als sch**ß Sonnenschutzlotion zur H**le.", "Verd****e Sonnenmilch ist nichts f**king weiter als sch**ß Sonnenschutzlotion zur H**le .")
 
-    @unittest.expectedFailure
     def test_own_123(self):
-        self._equal("Ooh, wie süüß <3!", "Ooh, wie süüß <3 !")
+        self._equal("Ooh, wie süüß <3!", "Ooh , wie süüß <3 !")
 
     @unittest.expectedFailure
     def test_own_124(self):
