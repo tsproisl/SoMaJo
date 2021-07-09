@@ -59,9 +59,14 @@ class SoMaJo:
         parallelization.
 
         """
+        def partok():
+            with multiprocessing.Pool(min(parallel, multiprocessing.cpu_count())) as pool:
+                tokens = pool.imap(self._tokenize, token_lists, 250)
+                for par in tokens:
+                    yield par
+
         if parallel > 1:
-            pool = multiprocessing.Pool(min(parallel, multiprocessing.cpu_count()))
-            tokens = pool.imap(self._tokenize, token_lists, 250)
+            tokens = partok()
         else:
             tokens = map(self._tokenize, token_lists)
         if self.split_sentences:
