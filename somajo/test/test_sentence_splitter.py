@@ -179,6 +179,12 @@ class TestMisc(TestSentenceSplitter):
     def test_misc_19(self):
         self._equal("Großartig! 👍🥰 Weiter so!", ["Großartig ! 👍 🥰", "Weiter so !"])
 
+    def test_misc_20(self):
+        self._equal('"In welchen Modi werden wir in einigen Jahren kommunizieren?" @berlinothar #ibk #cmc #dtaclarin14', ['" In welchen Modi werden wir in einigen Jahren kommunizieren ? "', "@berlinothar #ibk #cmc #dtaclarin14"])
+
+    def test_misc_21(self):
+        self._equal("Oder gibt es Unterschiede? #semibk", ["Oder gibt es Unterschiede ?", "#semibk"])
+
 
 class TestMiscEnglish(TestSentenceSplitterEnglish):
     """"""
