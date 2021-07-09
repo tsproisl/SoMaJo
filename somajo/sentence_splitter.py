@@ -253,7 +253,7 @@ class SentenceSplitter():
                         break
                     elif opening or (self.opening_punct.search(tok_j.text) and not closing):
                         last = "opening"
-                    elif closing or (self.closing_punct.search(tok_j.text) and not opening) and last != "opening":
+                    elif (closing or (self.closing_punct.search(tok_j.text) and not opening)) and last != "opening":
                         last_token_in_sentence = tok_j
                         first_token_in_sentence = None
                         last = "closing"
