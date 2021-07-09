@@ -256,6 +256,16 @@ class SentenceSplitter():
                         last_token_in_sentence.last_in_sentence = True
                         first_token_in_sentence.first_in_sentence = True
                         break
+                    # “Emoticons are treated as non-verbal comments to
+                    # the text and are thus integrated in the
+                    # utterance.” (Rehbein et al. 2018: 20)
+                    #
+                    # This does not work with pretokenized text fed
+                    # into the split and split_xml methods since their
+                    # input does not have SoMaJo token classes.
+                    elif tok_j.token_class == "emoticon" and last != "opening":
+                        last_token_in_sentence = tok_j
+                        first_token_in_sentence = None
                     elif opening or (self.opening_punct.search(tok_j.text) and not closing):
                         last = "opening"
                     elif (closing or (self.closing_punct.search(tok_j.text) and not opening)) and last != "opening":
