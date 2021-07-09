@@ -27,6 +27,11 @@ class SentenceSplitter():
             # German closing quotes [“‘«‹] have category Pi
             self.problematic_quotes = set(['"', "»", "«", "›", "‹", "“", "‘"])
         self.eos_abbreviations = utils.read_abbreviation_file("eos_abbreviations.txt")
+        # We match these via regular expressions because users could
+        # call the split or split_xml methods with pretokenized input
+        # that does not have SoMaJo token classes
+        self.mention = re.compile(r'^[@]\w+$')
+        self.hashtag = re.compile(r'^[#]\w(?:[\w-]*\w)?$')
 
     def _get_sentence_boundaries(self, tokens):
         sentence_boundaries = []
@@ -247,7 +252,7 @@ class SentenceSplitter():
                         # closing: last token or followed by space or closing
                         elif j == n - 1 or tok_j.space_after or self.closing_punct.search(tokens[j + 1].text):
                             closing = True
-                    if tok_j.text[0].isupper() or tok_j.text.isnumeric():
+                    if tok_j.text[0].isupper() or tok_j.text.isnumeric() or self.mention.search(tok_j.text) or self.hashtag.search(tok_j.text):
                         last_token_in_sentence.last_in_sentence = True
                         first_token_in_sentence.first_in_sentence = True
                         break
