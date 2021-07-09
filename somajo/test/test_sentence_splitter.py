@@ -173,6 +173,12 @@ class TestMisc(TestSentenceSplitter):
     def test_misc_17(self):
         self._equal("blafasel bla. 700 Jahre später…", ["blafasel bla .", "700 Jahre später …"])
 
+    def test_misc_18(self):
+        self._equal("Großartig! 👍 Weiter so!", ["Großartig ! 👍", "Weiter so !"])
+
+    def test_misc_19(self):
+        self._equal("Großartig! 👍🥰 Weiter so!", ["Großartig ! 👍 🥰", "Weiter so !"])
+
 
 class TestMiscEnglish(TestSentenceSplitterEnglish):
     """"""
