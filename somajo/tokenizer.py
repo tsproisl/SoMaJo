@@ -257,7 +257,8 @@ class Tokenizer():
 
         # MENTIONS, HASHTAGS, ACTION WORDS, UNDERLINE
         self.mention = re.compile(r'[@]\w+(?!\w)')
-        self.hashtag = re.compile(r'(?<!\w)[#]\w(?:[\w-]*\w)?(?!\w)')
+        self.hashtag_sequence = re.compile(r'(?<!\w)(?:[#]\w(?:[\w-]*\w)?)+(?!\w)')
+        self.single_hashtag = re.compile(r'[#]\w(?:[\w-]*\w)?(?!\w)')
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
         # a pair of underscores can be used to "underline" some text
         self.underline = re.compile(r"(?<!\w)(?P<left>_)(?P<middle>\w[^_]+\w)(?P<right>_)(?!\w)")
@@ -482,6 +483,20 @@ class Tokenizer():
                 continue
             self._split_matches(regex, t, token_class, repl, split_named_subgroups, delete_whitespace)
 
+    def _split_all_matches_in_match(self, regex1, regex2, token_dll, token_class="regular", *, delete_whitespace=False):
+        """Find all matches for regex1 and turn all matches for regex2 within
+        the matches for regex1 into tokens.
+
+        """
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
+            boundaries = []
+            for m1 in regex1.finditer(t.value.text):
+                for m2 in regex2.finditer(m1.group(0)):
+                    boundaries.append((m2.start() + m1.start(), m2.end() + m1.start(), None))
+            self._split_on_boundaries(t, boundaries, token_class, delete_whitespace=delete_whitespace)
+
     def _split_all_emojis(self, token_dll, token_class="emoticon"):
         """Replace all emoji sequences"""
         self._split_all_matches(self.textfaces_emoji, token_dll, "emoticon")
@@ -631,7 +646,7 @@ class Tokenizer():
 
         # mentions, hashtags
         self._split_all_matches(self.mention, token_dll, "mention")
-        self._split_all_matches(self.hashtag, token_dll, "hashtag")
+        self._split_all_matches_in_match(self.hashtag_sequence, self.single_hashtag, token_dll, "hashtag")
         # action words
         self._split_all_matches(self.action_word, token_dll, "action_word")
         # underline

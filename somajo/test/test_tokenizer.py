@@ -677,6 +677,9 @@ class TestHashtags(TestTokenizer):
     def test_hashtags_03(self):
         self._equal("#Refugeeswelcome-Bewegung", "#Refugeeswelcome-Bewegung")
 
+    def test_hashtags_04(self):
+        self._equal("Bumble Bee Menga wünscht ein schönen Sonntag ! #staystrong#fckcorona#action#germany.", "Bumble Bee Menga wünscht ein schönen Sonntag ! #staystrong #fckcorona #action #germany .")
+
 
 class OwnAdditions(TestTokenizer):
     """"""
