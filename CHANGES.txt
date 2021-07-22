@@ -1,5 +1,9 @@
 # CHANGELOG #
 
+## Version ???, ??? ##
+
+- Split sequences of hashtags without spaces.
+
 ## Version 2.1.4, 2021-07-09 ##
 
 - Add a few abbreviations.
