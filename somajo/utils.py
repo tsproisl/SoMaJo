@@ -38,7 +38,7 @@ def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
             yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)]
 
 
-def read_abbreviation_file(filename):
+def read_abbreviation_file(filename, to_lower=False):
     """Return the abbreviations from the given filename."""
     abbreviations = set()
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), filename), encoding="utf-8") as fh:
@@ -48,6 +48,8 @@ def read_abbreviation_file(filename):
                 continue
             if line == "":
                 continue
+            if to_lower:
+                line = line.lower()
             abbreviations.add(line)
     return sorted(abbreviations, key=len, reverse=True)
 

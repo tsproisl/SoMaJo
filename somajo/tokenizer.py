@@ -242,7 +242,7 @@ class Tokenizer():
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:\p{L}+\.){2,}')
         # only abbreviations that are not matched by (?:\p{L}\.)+
-        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language[:2])
+        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language[:2], to_lower=True)
         # abbrev_simple = [(a, re.search(r"^\p{L}{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])\p{L}{2,}\.(?!\p{L}{1,3}\.)")
