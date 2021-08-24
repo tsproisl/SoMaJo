@@ -1,8 +1,9 @@
 # CHANGELOG #
 
-## Version ???, ??? ##
+## Version 2.1.5, 2021-08-24 ##
 
 - Split sequences of hashtags without spaces.
+- Add legal abbreviations (issue #21).
 
 ## Version 2.1.4, 2021-07-09 ##
 
