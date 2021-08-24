@@ -3,34 +3,30 @@
 #
 # Lines starting with “#” are treated as comments and will be ignored.
 
-E.ON
-Forsch.frage
-IT.NRW
-Kla.TV
-Kla.TV-Dokumentation
-Komm.formen
-Mat.-Nr.
-o.k.
-Pan.do/ra
-Sat.1
-SP.ON
-T.V.
-Zeitschr.titel
-
-# The following list is from Wiktionary
-
+ak.mas
 Art.-Nr.
 At.-Gew.
 Best.-Nr.
 BT-Drs.
 Dipl.-Ing.
+E.ON
+Forsch.frage
+GV.NRW.
 H.-I.
 H.-Qu.
+IT.NRW
+Kla.TV
+Kla.TV-Dokumentation
 klass.-lat.
+Komm.formen
 Krim.-Ob.-Insp.
 Kto.-Nr.
 L.-Abg.
 M.-Schr.
+Mat.-Nr.
+MBl.NRW.
+o.k.
+Pan.do/ra
 Priv.-Doz.
 prov.-fr.
 Proz.-Bev.
@@ -38,8 +34,14 @@ r.-k.
 Reg.-Bez.
 Rg.-Präs.
 röm.-kath.
+Sat.1
+SMBl.NRW.
+soz.-päd.
+SP.ON
+T.V.
 Uni-Kl.
 USt-IdNr.
+Zeitschr.titel
 
 # These should be moved to another file:
 .Net
