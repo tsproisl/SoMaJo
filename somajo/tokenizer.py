@@ -118,7 +118,7 @@ class Tokenizer():
                                    )
                                    (?!\w|[ -][0-9])""", re.VERBOSE | re.IGNORECASE)
         # we also allow things like tagesschau.de-App
-        self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|at|ch|com|org|net|edu|info|gov|jpg|png|gif|log|txt|xlsx?|docx?|pptx?|pdf)(?:-\w+)?\b', re.IGNORECASE)
+        self.url_without_protocol = re.compile(r'\b[\w./-]+\.(?:de|com|tv|me|net|us|org|at|cc|ly|be|ch|info|live|eu|edu|gov|jpg|png|gif|log|txt|xlsx?|docx?|pptx?|pdf)(?:-\w+)?\b', re.IGNORECASE)
         self.reddit_links = re.compile(r'(?<!\w)/?[rlu](?:/\w+)+/?(?!\w)', re.IGNORECASE)
 
         # XML entities
