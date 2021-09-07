@@ -501,6 +501,16 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_18(self):
         self._equal("/r/foo/bar/", "/r/foo/bar/")
 
+    def test_emails_urls_19(self):
+        self._equal("Schau mal die Doku auf kla.tv an", "Schau mal die Doku auf kla.tv an")
+
+    def test_emails_urls_20(self):
+        self._equal("Eine kla.tv-Zuschauerin hat…", "Eine kla.tv-Zuschauerin hat …")
+
+    @unittest.expectedFailure
+    def test_emails_urls_21(self):
+        self._equal("Schau mal die Doku auf kla.tv/dokus an", "Schau mal die Doku auf kla.tv/dokus an")
+
 
 class TestEmoticons(TestTokenizer):
     """"""
