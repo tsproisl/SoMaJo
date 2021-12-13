@@ -111,10 +111,7 @@ class DLL:
         if self.size == 0:
             raise IndexError
         element = self.last
-        self.last = element.prev
-        if element.prev is not None:
-            element.prev.next = None
-        self.size -= 1
+        self.remove(element)
         return element.value
 
     def previous_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
