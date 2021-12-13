@@ -1,8 +1,9 @@
 # CHANGELOG #
 
-## Version ?.?.?, ??? ##
+## Version 2.1.6, 2021-12-13 ##
 
 - Recognize more URLs without protocol.
+- Fix a small bug in implementation of doubly linked lists.
 
 ## Version 2.1.5, 2021-08-24 ##
 
