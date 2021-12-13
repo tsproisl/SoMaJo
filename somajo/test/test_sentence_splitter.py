@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import io
+import logging
 import unittest
 
 from somajo import SentenceSplitter
@@ -107,7 +108,8 @@ class TestSentenceSplitterTuple(unittest.TestCase):
 
     def _equal(self, raw, tokenized_sentences):
         """"""
-        tokens = self.tokenizer.tokenize_paragraph(raw)
+        with self.assertLogs(level=logging.WARN):
+            tokens = self.tokenizer.tokenize_paragraph(raw)
         sentences = self.sentence_splitter.split(tokens)
         self.assertEqual(sentences, tokenized_sentences)
 
@@ -115,7 +117,8 @@ class TestSentenceSplitterTuple(unittest.TestCase):
         """"""
         eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         eos_tags = set(eos_tags)
-        tokens = self.tokenizer.tokenize_xml(raw, is_file=False)
+        with self.assertLogs(level=logging.WARN):
+            tokens = self.tokenizer.tokenize_xml(raw, is_file=False)
         sentences = self.sentence_splitter.split_xml(tokens, eos_tags)
         self.assertEqual(sentences, tokenized_sentences)
 

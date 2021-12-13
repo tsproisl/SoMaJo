@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import itertools
+import logging
 import unittest
 
 from somajo import Tokenizer
@@ -48,13 +49,15 @@ class TestTokenizerDeprecated(TestTokenizer):
     def _equal(self, raw, tokenized):
         if isinstance(tokenized, str):
             tokenized = tokenized.split()
-        tokens = self.tokenizer.tokenize_paragraph(raw)
+        with self.assertLogs(level=logging.WARN):
+            tokens = self.tokenizer.tokenize_paragraph(raw)
         self.assertEqual(tokens, tokenized)
 
     def _equal_xml(self, raw, tokenized):
         if isinstance(tokenized, str):
             tokenized = tokenized.split()
-        tokens = self.tokenizer.tokenize_xml(raw, is_file=False)
+        with self.assertLogs(level=logging.WARN):
+            tokens = self.tokenizer.tokenize_xml(raw, is_file=False)
         self.assertEqual(tokens, tokenized)
 
 
