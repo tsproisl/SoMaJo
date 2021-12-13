@@ -105,20 +105,17 @@ class DLL:
         return self.is_left_of(ref_element, element)
 
     def next_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
-        self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
+        return self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
 
     def pop(self):
         if self.size == 0:
             raise IndexError
         element = self.last
-        self.last = element.prev
-        if element.prev is not None:
-            element.prev.next = None
-        self.size -= 1
+        self.remove(element)
         return element.value
 
     def previous_matching(self, item, attrgetter, value, ignore_attrgetter=None, ignore_value=None):
-        self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)
+        return self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)
 
     def remove(self, element):
         if self.first is element:
