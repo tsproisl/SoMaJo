@@ -1,6 +1,7 @@
 # SoMaJo #
 
 [![PyPI](https://img.shields.io/pypi/v/SoMaJo)](https://pypi.org/project/SoMaJo/)
+[![Build](https://github.com/tsproisl/SoMaJo/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/tsproisl/SoMaJo/actions/workflows/test.yml?query=branch%3Amaster)
 
   * [Introduction](#introduction)
   * [Installation](#installation)
