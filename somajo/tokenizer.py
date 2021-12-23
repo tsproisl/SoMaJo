@@ -458,11 +458,11 @@ class Tokenizer():
                     boundaries.append((m.start(), m.end(), None))
         self._split_on_boundaries(node, boundaries, token_class)
 
-    def _split_set(self, regex, node, items, token_class="regular", ignore_case=False):
+    def _split_set(self, regex, node, items, token_class="regular", to_lower=False):
         boundaries = []
         for m in regex.finditer(node.value.text):
             instance = m.group(0)
-            if ignore_case:
+            if to_lower:
                 instance = instance.lower()
             if instance in items:
                 boundaries.append((m.start(), m.end(), None))
@@ -505,13 +505,18 @@ class Tokenizer():
                 continue
             self._split_emojis(t, token_class)
 
-    def _split_all_set(self, token_dll, regex, items, token_class="regular", ignore_case=False):
-        """Turn all elements from items into separate tokens. (All elements
-        need to be matched by regex.)"""
+    def _split_all_set(self, token_dll, regex, items, token_class="regular", to_lower=False):
+        """Turn all elements from items into separate tokens. Note: All
+        elements need to be matched by regex. Optionally lowercase the
+        matches before the comparison. Note: to_lower does not modify
+        the elements of items, i.e. setting to_lower=True only makes
+        sense if the elements of items are already in lowercase.
+
+        """
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
-            self._split_set(regex, t, items, token_class, ignore_case)
+            self._split_set(regex, t, items, token_class, to_lower)
 
     def _split_all_left(self, regex, token_dll):
         """Split to the left of the match."""
@@ -656,7 +661,7 @@ class Tokenizer():
 
         # tokens with + or &
         self._split_all_matches(self.token_with_plus_ampersand, token_dll)
-        self._split_all_set(token_dll, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, ignore_case=True)
+        self._split_all_set(token_dll, self.simple_plus_ampersand_candidates, self.simple_plus_ampersand, to_lower=True)
 
         # camelCase
         if self.split_camel_case:

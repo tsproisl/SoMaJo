@@ -1601,3 +1601,36 @@ class TestSplitOnBoundaries(unittest.TestCase):
         self.assertEqual(tokens[1].original_spelling, "23")
         self.assertEqual(tokens[3].original_spelling, "678")
         self.assertEqual([t._locked for t in tokens], [False, True, False, True, False])
+
+
+class TestSplitAllSet(unittest.TestCase):
+    """"""
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = Tokenizer(language="de_CMC", split_camel_case=True)
+        self.regex = re.compile(r"\p{L}{3}")
+        self.set_ = set(["abc", "xYz"])
+
+    def test_split_all_set_01(self):
+        token_dll = DLL([Token(s) for s in "0abc0 0xyz0".split()])
+        self.tokenizer._split_all_set(token_dll, self.regex, self.set_)
+        tokens = token_dll.to_list()
+        self.assertEqual([t.text for t in tokens], "0 abc 0 0xyz0".split())
+
+    def test_split_all_set_02(self):
+        token_dll = DLL([Token(s) for s in "0aBc0 0xYz0".split()])
+        self.tokenizer._split_all_set(token_dll, self.regex, self.set_)
+        tokens = token_dll.to_list()
+        self.assertEqual([t.text for t in tokens], "0aBc0 0 xYz 0".split())
+
+    def test_split_all_set_03(self):
+        token_dll = DLL([Token(s) for s in "0abc0 0xyz0".split()])
+        self.tokenizer._split_all_set(token_dll, self.regex, self.set_, to_lower=True)
+        tokens = token_dll.to_list()
+        self.assertEqual([t.text for t in tokens], "0 abc 0 0xyz0".split())
+
+    def test_split_all_set_04(self):
+        token_dll = DLL([Token(s) for s in "0aBc0 0xYz0".split()])
+        self.tokenizer._split_all_set(token_dll, self.regex, self.set_, to_lower=True)
+        tokens = token_dll.to_list()
+        self.assertEqual([t.text for t in tokens], "0 aBc 0 0xYz0".split())
