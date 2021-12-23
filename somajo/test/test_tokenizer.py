@@ -1383,3 +1383,96 @@ class TestDeprecated(TestTokenizerDeprecated):
 
     def test_deprecated_02(self):
         self._equal_xml("<p>foo bar baz</p>", "<p> foo bar baz </p>")
+
+
+class TestRemoveEmptyTokens(unittest.TestCase):
+    """"""
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = Tokenizer(language="de_CMC", split_camel_case=True)
+
+    def test_remove_empty_tokens_01(self):
+        token_dll = DLL([Token(s) for s in (" ", "Foo", "bar", "baz", "qux")])
+        token_dll.first.value.first_in_sentence = True
+        token_dll.last.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "Foo bar baz qux".split())
+        self.assertTrue(token_dll.first.value.first_in_sentence)
+        self.assertTrue(token_dll.last.value.last_in_sentence)
+
+    def test_remove_empty_tokens_02(self):
+        token_dll = DLL([Token(s) for s in ("Foo", "bar", "baz", "qux", " ")])
+        token_dll.first.value.first_in_sentence = True
+        token_dll.last.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "Foo bar baz qux".split())
+        self.assertTrue(token_dll.first.value.first_in_sentence)
+        self.assertTrue(token_dll.last.value.last_in_sentence)
+
+    def test_remove_empty_tokens_03(self):
+        token_dll = DLL([Token(s) for s in ("<s>", " ", "Foo", "bar", "baz", "qux", "</s>")])
+        token_dll.first.value.markup = True
+        token_dll.last.value.markup = True
+        token_dll.first.next.value.first_in_sentence = True
+        token_dll.last.prev.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "<s> Foo bar baz qux </s>".split())
+        self.assertTrue(token_dll.first.next.value.first_in_sentence)
+        self.assertTrue(token_dll.last.prev.value.last_in_sentence)
+
+    def test_remove_empty_tokens_04(self):
+        token_dll = DLL([Token(s) for s in ("<s>", "Foo", "bar", "baz", "qux", " ", "</s>")])
+        token_dll.first.value.markup = True
+        token_dll.last.value.markup = True
+        token_dll.first.next.value.first_in_sentence = True
+        token_dll.last.prev.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "<s> Foo bar baz qux </s>".split())
+        self.assertTrue(token_dll.first.next.value.first_in_sentence)
+        self.assertTrue(token_dll.last.prev.value.last_in_sentence)
+
+    def test_remove_empty_tokens_05(self):
+        token_dll = DLL([Token(s) for s in ("<s>", " ", "<br/>", "Foo", "bar", "baz", "qux", "</s>")])
+        token_dll.first.value.markup = True
+        token_dll.last.value.markup = True
+        token_dll.first.next.next.value.markup = True
+        token_dll.first.next.value.first_in_sentence = True
+        token_dll.last.prev.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "<s> <br/> Foo bar baz qux </s>".split())
+        self.assertTrue(token_dll.first.next.next.value.first_in_sentence)
+        self.assertTrue(token_dll.last.prev.value.last_in_sentence)
+
+    def test_remove_empty_tokens_06(self):
+        token_dll = DLL([Token(s) for s in ("<s>", "Foo", "bar", "baz", "qux", "<br/>", " ", "</s>")])
+        token_dll.first.value.markup = True
+        token_dll.last.value.markup = True
+        token_dll.last.prev.prev.value.markup = True
+        token_dll.first.next.value.first_in_sentence = True
+        token_dll.last.prev.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "<s> Foo bar baz qux <br/> </s>".split())
+        self.assertTrue(token_dll.first.next.value.first_in_sentence)
+        self.assertTrue(token_dll.last.prev.prev.value.last_in_sentence)
+
+    def test_remove_empty_tokens_07(self):
+        token_dll = DLL([Token(s) for s in ("<s>", " ", "Foo", " ", "</s>")])
+        token_dll.first.value.markup = True
+        token_dll.last.value.markup = True
+        token_dll.first.next.value.first_in_sentence = True
+        token_dll.last.prev.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "<s> Foo </s>".split())
+        self.assertTrue(token_dll.first.next.value.first_in_sentence)
+        self.assertTrue(token_dll.first.next.value.last_in_sentence)
+
+    def test_remove_empty_tokens_08(self):
+        token_dll = DLL([Token(s) for s in ("<s>", " ", " ", "</s>")])
+        token_dll.first.value.markup = True
+        token_dll.last.value.markup = True
+        token_dll.first.next.value.first_in_sentence = True
+        token_dll.last.prev.value.last_in_sentence = True
+        self.tokenizer._remove_empty_tokens(token_dll)
+        self.assertEqual([t.text for t in token_dll.to_list()], "<s> </s>".split())
+        self.assertFalse(any([t.value.first_in_sentence for t in token_dll]))
+        self.assertFalse(any([t.value.last_in_sentence for t in token_dll]))
