@@ -232,7 +232,7 @@ Lust auf Film ? ;-)
 ```
 
 
-#### tokenize_xml(xml_data, eos_tags, \*, strip_tags=False, parallel=1)
+#### tokenize_xml(xml_data, eos_tags, \*, strip_tags=False, parallel=1, prune_tags=None)
 Split a string of XML data into sequences of tokens.
 
 
@@ -253,6 +253,12 @@ Split a string of XML data into sequences of tokens.
 
 
     * **parallel** (*int, (default=1)*) – Number of processes to use.
+
+
+    * **prune_tags** (*iterable*) – These XML tags and their contents will be removed from the
+    input before tokenization. For HTML input, you might use
+    `['script', 'style']` or, depending on your use case,
+    `['head']`.
 
 
 
@@ -373,7 +379,7 @@ Film
 ```
 
 
-#### tokenize_xml_file(xml_file, eos_tags, \*, strip_tags=False, parallel=1)
+#### tokenize_xml_file(xml_file, eos_tags, \*, strip_tags=False, parallel=1, prune_tags=None)
 Split the contents of an xml file into sequences of tokens.
 
 
@@ -391,10 +397,16 @@ Split the contents of an xml file into sequences of tokens.
     'div', 'ol', 'ul', 'dl', 'table']`
 
 
-    * **strip_tags** (*bool, (default=False)*) – Remove the XML tags from the output.
+    * **strip_tags** (*bool, (default=False)*) – Remove all XML tags from the output.
 
 
     * **parallel** (*int, (default=1)*) – Number of processes to use.
+
+
+    * **prune_tags** (*iterable*) – These XML tags and their contents will be removed from the
+    input before tokenization. For HTML input, you might use
+    `['script', 'style']` or, depending on your use case,
+    `['head']`.
 
 
 
