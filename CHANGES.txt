@@ -1,5 +1,14 @@
 # CHANGELOG #
 
+## Version 2.2.0, 2022-01-18 ##
+
+- New feature: Prune XML tags and their contents from the input before
+  tokenization (via the command line option --prune TAGNAME1 --prune
+  TAGNAME2 … or by passing prune_tags=["TAGNAME1", "TAGNAME2", …] to
+  tokenize_xml or tokenize_xml_file). This can be useful when
+  processing HTML files, e.g. for removing any <script> and <style>
+  tags from the input.
+
 ## Version 2.1.6, 2021-12-13 ##
 
 - Recognize more URLs without protocol.
