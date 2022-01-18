@@ -28,16 +28,16 @@ class TestSoMaJo(unittest.TestCase):
         sentences = [[t.text for t in s] for s in sentences]
         self.assertEqual(sentences, [ts.split() for ts in tokenized_sentences])
 
-    def _equal_xml(self, xml, tokenized_sentences, strip_tags=False, parallel=1):
+    def _equal_xml(self, xml, tokenized_sentences, strip_tags=False, parallel=1, prune_tags=None):
         eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
-        sentences = self.tokenizer.tokenize_xml(xml, eos_tags, strip_tags=strip_tags, parallel=parallel)
+        sentences = self.tokenizer.tokenize_xml(xml, eos_tags, strip_tags=strip_tags, parallel=parallel, prune_tags=prune_tags)
         sentences = [[t.text for t in s] for s in sentences]
         self.assertEqual(sentences, [ts.split() for ts in tokenized_sentences])
 
-    def _equal_xml_file(self, xml, tokenized_sentences, strip_tags=False, parallel=1):
+    def _equal_xml_file(self, xml, tokenized_sentences, strip_tags=False, parallel=1, prune_tags=None):
         eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         pseudofile = io.StringIO(xml)
-        sentences = self.tokenizer.tokenize_xml_file(pseudofile, eos_tags, strip_tags=strip_tags, parallel=parallel)
+        sentences = self.tokenizer.tokenize_xml_file(pseudofile, eos_tags, strip_tags=strip_tags, parallel=parallel, prune_tags=prune_tags)
         sentences = [[t.text for t in s] for s in sentences]
         self.assertEqual(sentences, [ts.split() for ts in tokenized_sentences])
 
@@ -145,3 +145,11 @@ class TestXMLStripTags(TestSoMaJo):
 
     def test_xml_02(self):
         self._equal_xml_file("<html>\n  <body>\n    <p>Foo bar. Baz qux</p>\n    <p>alpha. Beta gamma</p>\n  </body>\n</html>", ["Foo bar .", "Baz qux", "alpha .", "Beta gamma"], strip_tags=True)
+
+
+class TestXMLPruneTags(TestSoMaJo):
+    def test_xml_01(self):
+        self._equal_xml("<html>\n  <head>\n    Spam\n  </head>\n  <body>\n    <p>Foo bar. Baz qux</p>\n    <p>alpha. Beta gamma</p>\n  </body>\n</html>", ["<html> <body> <p> Foo bar .", "Baz qux </p>", "<p> alpha .", "Beta gamma </p> </body> </html>"], prune_tags=["head"])
+
+    def test_xml_02(self):
+        self._equal_xml_file("<html>\n  <head>\n    Spam\n  </head>\n  <body>\n    <p>Foo bar. Baz qux</p>\n    <p>alpha. Beta gamma</p>\n  </body>\n</html>", ["<html> <body> <p> Foo bar .", "Baz qux </p>", "<p> alpha .", "Beta gamma </p> </body> </html>"], prune_tags=["head"])

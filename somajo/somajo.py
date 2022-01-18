@@ -162,7 +162,7 @@ class SoMaJo:
             tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
 
-    def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1):
+    def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1, prune_tags=None):
         """Split the contents of an xml file into sequences of tokens.
 
         Parameters
@@ -177,9 +177,14 @@ class SoMaJo:
             'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr',
             'div', 'ol', 'ul', 'dl', 'table']``
         strip_tags : bool, (default=False)
-            Remove the XML tags from the output.
+            Remove all XML tags from the output.
         parallel : int, (default=1)
             Number of processes to use.
+        prune_tags : iterable
+            These XML tags and their contents will be removed from the
+            input before tokenization. For HTML input, you might use
+            ``['script', 'style']`` or, depending on your use case,
+            ``['head']``.
 
         Yields
         -------
@@ -281,7 +286,9 @@ class SoMaJo:
         """
         if eos_tags is not None:
             eos_tags = set(eos_tags)
-        token_lists = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags)
+        if prune_tags is not None:
+            prune_tags = set(prune_tags)
+        token_lists = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags, prune_tags=prune_tags)
         tokens = self._parallel_tokenize(token_lists, parallel=parallel, strip_tags=strip_tags)
         if not (strip_tags and self.xml_sentences is None):
             tokens = map(utils.escape_xml_tokens, tokens)
@@ -394,7 +401,7 @@ class SoMaJo:
             tokens = map(utils.escape_xml_tokens, tokens)
         return tokens
 
-    def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1):
+    def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1, prune_tags=None):
         """Split a string of XML data into sequences of tokens.
 
         Parameters
@@ -411,6 +418,11 @@ class SoMaJo:
             Remove the XML tags from the output.
         parallel : int, (default=1)
             Number of processes to use.
+        prune_tags : iterable
+            These XML tags and their contents will be removed from the
+            input before tokenization. For HTML input, you might use
+            ``['script', 'style']`` or, depending on your use case,
+            ``['head']``.
 
         Yields
         ------
@@ -524,7 +536,9 @@ class SoMaJo:
         """
         if eos_tags is not None:
             eos_tags = set(eos_tags)
-        token_lists = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags)
+        if prune_tags is not None:
+            prune_tags = set(prune_tags)
+        token_lists = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags, prune_tags=prune_tags)
         tokens = self._parallel_tokenize(token_lists, parallel=parallel, strip_tags=strip_tags)
         if not (strip_tags and self.xml_sentences is None):
             tokens = map(utils.escape_xml_tokens, tokens)
