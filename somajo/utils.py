@@ -55,12 +55,14 @@ def read_abbreviation_file(filename, to_lower=False):
 
 
 class SaxTokenHandler(xml.sax.handler.ContentHandler):
-    def __init__(self, eos_tags=None):
+    def __init__(self, eos_tags=None, prune_tags=None):
         super().__init__()
         self.eos_tags = eos_tags
+        self.prune_tags = prune_tags
         self.token_list = []
         self.content = ""
         self.sentence_start = True
+        self.open_prune_tags = []
 
     def _insert_element(self, name, text, markup_class):
         sentence_boundary = False
@@ -77,23 +79,31 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
             self.sentence_start = True
 
     def characters(self, data):
-        self.content += data
+        if not self.open_prune_tags:
+            self.content += data
 
     def startElement(self, name, attrs):
-        if len(attrs) > 0:
-            text = "<%s %s>" % (name, " ".join(["%s=\"%s\"" % (k, xml.sax.saxutils.escape(v, {'"': "&quot;"})) for k, v in attrs.items()]))
-        else:
-            text = "<%s>" % name
-        self._insert_element(name, text, "start")
+        if self.prune_tags is not None and name in self.prune_tags:
+            self.open_prune_tags.append(name)
+        if not self.open_prune_tags:
+            if len(attrs) > 0:
+                text = "<%s %s>" % (name, " ".join(["%s=\"%s\"" % (k, xml.sax.saxutils.escape(v, {'"': "&quot;"})) for k, v in attrs.items()]))
+            else:
+                text = "<%s>" % name
+            self._insert_element(name, text, "start")
 
     def endElement(self, name):
-        text = "</%s>" % name
-        self._insert_element(name, text, "end")
+        if not self.open_prune_tags:
+            text = "</%s>" % name
+            self._insert_element(name, text, "end")
+        if self.prune_tags is not None and name in self.prune_tags:
+            top = self.open_prune_tags.pop()
+            assert top == name
 
 
-def incremental_xml_parser(f, eos_tags=None):
+def incremental_xml_parser(f, eos_tags=None, prune_tags=None):
     parser = xml.sax.make_parser(["xml.sax.xmlreader.IncrementalParser"])
-    handler = SaxTokenHandler(eos_tags)
+    handler = SaxTokenHandler(eos_tags, prune_tags)
     parser.setContentHandler(handler)
     for line in f:
         parser.feed(line)
@@ -103,13 +113,13 @@ def incremental_xml_parser(f, eos_tags=None):
     parser.close()
 
 
-def _xml_chunk_generator(f, eos_tags=None):
+def _xml_chunk_generator(f, eos_tags=None, prune_tags=None):
     """Parse the XML data and yield doubly linked lists of Token objects
     that are delimited by eos_tags.
 
     """
     non_whitespace = re.compile(r"\S")
-    token_lists = incremental_xml_parser(f, eos_tags)
+    token_lists = incremental_xml_parser(f, eos_tags, prune_tags)
     current = []
     bos, eos = True, False
     lexical_tokens = 0
@@ -284,7 +294,7 @@ def _xml_chunk_generator(f, eos_tags=None):
         yield current
 
 
-def xml_chunk_generator(data, is_file=True, eos_tags=None):
+def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None):
     """Parse the XML data and yield doubly linked lists of Token objects
     that are delimited by eos_tags.
 
@@ -292,13 +302,13 @@ def xml_chunk_generator(data, is_file=True, eos_tags=None):
     if is_file:
         if isinstance(data, str):
             with open(data, encoding="utf-8") as f:
-                for chunk in _xml_chunk_generator(f, eos_tags):
+                for chunk in _xml_chunk_generator(f, eos_tags, prune_tags):
                     yield chunk
         else:
-            for chunk in _xml_chunk_generator(data, eos_tags):
+            for chunk in _xml_chunk_generator(data, eos_tags, prune_tags):
                 yield chunk
     else:
-        for chunk in _xml_chunk_generator(data.split("\n"), eos_tags):
+        for chunk in _xml_chunk_generator(data.split("\n"), eos_tags, prune_tags):
             yield chunk
 
 
