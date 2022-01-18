@@ -15,6 +15,7 @@ def arguments():
     parser.add_argument("-s", "--paragraph_separator", choices=SoMaJo.paragraph_separators, default=SoMaJo._default_parsep, help="How are paragraphs separated in the input text? Will be ignored if option -x/--xml is used. (Default: empty_lines)")
     parser.add_argument("-x", "--xml", action="store_true", help="The input is an XML file. You can specify tags that always constitute a sentence break (e.g. HTML p tags) via the --tag option.")
     parser.add_argument("--tag", action="append", help="Start and end tags of this type constitute sentence breaks, i.e. they do not occur in the middle of a sentence. Can be used multiple times to specify multiple tags, e.g. --tag p --tag br. Implies option -x/--xml. (Default: --tag title --tag h1 --tag h2 --tag h3 --tag h4 --tag h5 --tag h6 --tag p --tag br --tag hr --tag div --tag ol --tag ul --tag dl --tag table)")
+    parser.add_argument("--prune", action="append", help="Tags of this type will be removed from the input before tokenization. Can be used multiple times to specify multiple tags, e.g. --tag script --tag style. Implies option -x/--xml. By default, no tags are pruned.")
     parser.add_argument("--strip-tags", action="store_true", help="Suppresses output of XML tags. Implies option -x/--xml.")
     parser.add_argument("-c", "--split_camel_case", action="store_true", help="Split items in written in camelCase (excluding established names and terms).")
     parser.add_argument("--split_sentences", "--split-sentences", action="store_true", help="Also split the input into sentences.")
@@ -34,15 +35,14 @@ def main():
     n_sentences = 0
     t0 = time.perf_counter()
     is_xml = False
-    if args.xml or args.tag is not None:
+    if args.xml or args.tag is not None or args.prune is not None:
         is_xml = True
     tokenizer = SoMaJo(args.language, split_camel_case=args.split_camel_case, split_sentences=args.split_sentences, xml_sentences=args.sentence_tag)
     if is_xml:
         eos_tags = args.tag
         if eos_tags is None:
             eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
-        eos_tags = set(eos_tags)
-        chunks = tokenizer.tokenize_xml_file(args.FILE, eos_tags, strip_tags=args.strip_tags, parallel=args.parallel)
+        chunks = tokenizer.tokenize_xml_file(args.FILE, eos_tags, strip_tags=args.strip_tags, parallel=args.parallel, prune_tags=args.prune)
     else:
         chunks = tokenizer.tokenize_text_file(args.FILE, args.paragraph_separator, parallel=args.parallel)
     for chunk in chunks:
