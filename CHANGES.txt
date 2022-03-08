@@ -1,5 +1,9 @@
 # CHANGELOG #
 
+## Version 2.2.1, 2022-03-08 ##
+
+- Bugfix: Command-line option --strip-tags implies option --xml.
+
 ## Version 2.2.0, 2022-01-18 ##
 
 - New feature: Prune XML tags and their contents from the input before
