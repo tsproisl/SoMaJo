@@ -35,7 +35,7 @@ def main():
     n_sentences = 0
     t0 = time.perf_counter()
     is_xml = False
-    if args.xml or args.tag is not None or args.prune is not None:
+    if args.xml or args.strip_tags or (args.tag is not None) or (args.prune is not None):
         is_xml = True
     tokenizer = SoMaJo(args.language, split_camel_case=args.split_camel_case, split_sentences=args.split_sentences, xml_sentences=args.sentence_tag)
     if is_xml:
