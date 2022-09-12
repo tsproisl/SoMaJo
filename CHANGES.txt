@@ -1,5 +1,9 @@
 # CHANGELOG #
 
+## Version 2.2.2, 2022-09-12 ##
+
+- Bugfix: Command-line option --sentence_tag implies option --split_sentences.
+
 ## Version 2.2.1, 2022-03-08 ##
 
 - Bugfix: Command-line option --strip-tags implies option --xml.
