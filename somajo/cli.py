@@ -19,7 +19,7 @@ def arguments():
     parser.add_argument("--strip-tags", action="store_true", help="Suppresses output of XML tags. Implies option -x/--xml.")
     parser.add_argument("-c", "--split_camel_case", action="store_true", help="Split items in written in camelCase (excluding established names and terms).")
     parser.add_argument("--split_sentences", "--split-sentences", action="store_true", help="Also split the input into sentences.")
-    parser.add_argument("--sentence_tag", "--sentence-tag", type=str, help="Tag name for sentence boundaries (e.g. --sentence_tag s). If this option is specified, sentences will be delimited by XML tags (e.g. <s>…</s>) instead of empty lines.")
+    parser.add_argument("--sentence_tag", "--sentence-tag", type=str, help="Tag name for sentence boundaries (e.g. --sentence_tag s). If this option is specified, sentences will be delimited by XML tags (e.g. <s>…</s>) instead of empty lines. This option implies --split_sentences")
     parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (number, XML tag, abbreviation, etc.) in addition to the tokens.")
     parser.add_argument("-e", "--extra_info", action="store_true", help='Output additional information for each token: SpaceAfter=No if the token was not followed by a space and OriginalSpelling="…" if the token contained whitespace.')
     parser.add_argument("--parallel", type=int, default=1, metavar="N", help="Run N worker processes (up to the number of CPUs) to speed up tokenization.")
@@ -37,6 +37,8 @@ def main():
     is_xml = False
     if args.xml or args.strip_tags or (args.tag is not None) or (args.prune is not None):
         is_xml = True
+    if args.sentence_tag:
+        args.split_sentences = True
     tokenizer = SoMaJo(args.language, split_camel_case=args.split_camel_case, split_sentences=args.split_sentences, xml_sentences=args.sentence_tag)
     if is_xml:
         eos_tags = args.tag
