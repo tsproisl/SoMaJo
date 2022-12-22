@@ -1218,6 +1218,12 @@ class TestNumbers(TestTokenizer):
     def test_numbers_36(self):
         self._equal("100 Mbit/s", "100 Mbit/s")
 
+    def test_numbers_37(self):
+        self._equal("das III. Geschwader", "das III. Geschwader")
+
+    def test_numbers_38(self):
+        self._equal("Ludwig XIV. war", "Ludwig XIV. war")
+
 
 class TestCamelCase(TestTokenizer):
     def test_camelcase_01(self):
