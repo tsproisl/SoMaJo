@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version ?, ? ##
+
+- Improvements to tokenization: Roman ordinals, abbreviation “Art.”
+  preceding a number
+
 ## Version 2.2.2, 2022-09-12 ##
 
 - Bugfix: Command-line option --sentence_tag implies option --split_sentences.
