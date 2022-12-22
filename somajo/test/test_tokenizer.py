@@ -11,7 +11,6 @@ from somajo import utils
 
 
 class TestTokenizer(unittest.TestCase):
-    """"""
     def setUp(self):
         """Necessary preparations"""
         self.tokenizer = Tokenizer(language="de_CMC", split_camel_case=True)
@@ -39,7 +38,6 @@ class TestTokenizer(unittest.TestCase):
 
 
 class TestEnglishTokenizer(TestTokenizer):
-    """"""
     def setUp(self):
         """Necessary preparations"""
         self.tokenizer = Tokenizer(language="en_PTB", split_camel_case=True)
@@ -61,8 +59,390 @@ class TestTokenizerDeprecated(TestTokenizer):
         self.assertEqual(tokens, tokenized)
 
 
+class TestGuidelines(TestTokenizer):
+    """Test cases taken from the EmpiriST tokenization guidelines:
+    https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxlbXBpcmlzdDIwMTV8Z3g6M2Y3MDlkYmQzMDk4NzFlZA
+
+    Function names: test_<category>_<page><n>
+
+    """
+
+    def test_punctuation_0201(self):
+        self._equal("Als ich ihn sah, war es bereits zu spät.", "Als ich ihn sah , war es bereits zu spät .")
+
+    def test_punctuation_0601(self):
+        self._equal("Das hab ich mich auch schon gefragt...", "Das hab ich mich auch schon gefragt ...")
+
+    def test_punctuation_0602(self):
+        self._equal("Das ist ein Test?!", "Das ist ein Test ?!")
+
+    def test_punctuation_0603(self):
+        self._equal("bh's", "bh's")
+
+    def test_punctuation_0701(self):
+        self._equal("mit'm Fahrrad", "mit'm Fahrrad")
+
+    def test_punctuation_0702(self):
+        self._equal("des Virus'", "des Virus'")
+
+    @unittest.expectedFailure
+    def test_punctuation_0703(self):
+        self._equal("du bist echt ein a...", "du bist echt ein a...")
+
+    @unittest.expectedFailure
+    def test_punctuation_0704(self):
+        self._equal("f*** you!", "f*** you !")
+
+    def test_punctuation_0705(self):
+        self._equal("Test.......", "Test .......")
+
+    def test_punctuation_0706(self):
+        self._equal("Test????????", "Test ????????")
+
+    def test_punctuation_0707(self):
+        self._equal("Test!!!", "Test !!!")
+
+    def test_punctuation_0708(self):
+        self._equal("Test?!?!?!", "Test ?!?!?!")
+
+    def test_punctuation_0801(self):
+        self._equal("In der 2....", "In der 2. ...")
+
+    def test_punctuation_0802(self):
+        self._equal("Test....????!!!!", "Test .... ????!!!!")
+
+    def test_punctuation_0803(self):
+        self._equal("Laub- und Nadelbäume", "Laub- und Nadelbäume")
+
+    def test_punctuation_0804(self):
+        self._equal("Hals-Nasen-Ohren-Arzt", "Hals-Nasen-Ohren-Arzt")
+
+    def test_punctuation_0901(self):
+        self._equal("10%", "10 %")
+
+    def test_punctuation_0902(self):
+        self._equal("200€", "200 €")
+
+    def test_punctuation_0903(self):
+        self._equal("§§48", "§§ 48")
+
+    def test_punctuation_0904(self):
+        self._equal("11+21=33", "11 + 21 = 33")
+
+    def test_punctuation_0905(self):
+        self._equal("Avril_Lavigne", "Avril_Lavigne")
+
+    @unittest.expectedFailure
+    def test_punctuation_0906(self):
+        self._equal("+s", "+s")
+
+    def test_punctuation_0907(self):
+        self._equal("-v", "-v")
+
+    def test_punctuation_1001(self):
+        self._equal("f->d", "f -> d")
+
+    def test_punctuation_1002(self):
+        self._equal("f - > d", "f -> d")
+
+    @unittest.expectedFailure
+    def test_punctuation_1003(self):
+        self._equal("/ig schdöbbs", "/ig schdöbbs")
+
+    def test_punctuation_1004(self):
+        self._equal("(Neu-)Veröffentlichung", "( Neu- ) Veröffentlichung")
+
+    def test_punctuation_1005(self):
+        self._equal("Student(inn)en", "Student(inn)en")
+
+    def test_punctuation_1101(self):
+        self._equal("StudentInnen", "StudentInnen")
+
+    def test_punctuation_1102(self):
+        self._equal("Student/innen", "Student/innen")
+
+    def test_punctuation_1103(self):
+        self._equal("Experten/Expertinnen", "Experten / Expertinnen")
+
+    def test_punctuation_1104(self):
+        self._equal("(“normale”/saisonale) Grippe", "( “ normale ” / saisonale ) Grippe")
+
+    def test_punctuation_1105(self):
+        self._equal("Vitamin C-Mangel", "Vitamin C-Mangel")
+
+    def test_punctuation_1106(self):
+        self._equal("Magen- Darm- Erkrankung", "Magen- Darm- Erkrankung")
+
+    def test_punctuation_1201(self):
+        self._equal("Oster-„Beckerei“", "Oster- „ Beckerei “")
+
+    def test_punctuation_1202(self):
+        self._equal("i-„Pott“", "i- „ Pott “")
+
+    def test_sumtimedate_1301(self):
+        self._equal("6.200", "6.200")
+
+    def test_sumtimedate_1302(self):
+        self._equal("6.200,-", "6.200,-")
+
+    def test_sumtimedate_1303(self):
+        self._equal("das dauert 2:40 std.", "das dauert 2:40 std.")
+
+    def test_sumtimedate_1304(self):
+        self._equal("-1,5", "-1,5")
+
+    def test_sumtimedate_1304a(self):
+        """Unicode minus sign"""
+        self._equal("−1,5", "−1,5")
+
+    def test_sumtimedate_1305(self):
+        self._equal("1/2 h", "1/2 h")
+
+    def test_sumtimedate_1306(self):
+        self._equal("1 / 2 h", "1 / 2 h")
+
+    def test_sumtimedate_1307(self):
+        self._equal("14:00–18:00", "14:00 – 18:00")
+
+    def test_sumtimedate_1401(self):
+        self._equal("14–18 Uhr", "14 – 18 Uhr")
+
+    def test_sumtimedate_1402(self):
+        self._equal("1-3 Semester", "1 - 3 Semester")
+
+    def test_sumtimedate_1403(self):
+        self._equal("30-50kg", "30 - 50 kg")
+
+    def test_sumtimedate_1404(self):
+        self._equal("ca. 20°C", "ca. 20 ° C")
+
+    def test_sumtimedate_1404a(self):
+        self._equal("ca. 20 °C", "ca. 20 ° C")
+
+    def test_sumtimedate_1405(self):
+        self._equal("ca. 20 GHz", "ca. 20 GHz")
+
+    def test_sumtimedate_1406(self):
+        self._equal("4-11mal", "4 - 11mal")
+
+    def test_sumtimedate_1501(self):
+        self._equal("16.07.2013", "16. 07. 2013")
+
+    def test_sumtimedate_1502(self):
+        self._equal("16. Juli 2013", "16. Juli 2013")
+
+    def test_sumtimedate_1503(self):
+        self._equal("21/07/1980", "21/ 07/ 1980")
+
+    def test_sumtimedate_1504(self):
+        self._equal("Weimarer Klassik", "Weimarer Klassik")
+
+    def test_sumtimedate_1505(self):
+        self._equal("Hälfte des XIX Jh. = Anfang 1796", "Hälfte des XIX Jh. = Anfang 1796")
+
+    def test_sumtimedate_1601(self):
+        self._equal("WS04", "WS 04")
+
+    def test_sumtimedate_1602(self):
+        self._equal("24-stündig", "24-stündig")
+
+    def test_abbreviations_1603(self):
+        self._equal("etc.", "etc.")
+
+    def test_abbreviations_1604(self):
+        self._equal("d.h.", "d. h.")
+
+    def test_abbreviations_1605(self):
+        self._equal("d. h.", "d. h.")
+
+    def test_abbreviations_1606(self):
+        self._equal("o.ä.", "o. ä.")
+
+    def test_abbreviations_1607(self):
+        self._equal("u.dgl.", "u. dgl.")
+
+    def test_abbreviations_1608(self):
+        self._equal("u. dgl.", "u. dgl.")
+
+    def test_abbreviations_1609(self):
+        self._equal("std.", "std.")
+
+    def test_abbreviations_1610(self):
+        self._equal("Mat.-Nr.", "Mat.-Nr.")
+
+    def test_abbreviations_1611(self):
+        self._equal("Wir kauften Socken, Hemden, Schuhe etc. Danach hatten wir alles.", "Wir kauften Socken , Hemden , Schuhe etc. Danach hatten wir alles .")
+
+    def test_abbreviations_1701(self):
+        self._equal("zB", "zB")
+
+    def test_abbreviations_1702(self):
+        self._equal("Zeitschr.titel", "Zeitschr.titel")
+
+    def test_abbreviations_1703(self):
+        self._equal("A9", "A9")
+
+    def test_abbreviations_1704(self):
+        self._equal("cu Peter", "cu Peter")
+
+    def test_abbreviations_1705(self):
+        self._equal("Bruce Springsteen aka The Boss", "Bruce Springsteen aka The Boss")
+    def test_typos_1801(self):
+        self._equal("die stehen da schona ber ohne preise", "die stehen da schona ber ohne preise")
+
+    def test_typos_1802(self):
+        self._equal("tag quaki : )", "tag quaki :)")
+
+    def test_typos_1901(self):
+        self._equal("Ich hab da noch maldrüber nachgedacht", "Ich hab da noch maldrüber nachgedacht")
+
+    def test_typos_1902(self):
+        self._equal("Anna,kannst du mal", "Anna , kannst du mal")
+
+    @unittest.expectedFailure
+    def test_typos_1903(self):
+        self._equal("handfest un direkt- so sind se...die Pottler", "handfest un direkt - so sind se ... die Pottler")
+
+    def test_typos_1904(self):
+        self._equal("Warst du vom Zeugnis überraschtß", "Warst du vom Zeugnis überraschtß")
+
+    def test_contractions_2001(self):
+        self._equal("stimmt’s", "stimmt’s")
+
+    def test_contractions_2002(self):
+        self._equal("waren’s", "waren’s")
+
+    def test_camel_case_2101(self):
+        self._equal("Zu welchemHandlungsbereich gehört unsereKomm hier? Bildung?Freizeit?Mischung?", "Zu welchem Handlungsbereich gehört unsere Komm hier ? Bildung ? Freizeit ? Mischung ?")
+
+    def test_camel_case_2102(self):
+        self._equal("derText", "der Text")
+
+    def test_camel_case_2103(self):
+        self._equal("PepsiCo", "PepsiCo")
+
+    def test_tags_2104(self):
+        self._equal('eine <A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">umfangreiche Diskussion</A> zu diesem Abschnitt', ['eine', '<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">', 'umfangreiche', 'Diskussion', '</A>', 'zu', 'diesem', 'Abschnitt'])
+
+    def test_emails_urls_2201(self):
+        self._equal("michael.beisswenger@tu-dortmund.de", "michael.beisswenger@tu-dortmund.de")
+
+    def test_emails_urls_2202(self):
+        self._equal("https://en.wikipedia.org/wiki/Main_Page", "https://en.wikipedia.org/wiki/Main_Page")
+
+    def test_emails_urls_2203(self):
+        self._equal("http://www.shortnews.de", "http://www.shortnews.de")
+
+    def test_emails_urls_2203a(self):
+        self._equal("Auf http://www.shortnews.de, der besten Seite.", "Auf http://www.shortnews.de , der besten Seite .")
+
+    def test_emails_urls_2203b(self):
+        self._equal("Auf www.shortnews.de, der besten Seite.", "Auf www.shortnews.de , der besten Seite .")
+
+    def test_emails_urls_2204(self):
+        self._equal("shortnews.de", "shortnews.de")
+
+    def test_emails_urls_2204a(self):
+        self._equal("Auf shortnews.de, der besten Seite.", "Auf shortnews.de , der besten Seite .")
+
+    def test_emoticons_2205(self):
+        self._equal(":-)", ":-)")
+
+    def test_emoticons_2206(self):
+        self._equal(":-)))))", ":-)))))")
+
+    def test_emoticons_2207(self):
+        self._equal(";-)", ";-)")
+
+    def test_emoticons_2208(self):
+        self._equal(":)", ":)")
+
+    def test_emoticons_2209(self):
+        self._equal(";)", ";)")
+
+    def test_emoticons_2301(self):
+        self._equal(":-(", ":-(")
+
+    def test_emoticons_2302(self):
+        self._equal("8)", "8)")
+
+    def test_emoticons_2303(self):
+        self._equal(":D", ":D")
+
+    def test_emoticons_2304(self):
+        self._equal("^^", "^^")
+
+    def test_emoticons_2305(self):
+        self._equal("o.O", "o.O")
+
+    def test_emoticons_2306(self):
+        self._equal("oO", "oO")
+
+    def test_emoticons_2307(self):
+        self._equal("\\O/", "\\O/")
+
+    def test_emoticons_2308(self):
+        self._equal("\\m/", "\\m/")
+
+    def test_emoticons_2309(self):
+        self._equal(":;))", ":;))")
+
+    def test_emoticons_2310(self):
+        self._equal("_))", "_))")
+
+    def test_emoticons_2311(self):
+        self._equal("tag quaki : )", "tag quaki :)")
+
+    def test_emoticons_2311a(self):
+        self._equal("hallo peter ; )", "hallo peter ;)")
+
+    def test_emoticons_2312(self):
+        self._equal("Das hab ich auch schon gehört (find ich super :-)", "Das hab ich auch schon gehört ( find ich super :-)")
+
+    def test_actions_2401(self):
+        self._equal("*grübel*", "* grübel *")
+
+    def test_actions_2402(self):
+        self._equal("*auf locher rumhüpf & konfetti mach*", "* auf locher rumhüpf & konfetti mach *")
+
+    def test_actions_2501(self):
+        self._equal("*dichmalganzdolleknuddelt*", "* dichmalganzdolleknuddelt *")
+
+    def test_actions_2502(self):
+        self._equal("immer noch nicht fassen kann", "immer noch nicht fassen kann")
+
+    def test_actions_2503(self):
+        self._equal("quakirenntdemflöppymitdeneiswürfelnnach*", "quakirenntdemflöppymitdeneiswürfelnnach *")
+
+    def test_actions_2504(self):
+        self._equal("+s*", "+ s *")
+
+    def test_actions_2505(self):
+        self._equal("*danachdenraminmeinenrechnereinbau*G*", "* danachdenraminmeinenrechnereinbau * G *")
+
+    def test_actions_2601(self):
+        self._equal("quaki knuddelt Thor", "quaki knuddelt Thor")
+
+    def test_addressing_2602(self):
+        self._equal("@bine23", "@bine23")
+
+    def test_addressing_2603(self):
+        self._equal("@alle", "@alle")
+
+    def test_addressing_2604(self):
+        self._equal("winke@bochum", "winke @bochum")
+
+    def test_addressing_2605(self):
+        self._equal("@bine23: hallöchen! :-)", "@bine23 : hallöchen ! :-)")
+
+    def test_hashtags_2701(self):
+        self._equal("#urlaub", "#urlaub")
+
+    def test_hashtags_2702(self):
+        self._equal("#SPD", "#SPD")
+
+
 class TestWhitespace(TestTokenizer):
-    """"""
     def test_whitespace_01(self):
         # self.assertEqual(self.tokenizer.tokenize_text("Petra und Simone gehen ins Kino"), "Petra und Simone gehen ins Kino".split())
         self._equal("Petra und Simone gehen ins Kino", "Petra und Simone gehen ins Kino")
@@ -81,67 +461,8 @@ class TestWhitespace(TestTokenizer):
 
 
 class TestPunctuation(TestTokenizer):
-    """"""
-    def test_punctuation_01(self):
-        self._equal("Als ich ihn sah, war es bereits zu spät.", "Als ich ihn sah , war es bereits zu spät .")
-
-    def test_punctuation_02(self):
-        self._equal("Das hab ich mich auch schon gefragt...", "Das hab ich mich auch schon gefragt ...")
-
-    def test_punctuation_03(self):
-        self._equal("Das ist ein Test?!", "Das ist ein Test ?!")
-
-    def test_punctuation_04(self):
-        self._equal("bh's", "bh's")
-
-    def test_punctuation_05(self):
-        self._equal("mit'm Fahrrad", "mit'm Fahrrad")
-
-    def test_punctuation_06(self):
-        self._equal("des Virus'", "des Virus'")
-
-    @unittest.expectedFailure
-    def test_punctuation_07(self):
-        self._equal("du bist echt ein a...", "du bist echt ein a...")
-
-    def test_punctuation_08(self):
-        self._equal("Test.......", "Test .......")
-
-    def test_punctuation_09(self):
-        self._equal("Test????????", "Test ????????")
-
-    def test_punctuation_10(self):
-        self._equal("Test!!!", "Test !!!")
-
-    def test_punctuation_11(self):
-        self._equal("Test?!?!?!", "Test ?!?!?!")
-
-    def test_punctuation_12(self):
-        self._equal("In der 2....", "In der 2. ...")
-
     def test_punctuation_13(self):
         self._equal("Test etc....", "Test etc. ...")
-
-    def test_punctuation_14(self):
-        self._equal("Test....????!!!!", "Test .... ????!!!!")
-
-    def test_punctuation_15(self):
-        self._equal("Laub- und Nadelbäume", "Laub- und Nadelbäume")
-
-    def test_punctuation_16(self):
-        self._equal("Hals-Nasen-Ohren-Arzt", "Hals-Nasen-Ohren-Arzt")
-
-    def test_punctuation_17(self):
-        self._equal("10%", "10 %")
-
-    def test_punctuation_18(self):
-        self._equal("200€", "200 €")
-
-    def test_punctuation_19(self):
-        self._equal("§§48", "§§ 48")
-
-    def test_punctuation_20(self):
-        self._equal("11+21=33", "11 + 21 = 33")
 
     def test_punctuation_21(self):
         self._equal("$25", "$ 25")
@@ -165,48 +486,8 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_27(self):
         self._equal("~12", "~ 12")
 
-    def test_punctuation_28(self):
-        self._equal("Avril_Lavigne", "Avril_Lavigne")
-
-    @unittest.expectedFailure
-    def test_punctuation_29(self):
-        self._equal("+s", "+s")
-
-    def test_punctuation_30(self):
-        self._equal("-v", "-v")
-
-    def test_punctuation_31(self):
-        self._equal("f->d", "f -> d")
-
-    def test_punctuation_32(self):
-        self._equal("f - > d", "f -> d")
-
     def test_punctuation_32a(self):
         self._equal("f→d", "f → d")
-
-    def test_punctuation_33(self):
-        self._equal("(Neu-)Veröffentlichung", "( Neu- ) Veröffentlichung")
-
-    def test_punctuation_34(self):
-        self._equal("Student(inn)en", "Student(inn)en")
-
-    def test_punctuation_35(self):
-        self._equal("Student/innen", "Student/innen")
-
-    def test_punctuation_36(self):
-        self._equal("i-„Pott“", "i- „ Pott “")
-
-    def test_punctuation_37(self):
-        self._equal("Experten/Expertinnen", "Experten / Expertinnen")
-
-    def test_punctuation_38(self):
-        self._equal("(“normale”/saisonale) Grippe", "( “ normale ” / saisonale ) Grippe")
-
-    def test_punctuation_39(self):
-        self._equal("Vitamin C-Mangel", "Vitamin C-Mangel")
-
-    def test_punctuation_40(self):
-        self._equal("Magen- Darm- Erkrankung", "Magen- Darm- Erkrankung")
 
     def test_punctuation_41(self):
         self._equal("Das ist ein Zitat im ``LaTeX-Stil''!", "Das ist ein Zitat im `` LaTeX-Stil '' !")
@@ -240,190 +521,23 @@ class TestPunctuation(TestTokenizer):
 
 
 class TestTimeDate(TestTokenizer):
-    """"""
-    def test_time_01(self):
-        self._equal("6.200", "6.200")
-
-    def test_time_02(self):
-        self._equal("6.200,-", "6.200,-")
-
-    def test_time_03(self):
-        self._equal("das dauert 2:40 std.", "das dauert 2:40 std.")
-
-    def test_time_04(self):
-        self._equal("-1,5", "-1,5")
-
-    def test_time_05(self):
-        """Unicode minus sign"""
-        self._equal("−1,5", "−1,5")
-
-    def test_time_06(self):
-        self._equal("-1.5", "-1.5")
-
-    def test_time_07(self):
-        """Unicode minus sign"""
-        self._equal("−1.5", "−1.5")
-
-    def test_time_08(self):
-        self._equal("1/2 h", "1/2 h")
-
-    def test_time_09(self):
-        self._equal("1 / 2 h", "1 / 2 h")
-
-    def test_time_10(self):
-        self._equal("14:00-18:00", "14:00 - 18:00")
-
-    def test_time_11(self):
-        """Halbgeviertstrich (Bis-Strich)"""
-        self._equal("14:00–18:00", "14:00 – 18:00")
-
-    def test_time_12(self):
-        self._equal("14–18 Uhr", "14 – 18 Uhr")
-
-    def test_time_13(self):
-        self._equal("1-3 Semester", "1 - 3 Semester")
-
-    def test_time_14(self):
-        self._equal("30-50kg", "30 - 50 kg")
-
-    def test_time_15a(self):
-        self._equal("ca. 20°C", "ca. 20 ° C")
-
-    def test_time_15b(self):
-        self._equal("ca. 20 °C", "ca. 20 ° C")
-
-    def test_time_16(self):
-        self._equal("ca. 20 GHz", "ca. 20 GHz")
-
-    def test_time_17(self):
-        self._equal("4-11mal", "4 - 11mal")
-
-    def test_time_18(self):
-        self._equal("16.07.2013", "16. 07. 2013")
-
-    def test_time_19(self):
-        self._equal("16. Juli 2013", "16. Juli 2013")
-
-    def test_time_20(self):
-        self._equal("21/07/1980", "21/ 07/ 1980")
-
-    def test_time_21(self):
-        self._equal("Weimarer Klassik", "Weimarer Klassik")
-
-    def test_time_22(self):
-        self._equal("Hälfte des XIX Jh. = Anfang 1796", "Hälfte des XIX Jh. = Anfang 1796")
-
-    def test_time_23(self):
-        self._equal("WS04", "WS 04")
-
-    def test_time_24(self):
-        self._equal("24-stündig", "24-stündig")
-
     @unittest.expectedFailure
     def test_time_25(self):
         self._equal("Punkte 2-4. Das System", "Punkte 2 - 4 . Das System")
 
 
 class TestAbbreviations(TestTokenizer):
-    """"""
-    def test_abbreviations_01(self):
-        self._equal("etc.", "etc.")
-
-    def test_abbreviations_02(self):
-        self._equal("d.h.", "d. h.")
-
-    def test_abbreviations_03(self):
-        self._equal("d. h.", "d. h.")
-
-    def test_abbreviations_04(self):
-        self._equal("o.ä.", "o. ä.")
-
-    def test_abbreviations_05(self):
-        self._equal("u.dgl.", "u. dgl.")
-
-    def test_abbreviations_06(self):
-        self._equal("std.", "std.")
-
-    def test_abbreviations_07(self):
-        self._equal("Mat.-Nr.", "Mat.-Nr.")
-
-    def test_abbreviations_08(self):
-        self._equal("Wir kauften Socken, Hemden, Schuhe etc. Danach hatten wir alles.", "Wir kauften Socken , Hemden , Schuhe etc. Danach hatten wir alles .")
-
-    def test_abbreviations_09(self):
-        self._equal("zB", "zB")
-
-    def test_abbreviations_10(self):
-        self._equal("Zeitschr.titel", "Zeitschr.titel")
-
-    def test_abbreviations_11(self):
-        self._equal("A9", "A9")
-
-    def test_abbreviations_12(self):
-        self._equal("cu Peter", "cu Peter")
-
-    def test_abbreviations_13(self):
-        self._equal("Bruce Springsteen aka The Boss", "Bruce Springsteen aka The Boss")
-
     def test_abbreviations_14(self):
         self._equal("Englisch: tl;dr. Deutsch: zl;ng.", "Englisch : tl;dr . Deutsch : zl;ng .")
 
 
 class TestTypos(TestTokenizer):
-    """"""
-    def test_typos_01(self):
-        self._equal("die stehen da schona ber ohne preise", "die stehen da schona ber ohne preise")
-
-    def test_typos_02(self):
-        self._equal("tag quaki : )", "tag quaki :)")
-
     def test_typos_02a(self):
         # not all occurrences of : ( are a smiley
         self._equal("Tel: ( 0049) Tel: (+49 123 4567)", "Tel : ( 0049 ) Tel : ( +49 123 4567 )")
 
-    def test_typos_03(self):
-        self._equal("Ich hab da noch maldrüber nachgedacht", "Ich hab da noch maldrüber nachgedacht")
-
-    def test_typos_04(self):
-        self._equal("Anna,kannst du mal", "Anna , kannst du mal")
-
-    @unittest.expectedFailure
-    def test_typos_05(self):
-        self._equal("handfest un direkt- so sind se...die Pottler", "handfest un direkt - so sind se ... die Pottler")
-
-    def test_typos_06(self):
-        self._equal("Warst du vom Zeugnis überraschtß", "Warst du vom Zeugnis überraschtß")
-
-
-class TestContractions(TestTokenizer):
-    """"""
-    def test_contractions_01(self):
-        self._equal("stimmt’s", "stimmt’s")
-
-    def test_contractions_02(self):
-        self._equal("waren’s", "waren’s")
-
-
-class TestCamelCase(TestTokenizer):
-    """"""
-    def test_camel_case_01(self):
-        self._equal("Zu welchemHandlungsbereich gehört unsereKomm hier? Bildung?Freizeit?Mischung?", "Zu welchem Handlungsbereich gehört unsere Komm hier ? Bildung ? Freizeit ? Mischung ?")
-
-    def test_camel_case_02(self):
-        self._equal("derText", "der Text")
-
-    def test_camel_case_03(self):
-        self._equal("PepsiCo", "PepsiCo")
-
 
 class TestTags(TestTokenizer):
-    """"""
-    def test_tags_01(self):
-        self._equal('<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">', ['<A target="_blank" href="https://en.wikipedia.org/w/index.php?tit-le=Talk:PRISM_(surveillance_program)&oldid=559238329#Known_Counter_Measures_deleted_.21">'])
-
-    def test_tags_02(self):
-        self._equal("</A>", "</A>")
-
     def test_tags_03(self):
         self._equal("<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>", ["<?xml version='1.0' encoding='US-ASCII' standalone='yes' ?>"])
 
@@ -432,7 +546,6 @@ class TestTags(TestTokenizer):
 
 
 class TestEntities(TestTokenizer):
-    """"""
     def test_tags_01(self):
         self._equal("&amp;", "&amp;")
 
@@ -447,25 +560,6 @@ class TestEntities(TestTokenizer):
 
 
 class TestEmailsURLs(TestTokenizer):
-    """"""
-    def test_emails_urls_01(self):
-        self._equal("michael.beisswenger@tu-dortmund.de", "michael.beisswenger@tu-dortmund.de")
-
-    def test_emails_urls_02(self):
-        self._equal("https://en.wikipedia.org/wiki/Main_Page", "https://en.wikipedia.org/wiki/Main_Page")
-
-    def test_emails_urls_03(self):
-        self._equal("http://www.shortnews.de", "http://www.shortnews.de")
-
-    def test_emails_urls_04(self):
-        self._equal("shortnews.de", "shortnews.de")
-
-    def test_emails_urls_05(self):
-        self._equal("Auf www.shortnews.de, der besten Seite.", "Auf www.shortnews.de , der besten Seite .")
-
-    def test_emails_urls_06(self):
-        self._equal("Auf shortnews.de, der besten Seite.", "Auf shortnews.de , der besten Seite .")
-
     def test_emails_urls_07(self):
         self._equal("In der Zeitung (http://www.sueddeutsche.de) stand", "In der Zeitung ( http://www.sueddeutsche.de ) stand")
 
@@ -516,58 +610,6 @@ class TestEmailsURLs(TestTokenizer):
 
 
 class TestEmoticons(TestTokenizer):
-    """"""
-    def test_emoticons_01(self):
-        self._equal(":-)", ":-)")
-
-    def test_emoticons_02(self):
-        self._equal(":-)))))", ":-)))))")
-
-    def test_emoticons_03(self):
-        self._equal(";-)", ";-)")
-
-    def test_emoticons_04(self):
-        self._equal(":)", ":)")
-
-    def test_emoticons_05(self):
-        self._equal(";)", ";)")
-
-    def test_emoticons_06(self):
-        self._equal(":-(", ":-(")
-
-    def test_emoticons_07(self):
-        self._equal("8)", "8)")
-
-    def test_emoticons_08(self):
-        self._equal(":D", ":D")
-
-    def test_emoticons_09(self):
-        self._equal("^^", "^^")
-
-    def test_emoticons_10(self):
-        self._equal("o.O", "o.O")
-
-    def test_emoticons_11(self):
-        self._equal("oO", "oO")
-
-    def test_emoticons_12(self):
-        self._equal("\\O/", "\\O/")
-
-    def test_emoticons_13(self):
-        self._equal("\\m/", "\\m/")
-
-    def test_emoticons_14(self):
-        self._equal(":;))", ":;))")
-
-    def test_emoticons_15(self):
-        self._equal("_))", "_))")
-
-    def test_emoticons_16(self):
-        self._equal("hallo peter ; )", "hallo peter ;)")
-
-    def test_emoticons_17(self):
-        self._equal("Das hab ich auch schon gehört (find ich super :-)", "Das hab ich auch schon gehört ( find ich super :-)")
-
     def test_emoticons_18(self):
         self._equal("bla🙅fasel", "bla 🙅 fasel")
 
@@ -637,56 +679,7 @@ class TestEmoticons(TestTokenizer):
         self._equal(":-) ;-) (-: :-> :-D \\o/ :-P B-) :-$ :-* O:-) =-O O_O O_o o_O :O :-! :-x :-| :-\\ :-(:'(:-[>:-(^.^ ^_^ \\(ˆ˚ˆ)/ ヽ(°◇° )ノ ¯\\(°_o)/¯ ¯\\_(ツ)_/¯ (¬_¬) (>_<) (╥﹏╥) (☞ﾟヮﾟ)☞ ☜(ﾟヮﾟ☜) ☜(⌒▽⌒)☞ (╯°□°)╯︵┻━┻ ┬─┬ ノ(°–°ノ) (^._.^)ﾉ ฅ^•ﻌ•^ฅ ʕ•ᴥ•ʔ (•_•) ■-■¬ <(•_•) (■_■¬) ƪ(ړײ)‎ƪ​​", [":-)", ";-)", "(-:", ":->", ":-D", "\\o/", ":-P", "B-)", ":-$", ":-*", "O:-)", "=-O", "O_O", "O_o", "o_O", ":O", ":-!", ":-x", ":-|", ":-\\", ":-(", ":'(", ":-[", ">:-(", "^.^", "^_^", "\\(ˆ˚ˆ)/", "ヽ(°◇° )ノ", "¯\\(°_o)/¯", "¯\\_(ツ)_/¯", "(¬_¬)", "(>_<)", "(╥﹏╥)", "(☞ﾟヮﾟ)☞", "☜(ﾟヮﾟ☜)", "☜(⌒▽⌒)☞", "(╯°□°)╯︵", "┻━┻", "┬─┬", "ノ(°–°ノ)", "(^._.^)ﾉ", "ฅ^•ﻌ•^ฅ", "ʕ•ᴥ•ʔ", "(•_•)", "■-■¬ <(•_•)", "(■_■¬)", "ƪ(ړײ)ƪ"])
 
 
-class TestActions(TestTokenizer):
-    """"""
-    def test_actions_01(self):
-        self._equal("*grübel*", "* grübel *")
-
-    def test_actions_02(self):
-        self._equal("*auf locher rumhüpf & konfetti mach*", "* auf locher rumhüpf & konfetti mach *")
-
-    def test_actions_03(self):
-        self._equal("*dichmalganzdolleknuddelt*", "* dichmalganzdolleknuddelt *")
-
-    def test_actions_04(self):
-        self._equal("immer noch nicht fassen kann", "immer noch nicht fassen kann")
-
-    def test_actions_05(self):
-        self._equal("quakirenntdemflöppymitdeneiswürfelnnach*", "quakirenntdemflöppymitdeneiswürfelnnach *")
-
-    def test_actions_06(self):
-        self._equal("+s*", "+ s *")
-
-    def test_actions_07(self):
-        self._equal("*danachdenraminmeinenrechnereinbau*G*", "* danachdenraminmeinenrechnereinbau * G *")
-
-    def test_actions_08(self):
-        self._equal("quaki knuddelt Thor", "quaki knuddelt Thor")
-
-
-class TestAddressing(TestTokenizer):
-    """"""
-    def test_addressing_01(self):
-        self._equal("@bine23", "@bine23")
-
-    def test_addressing_02(self):
-        self._equal("@alle", "@alle")
-
-    def test_addressing_03(self):
-        self._equal("winke@bochum", "winke @bochum")
-
-    def test_addressing_04(self):
-        self._equal("@bine23: hallöchen! :-)", "@bine23 : hallöchen ! :-)")
-
-
 class TestHashtags(TestTokenizer):
-    """"""
-    def test_hashtags_01(self):
-        self._equal("#urlaub", "#urlaub")
-
-    def test_hashtags_02(self):
-        self._equal("#SPD", "#SPD")
-
     def test_hashtags_03(self):
         self._equal("#Refugeeswelcome-Bewegung", "#Refugeeswelcome-Bewegung")
 
@@ -695,7 +688,6 @@ class TestHashtags(TestTokenizer):
 
 
 class OwnAdditions(TestTokenizer):
-    """"""
     def test_own_01(self):
         self._equal("WS05/06", "WS 05/06")
 
@@ -1166,7 +1158,6 @@ class TestUnderline(TestTokenizer):
 
 
 class TestJunk(TestTokenizer):
-    """"""
     def test_junk_01(self):
         # zero width space
         self._equal("foo​bar", "foobar")
@@ -1205,7 +1196,6 @@ class TestJunk(TestTokenizer):
 
 
 class TestXML(TestTokenizer):
-    """"""
     def test_xml_01(self):
         self._equal_xml("<foo><p>Most of myWork is in the areas of <a>language technology</a>, stylometry&amp;Digital Humanities. Recurring key aspects of my research are:</p>foobar</foo>", "<foo> <p> Most of my Work is in the areas of <a> language technology </a> , stylometry &amp; Digital Humanities . Recurring key aspects of my research are : </p> foobar </foo>")
 
@@ -1248,7 +1238,6 @@ class TestXML(TestTokenizer):
 
 
 class TestMisc(TestTokenizer):
-    """"""
     def test_misc_01(self):
         self._equal("[Alt] + 240 =­\n", "[ Alt ] + 240 =")
 
@@ -1278,7 +1267,6 @@ class TestMisc(TestTokenizer):
 
 
 class TestEnglish(TestEnglishTokenizer):
-    """"""
     def test_english_01(self):
         self._equal("I don't know.", "I do n't know .")
 
@@ -1377,7 +1365,6 @@ class TestEnglish(TestEnglishTokenizer):
 
 
 class TestDeprecated(TestTokenizerDeprecated):
-    """"""
     def test_deprecated_01(self):
         self._equal("foo bar baz", "foo bar baz")
 
