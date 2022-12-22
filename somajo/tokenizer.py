@@ -254,6 +254,7 @@ class Tokenizer():
                                        r'|'.join([re.escape(_) for _ in abbreviation_list]) +
                                        # r"))+(?!\p{L}{1,3}\.)", re.V1)
                                        r")+(?!\p{L}{1,3}\.)", re.IGNORECASE)
+        self.artikel = re.compile(r"\bArt.(?=\s?\d)", re.IGNORECASE)
 
         # MENTIONS, HASHTAGS, ACTION WORDS, UNDERLINE
         self.mention = re.compile(r'[@]\w+(?!\w)')
@@ -275,6 +276,7 @@ class Tokenizer():
         self.en_us_zip_code = re.compile(r"(?<![\d-])\d{5}-\d{4}(?![\d-])")
         self.ordinal = re.compile(r'(?<![\w.])(?:\d{1,3}|\d{5,}|[3-9]\d{3})\.(?!\d)')
         self.english_ordinal = re.compile(r'\b(?:\d+(?:,\d+)*)?(?:1st|2nd|3rd|\dth)\b')
+        self.roman_ordinal = re.compile(r"\b(?=[MDCLXVI])M{0,4}(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3})\.")
         self.english_decades = re.compile(r"\b(?:[12]\d)?\d0['’]?s\b")
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
         self.calculation = re.compile(r"(?P<arg1>\d+(?:[,.]\d+)?)(?P<op>[+*x×÷−])(?P<arg2>\d+(?:[,.]\d+)?)")
@@ -693,6 +695,7 @@ class Tokenizer():
         # remove known abbreviations
         split_abbreviations = False if self.language == "en" or self.language == "en_PTB" else True
         self._split_abbreviations(token_dll, split_multipart_abbrevs=split_abbreviations)
+        self._split_all_matches(self.artikel, token_dll, "abbreviation")
 
         # DATES AND NUMBERS
         self._split_all_matches(self.isbn, token_dll, "number", delete_whitespace=True)
@@ -716,6 +719,7 @@ class Tokenizer():
             self._split_all_matches(self.ordinal, token_dll, "ordinal")
         elif self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.english_ordinal, token_dll, "ordinal")
+        self._split_all_matches(self.roman_ordinal, token_dll, "ordinal")
         # fractions
         self._split_all_matches(self.fraction, token_dll, "number")
         # calculations
