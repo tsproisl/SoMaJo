@@ -1079,6 +1079,12 @@ class TestAbbreviations(TestTokenizer):
     def test_abbreviations_16(self):
         self._equal("Hey Mr. Schlauberger", "Hey Mr. Schlauberger")
 
+    def test_abbreviations_17(self):
+        self._equal("Nach Art. 1 Grundgesetz", "Nach Art. 1 Grundgesetz")
+
+    def test_abbreviations_17a(self):
+        self._equal("Meine Art. Genau", "Meine Art . Genau")
+
 
 class TestHashtagsMentions(TestTokenizer):
     def test_hashtag_mentions_01(self):
