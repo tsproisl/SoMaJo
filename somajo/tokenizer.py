@@ -279,6 +279,34 @@ class Tokenizer():
         self.roman_ordinal = re.compile(r"\b(?=[MDCLXVI])M{0,4}(?:C[MD]|D?C{0,3})(?:X[CL]|L?X{0,3})(?:I[XV]|V?I{0,3})\.")
         self.english_decades = re.compile(r"\b(?:[12]\d)?\d0['’]?s\b")
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
+        fraction = r"""(?:
+                         \d{1,2}/(?:[1-9]|10)          # denominators 1–10
+                         |
+                         (?:\d{1,2}|100)/100           # denominator 100
+                         |
+                         (?:\d{1,3}|1000)/1000         # denominator 1000
+                       )"""
+        scientific_number = r"""(?:
+                                  [−+-]?               # optional sign
+                                  (?:\d*               # optional digits before decimal point
+                                  [.,])?               # optional decimal point
+                                  \d+                  # digits
+                                  (?:[eE][−+-]?\d+)?   # optional exponent
+                                )"""
+        grouped_number = r"""(?:
+                               \d{1,3}(?:[.]\d{3})+(?:,\d+)?  # dot for thousands, comma for decimals: 1.999,95
+                               |
+                               \d{1,3}(?:,\d{3})+(?:[.]\d+)?  # comma for thousands, dot for decimals: 1,999.95
+                             )"""
+        number = f"(?:{fraction}|{scientific_number}|{grouped_number})"
+        number_range = f"""(?:
+                             (?P<frfrom>{fraction})(?P<frdash>[-–])(?P<frto>{fraction})
+                             |
+                             (?P<snfrom>{scientific_number})(?P<sndash>[-–])(?P<snto>{scientific_number})
+                             |
+                             (?P<gnfrom>{grouped_number})(?P<gndash>[-–])(?P<gnto>{grouped_number})
+                           )"""
+        self.number_range = re.compile(r"(?<!\w|\d[.,]?)" + number_range + r"(?![.,]?\d)", re.VERBOSE)
         self.calculation = re.compile(r"(?P<arg1>\d+(?:[,.]\d+)?)(?P<op>[+*x×÷−])(?P<arg2>\d+(?:[,.]\d+)?)")
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*[,.]-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
