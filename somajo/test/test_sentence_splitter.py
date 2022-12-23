@@ -188,6 +188,13 @@ class TestMisc(TestSentenceSplitter):
     def test_misc_21(self):
         self._equal("Oder gibt es Unterschiede? #semibk", ["Oder gibt es Unterschiede ?", "#semibk"])
 
+    @unittest.expectedFailure
+    def test_misc_22(self):
+        self._equal("Die Nominierungen müssen bis spätestens zum 1. Februar des betreffenden Jahres erfolgen.[6] Es gilt das Datum des Poststempels.", ["Die Nominierungen müssen bis spätestens zum 1. Februar des betreffenden Jahres erfolgen . [ 6 ]", "Es gilt das Datum des Poststempels ."])
+
+    def test_misc_23(self):
+        self._equal("Auf drei Schiffen des III. Geschwaders", ["Auf drei Schiffen des III. Geschwaders"])
+
 
 class TestMiscEnglish(TestSentenceSplitterEnglish):
     """"""
