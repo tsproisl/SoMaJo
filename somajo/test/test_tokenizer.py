@@ -1255,6 +1255,28 @@ class TestNumbers(TestTokenizer):
     def test_numbers_41(self):
         self._equal("jenseits der 100-°C-Grenze bla", "jenseits der 100-°C-Grenze bla")
 
+    def test_numbers_42(self):
+        self._equal("eine 18-Jährigen-Falle.", "eine 18-Jährigen-Falle .")
+
+    def test_numbers_43(self):
+        self._equal("Ü-oder-U-18", "Ü-oder-U-18")
+
+    def test_numbers_44(self):
+        self._equal("das macht 1.234,56–2.345,67 €", "das macht 1.234,56 – 2.345,67 €")
+        self._equal("das macht 1.234,56-2.345,67 €", "das macht 1.234,56 - 2.345,67 €")
+
+    def test_numbers_45(self):
+        self._equal("etwa 1/2–3/4 voll", "etwa 1/2 – 3/4 voll")
+        self._equal("etwa 1/2-3/4 voll", "etwa 1/2 - 3/4 voll")
+
+    def test_numbers_46(self):
+        self._equal("-3.42e-4–+3.42e-4", "-3.42e-4 – +3.42e-4")
+        self._equal("-3.42e-4-+3.42e-4", "-3.42e-4 - +3.42e-4")
+
+    def test_numbers_47(self):
+        self._equal("etwa 4–6 Personen", "etwa 4 – 6 Personen")
+        self._equal("etwa 4-6 Personen", "etwa 4 - 6 Personen")
+
 
 class TestCamelCase(TestTokenizer):
     def test_camelcase_01(self):
