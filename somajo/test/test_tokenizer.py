@@ -1235,19 +1235,15 @@ class TestNumbers(TestTokenizer):
     def test_numbers_39b(self):
         self._equal("die COVID19-Pandemie ist", "die COVID19-Pandemie ist")
 
-    @unittest.expectedFailure
     def test_numbers_40(self):
         self._equal("fährt 10 km/h zu schnell", "fährt 10 km/h zu schnell")
 
-    @unittest.expectedFailure
     def test_numbers_40a(self):
         self._equal("fährt 10km/h zu schnell", "fährt 10 km/h zu schnell")
 
-    @unittest.expectedFailure
     def test_numbers_40b(self):
         self._equal("fährt 100 km/h. Zu schnell", "fährt 100 km/h . Zu schnell")
 
-    @unittest.expectedFailure
     def test_numbers_40c(self):
         self._equal("fährt 100km/h. Zu schnell", "fährt 100 km/h . Zu schnell")
 
