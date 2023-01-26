@@ -1120,7 +1120,7 @@ class TestNumbers(TestTokenizer):
         self._equal("5h", "5 h")
 
     def test_numbers_06(self):
-        self._equal("66cent", "66 cent")
+        self._equal("1/2kg", "1/2 kg")
 
     def test_numbers_07(self):
         self._equal("51cm", "51 cm")
