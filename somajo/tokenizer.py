@@ -280,11 +280,14 @@ class Tokenizer():
         self.english_decades = re.compile(r"\b(?:[12]\d)?\d0['’]?s\b")
         self.fraction = re.compile(r'(?<!\w)\d+/\d+(?![\d/])')
         fraction = r"""(?:
-                         \d{1,2}/(?:[1-9]|10)          # denominators 1–10
-                         |
-                         (?:\d{1,2}|100)/100           # denominator 100
-                         |
-                         (?:\d{1,3}|1000)/1000         # denominator 1000
+                         \d{1,2}/
+                         (?:
+                           (?:[1-9]|10)          # denominators 1–10
+                           |
+                           (?:\d{1,2}|100)/100           # denominator 100
+                           |
+                           (?:\d{1,3}|1000)/1000         # denominator 1000
+                         )
                        )"""
         scientific_number = r"""(?:
                                   [−+-]?               # optional sign
@@ -298,7 +301,7 @@ class Tokenizer():
                                |
                                \d{1,3}(?:,\d{3})+(?:[.]\d+)?  # comma for thousands, dot for decimals: 1,999.95
                              )"""
-        number = f"(?:{fraction}|{scientific_number}|{grouped_number})"
+        number = f"(?P<number>{fraction}|{scientific_number}|{grouped_number})"
         number_range = f"""(?:
                              (?P<frfrom>{fraction})(?P<frdash>[-–])(?P<frto>{fraction})
                              |
@@ -310,21 +313,10 @@ class Tokenizer():
         self.calculation = re.compile(r"(?P<arg1>\d+(?:[,.]\d+)?)(?P<op>[+*x×÷−])(?P<arg2>\d+(?:[,.]\d+)?)")
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*[,.]-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
-        self.measurement = re.compile(r'(?<!\w)(?P<a_amount>[−+-]?\d*[,.]?\d+) ?(?P<b_unit>km/h|(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|gbit/s|ghz|h|hz|kg|l|lb|mbit/s|min|ml|qm|s|sek)(?!\w)', re.IGNORECASE)
+        self.measurement = re.compile(r"(?<!\w|\d[.,]?)" + f"(?:{number}|{number_range})[ ]?" + r"(?P<unit>km/h|(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|gbit/s|ghz|h|hz|kg|l|lb|mbit/s|min|ml|qm|s|sek)" + r"(?!\w)", re.IGNORECASE | re.VERBOSE)
         # auch Web2.0
         self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[\p{L}@][\p{L}@-]* | [\p{L}@][\p{L}@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
-        self.number = re.compile(r"""(?<!\w|\d[.,]?)
-                                     (?:[−+-]?              # optional sign
-                                       (?:\d*               # optional digits before decimal point
-                                       [.,])?               # optional decimal point
-                                       \d+                  # digits
-                                       (?:[eE][−+-]?\d+)?   # optional exponent
-                                       |
-                                       \d{1,3}(?:[.]\d{3})+(?:,\d+)?  # dot for thousands, comma for decimals: 1.999,95
-                                       |
-                                       \d{1,3}(?:,\d{3})+(?:[.]\d+)?  # comma for thousands, dot for decimals: 1,999.95
-                                       )
-                                     (?![.,]?\d)""", re.VERBOSE)
+        self.number = re.compile(r"(?<!\w|\d[.,]?)" + number + r"(?![.,]?\d)", re.VERBOSE)
         self.ipv4 = re.compile(r"(?<!\w|\d[.,]?)(?:\d{1,3}[.]){3}\d{1,3}(?![.,]?\d)")
         self.section_number = re.compile(r"(?<!\w|\d[.,]?)(?:\d+[.])+\d+[.]?(?![.,]?\d)")
 
