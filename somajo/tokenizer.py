@@ -748,6 +748,8 @@ class Tokenizer():
         elif self.language == "en" or self.language == "en_PTB":
             self._split_all_matches(self.english_ordinal, token_dll, "ordinal")
         self._split_all_matches(self.roman_ordinal, token_dll, "ordinal")
+        # number ranges
+        self._split_all_matches(self.number_range, token_dll, "number", split_named_subgroups=True)
         # fractions
         self._split_all_matches(self.fraction, token_dll, "number")
         # calculations
