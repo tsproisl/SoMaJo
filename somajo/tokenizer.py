@@ -313,7 +313,8 @@ class Tokenizer():
         self.calculation = re.compile(r"(?P<arg1>\d+(?:[,.]\d+)?)(?P<op>[+*x×÷−])(?P<arg2>\d+(?:[,.]\d+)?)")
         self.amount = re.compile(r'(?<!\w)(?:\d+[\d,.]*[,.]-)(?!\w)')
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
-        self.measurement = re.compile(r"(?<!\w|\d[.,]?)" + f"(?:{number}|{number_range})[ ]?" + r"(?P<unit>km/h|(?:mm|cm|dm|m|km)(?:\^?[23])?|bit|cent|eur|f|ft|g|gbit/s|ghz|h|hz|kg|l|lb|mbit/s|min|ml|qm|s|sek)" + r"(?!\w)", re.IGNORECASE | re.VERBOSE)
+        units = utils.read_abbreviation_file("units.txt")
+        self.measurement = re.compile(r"(?<!\w|\d[.,]?)" + f"(?:{number}|{number_range})[ ]?" + r"(?P<unit>" + r"|".join([re.escape(_) for _ in units]) + ")" + r"(?!\w)", re.IGNORECASE | re.VERBOSE)
         # auch Web2.0
         self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[\p{L}@][\p{L}@-]* | [\p{L}@][\p{L}@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
         self.number = re.compile(r"(?<!\w|\d[.,]?)" + number + r"(?![.,]?\d)", re.VERBOSE)
@@ -712,6 +713,8 @@ class Tokenizer():
             self._split_all_matches(self.en_nonbreaking_prefixes, token_dll)
             self._split_all_matches(self.en_nonbreaking_suffixes, token_dll)
 
+        # measurements
+        self._split_all_matches(self.measurement, token_dll, "measurement")
         # remove known abbreviations
         split_abbreviations = False if self.language == "en" or self.language == "en_PTB" else True
         self._split_abbreviations(token_dll, split_multipart_abbrevs=split_abbreviations)
@@ -751,7 +754,7 @@ class Tokenizer():
         # semesters
         self._split_all_matches(self.semester, token_dll, "semester")
         # measurements
-        self._split_all_matches(self.measurement, token_dll, "measurement")
+        # self._split_all_matches(self.measurement, token_dll, "measurement")
         # number compounds
         self._split_all_matches(self.number_compound, token_dll, "number_compound")
         # numbers
