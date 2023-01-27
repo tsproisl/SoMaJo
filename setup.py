@@ -41,7 +41,8 @@ setup(
                    "non-breaking_suffixes_en.txt",
                    "single_token_abbreviations_de.txt",
                    "single_token_abbreviations_en.txt",
-                   "tokens_with_plus_or_ampersand.txt"]
+                   "tokens_with_plus_or_ampersand.txt",
+                   "units.txt"]
     },
     url="https://github.com/tsproisl/SoMaJo",
     download_url='https://github.com/tsproisl/SoMaJo/archive/v%s.tar.gz' % version["__version__"],
