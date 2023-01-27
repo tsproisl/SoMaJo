@@ -225,7 +225,7 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 | Corpus | Precision | Recall | F₁    |
 |--------|-----------|--------|-------|
 | CMC    | 99.71     | 99.56  | 99.64 |
-| Web    | 99.93     | 99.92  | 99.93 |
+| Web    | 99.91     | 99.92  | 99.91 |
 
 
 ## Tokenizing English text ##
@@ -255,7 +255,7 @@ Performance of the English tokenizer:
 
 | Corpus               | Precision | Recall | F₁    |
 |----------------------|-----------|--------|-------|
-| English Web Treebank | 99.67     | 99.61  | 99.64 |
+| English Web Treebank | 99.66     | 99.62  | 99.64 |
 
 
 ## References ##
