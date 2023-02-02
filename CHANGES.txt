@@ -1,9 +1,10 @@
 # CHANGELOG #
 
-## Version ?, ? ##
+## Version 2.2.3, 2023-02-02 ##
 
 - Improvements to tokenization: Roman ordinals, abbreviation “Art.”
-  preceding a number
+  preceding a number, certain units of measurement at the end of a
+  sentence (e.g. km/h).
 
 ## Version 2.2.2, 2022-09-12 ##
 
