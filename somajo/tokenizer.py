@@ -328,9 +328,8 @@ class Tokenizer():
         self.semester = re.compile(r'(?<!\w)(?P<a_semester>[WS]S|SoSe|WiSe)(?P<b_jahr>\d\d(?:/\d\d)?)(?!\w)', re.IGNORECASE)
         units = utils.read_abbreviation_file("units.txt")
         self.measurement = re.compile(r"(?<!\w|\d[.,]?)" + f"(?:{number}|{number_range})[ ]?" + r"(?P<unit>" + r"|".join([re.escape(_) for _ in units]) + ")" + r"(?!\w)", re.IGNORECASE | re.VERBOSE)
-        # auch Web2.0
-        self.number_compound = re.compile(r'(?<!\w) (?:\d+-?[\p{L}@][\p{L}@-]* | [\p{L}@][\p{L}@-]*-?\d+(?:\.\d)?) (?!\w)', re.VERBOSE)
-        self.number = re.compile(r"(?<!\w|\d[.,]?)" + number + r"(?![.,]?\d)", re.VERBOSE)
+        self.number_compound = re.compile(r'(?<!\w-?) (?:\d+-?[\p{L}@][\p{L}@-]*) (?!\w)', re.VERBOSE)
+        self.number = re.compile(r"(?<!\w-?|\d[.,]?)" + number + r"(?![.,]?\d)", re.VERBOSE)
         self.ipv4 = re.compile(r"(?<!\w|\d[.,]?)(?:\d{1,3}[.]){3}\d{1,3}(?![.,]?\d)")
         self.section_number = re.compile(r"(?<!\w|\d[.,]?)(?:\d+[.])+\d+[.]?(?![.,]?\d)")
 
