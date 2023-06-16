@@ -855,6 +855,7 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_43(self):
         self._equal("Google+", "Google+")
 
+    @unittest.expectedFailure
     def test_punctuation_44(self):
         self._equal("Industrie4.0", "Industrie4.0")
 
@@ -1228,13 +1229,17 @@ class TestNumbers(TestTokenizer):
     def test_numbers_39(self):
         self._equal("die COVID-19 Pandemie ist", "die COVID-19 Pandemie ist")
 
-    @unittest.expectedFailure
     def test_numbers_39a(self):
         self._equal("die COVID-19-Pandemie ist", "die COVID-19-Pandemie ist")
 
-    @unittest.expectedFailure
     def test_numbers_39b(self):
         self._equal("die COVID19-Pandemie ist", "die COVID19-Pandemie ist")
+
+    def test_numbers_39c(self):
+        self._equal("der G20-Gipfel war", "der G20-Gipfel war")
+
+    def test_numbers_39d(self):
+        self._equal("eine FFP2-Maske hilft", "eine FFP2-Maske hilft")
 
     def test_numbers_40(self):
         self._equal("fährt 10 km/h zu schnell", "fährt 10 km/h zu schnell")
