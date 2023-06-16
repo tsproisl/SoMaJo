@@ -255,7 +255,7 @@ Performance of the English tokenizer:
 
 | Corpus               | Precision | Recall | F₁    |
 |----------------------|-----------|--------|-------|
-| English Web Treebank | 99.66     | 99.62  | 99.64 |
+| English Web Treebank | 99.66     | 99.64  | 99.65 |
 
 
 ## References ##
