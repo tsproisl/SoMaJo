@@ -769,7 +769,7 @@ class Tokenizer():
         # measurements
         # self._split_all_matches(self.measurement, token_dll, "measurement")
         # number compounds
-        self._split_all_matches(self.number_compound, token_dll, "number_compound")
+        self._split_all_matches(self.number_compound, token_dll, "regular")
         # numbers
         self._split_all_matches(self.number, token_dll, "number")
         self._split_all_matches(self.ipv4, token_dll, "number")
