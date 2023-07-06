@@ -710,7 +710,7 @@ class Tokenizer():
 
         # English possessive and contracted forms
         if self.language == "en" or self.language == "en_PTB":
-            self._split_all_matches(self.english_decades, token_dll, "number_compound")
+            self._split_all_matches(self.english_decades, token_dll, "regular")
             self._split_all_matches(self.en_dms, token_dll)
             self._split_all_matches(self.en_llreve, token_dll)
             self._split_all_matches(self.en_not, token_dll)
