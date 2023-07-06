@@ -3,8 +3,8 @@
 * [class somajo.somajo.SoMaJo](#class-somajosomajosomajolanguage--split_camel_casefalse-split_sentencestrue-xml_sentencesnone)
     * [tokenize_text](#tokenize_textparagraphs--parallel1)
     * [tokenize_text_file](#tokenize_text_filetext_file-paragraph_separator--parallel1)
-    * [tokenize_xml](#tokenize_xmlxml_data-eos_tags--strip_tagsfalse-parallel1)
-    * [tokenize_xml_file](#tokenize_xml_filexml_file-eos_tags--strip_tagsfalse-parallel1)
+    * [tokenize_xml](#tokenize_xmlxml_data-eos_tags--strip_tagsfalse-parallel1-prune_tagsnone)
+    * [tokenize_xml_file](#tokenize_xml_filexml_file-eos_tags--strip_tagsfalse-parallel1-prune_tagsnone)
 * [class somajo.token.Token](#class-somajotokentokentext--markupfalse-markup_classnone-markup_eosnone-lockedfalse-token_classnone-space_aftertrue-original_spellingnone-first_in_sentencefalse-last_in_sentencefalse)
     * [property extra_info()](#property-extra_info)
 
