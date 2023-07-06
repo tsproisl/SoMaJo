@@ -17,7 +17,7 @@ class Token:
     locked : bool, (default=False)
         Mark the token as locked.
     token_class : {'URL', 'XML_entity', 'XML_tag', 'abbreviation', 'action_word', 'amount', 'date', 'email_address', 'emoticon', 'hashtag', 'measurement', 'mention', 'number', 'ordinal', 'regular', 'semester', 'symbol', 'time'}, optional (default=None)
-        The class of the token, e.g. "regular", "emoticon", "url", etc.
+        The class of the token, e.g. "regular", "emoticon", "URL", etc.
     space_after : bool, (default=True)
         Was there a space after the token in the original data?
     original_spelling : str, optional (default=None)
