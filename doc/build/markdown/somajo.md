@@ -1,6 +1,6 @@
 # somajo package
 
-* [class somajo.somajo.SoMaJo](#class-somajosomajosomajolanguage--split_camel_casefalse-split_sentencestrue)
+* [class somajo.somajo.SoMaJo](#class-somajosomajosomajolanguage--split_camel_casefalse-split_sentencestrue-xml_sentencesnone)
     * [tokenize_text](#tokenize_textparagraphs--parallel1)
     * [tokenize_text_file](#tokenize_text_filetext_file-paragraph_separator--parallel1)
     * [tokenize_xml](#tokenize_xmlxml_data-eos_tags--strip_tagsfalse-parallel1)
@@ -18,19 +18,15 @@ Bases: `object`
 Tokenization and sentence splitting.
 
 * **Parameters**
-  * **language** (*{'de_CMC'**,* *'en_PTB'}*) – Language-specific tokenization rules.
-  * **split_camel_case** (*bool**,* *(**default=False**)*) – Split words written in camelCase (excluding established names
+  * **language** (*{'de_CMC', 'en_PTB'}*) – Language-specific tokenization rules.
+  * **split_camel_case** (*bool, (**default=False**)*) – Split words written in camelCase (excluding established names
     and terms).
-  * **split_sentences** (*bool**,* *(**default=True**)*) – Perform sentence splitting in addition to tokenization.
-  * **xml_sentences** (*str**,* *(**default=None**)*) – Delimit sentences by XML tags of this name
-    (`xml_sentences='s'` → <s>…</s>). When used with XML input,
+  * **split_sentences** (*bool, (**default=True**)*) – Perform sentence splitting in addition to tokenization.
+  * **xml_sentences** (*str, (**default=None**)*) – Delimit sentences by XML tags of this name
+    (`xml_sentences='s'` → &lt;s>…&lt;/s>). When used with XML input,
     this might lead to minor changes to the original tags to
     guarantee well-formed output (tags might need to be closed and
     re-opened at sentence boundaries).
-
-#### paragraph_separators *= {'empty_lines', 'single_newlines'}*
-
-#### supported_languages *= {'de_CMC', 'en_PTB'}*
 
 #### tokenize_text(paragraphs, \*, parallel=1)
 
@@ -38,12 +34,12 @@ Split paragraphs of text into sequences of tokens.
 
 * **Parameters**
   * **paragraphs** (*iterable*) – An iterable of single paragraphs of text.
-  * **parallel** (*int**,* *(**default=1**)*) – Number of processes to use.
+  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
 * **Yields**
   *list* – The `Token` objects in a single sentence or paragraph
   (depending on the value of `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one sentence per
 line:
@@ -138,15 +134,15 @@ Split the contents of a text file into sequences of tokens.
 
 * **Parameters**
   * **text_file** (*str* *or* *file-like object*) – Either a filename or a file-like object containing text.
-  * **paragraph_separator** (*{'single_newlines'**,* *'empty_lines'}*) – How are paragraphs separated in the input? Is there one
+  * **paragraph_separator** (*{'single_newlines', 'empty_lines'}*) – How are paragraphs separated in the input? Is there one
     paragraph per line (‘single_newlines’) or do paragraphs
     span several lines and are separated by ‘empty_lines’?
-  * **parallel** (*int**,* *(**default=1**)*) – Number of processes to use.
+  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
 * **Yields**
   *list* – The `Token` objects in a single sentence or paragraph
   (depending on the value of `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; input file with
 paragraphs separated by empty lines; print one token per line
@@ -216,8 +212,8 @@ Split a string of XML data into sequences of tokens.
     you might use the following list of tags: `['title',
     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr',
     'div', 'ol', 'ul', 'dl', 'table']`
-  * **strip_tags** (*bool**,* *(**default=False**)*) – Remove the XML tags from the output.
-  * **parallel** (*int**,* *(**default=1**)*) – Number of processes to use.
+  * **strip_tags** (*bool, (**default=False**)*) – Remove the XML tags from the output.
+  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
   * **prune_tags** (*iterable*) – These XML tags and their contents will be removed from the
     input before tokenization. For HTML input, you might use
     `['script', 'style']` or, depending on your use case,
@@ -227,7 +223,7 @@ Split a string of XML data into sequences of tokens.
   XML delimited by `eos_tags` (depending on the value of
   `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -348,8 +344,8 @@ Split the contents of an xml file into sequences of tokens.
     you might use the following list of tags: `['title',
     'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr',
     'div', 'ol', 'ul', 'dl', 'table']`
-  * **strip_tags** (*bool**,* *(**default=False**)*) – Remove all XML tags from the output.
-  * **parallel** (*int**,* *(**default=1**)*) – Number of processes to use.
+  * **strip_tags** (*bool, (**default=False**)*) – Remove all XML tags from the output.
+  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
   * **prune_tags** (*iterable*) – These XML tags and their contents will be removed from the
     input before tokenization. For HTML input, you might use
     `['script', 'style']` or, depending on your use case,
@@ -359,7 +355,7 @@ Split the contents of an xml file into sequences of tokens.
   XML delimited by `eos_tags` (depending on the value of
   `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -464,15 +460,15 @@ Token objects store a piece of text (in the end a single token) with additional 
 
 * **Parameters**
   * **text** (*str*) – The text that makes up the token object
-  * **markup** (*bool**,* *(**default=False**)*) – Is the token a markup token?
-  * **markup_class** (*{'start'**,* *'end'}**,* *optional* *(**default=None**)*) – If markup=True, then markup_class must be either “start” or “end”.
-  * **markup_eos** (*bool**,* *optional* *(**default=None**)*) – Is the markup token a sentence boundary?
-  * **locked** (*bool**,* *(**default=False**)*) – Mark the token as locked.
-  * **token_class** (*str**,* *optional* *(**default=None**)*) – The class of the token, e.g. “regular”, “emoticon”, “url”, etc.
-  * **space_after** (*bool**,* *(**default=True**)*) – Was there a space after the token in the original data?
-  * **original_spelling** (*str**,* *optional* *(**default=None**)*) – The original spelling of the token, if it is different from the one in text.
-  * **first_in_sentence** (*bool**,* *(**default=False**)*) – Is it the first token of a sentence?
-  * **last_in_sentence** (*bool**,* *(**default=False**)*) – Is it the last token of a sentence?
+  * **markup** (*bool, (**default=False**)*) – Is the token a markup token?
+  * **markup_class** (*{'start', 'end'}, optional* *(**default=None**)*) – If markup=True, then markup_class must be either “start” or “end”.
+  * **markup_eos** (*bool, optional* *(**default=None**)*) – Is the markup token a sentence boundary?
+  * **locked** (*bool, (**default=False**)*) – Mark the token as locked.
+  * **token_class** (*str, optional* *(**default=None**)*) – The class of the token, e.g. “regular”, “emoticon”, “url”, etc.
+  * **space_after** (*bool, (**default=True**)*) – Was there a space after the token in the original data?
+  * **original_spelling** (*str, optional* *(**default=None**)*) – The original spelling of the token, if it is different from the one in text.
+  * **first_in_sentence** (*bool, (**default=False**)*) – Is it the first token of a sentence?
+  * **last_in_sentence** (*bool, (**default=False**)*) – Is it the last token of a sentence?
 
 #### *property* extra_info
 
@@ -483,7 +479,7 @@ String representation of extra information.
 * **Return type**
   str
 
-### Examples
+##### Examples
 
 ```pycon
 >>> tok = Token(":)", token_class="regular", space_after=False, original_spelling=": )")
