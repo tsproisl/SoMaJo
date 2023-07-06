@@ -464,7 +464,7 @@ Token objects store a piece of text (in the end a single token) with additional 
   * **markup_class** (*{'start', 'end'}, optional* *(**default=None**)*) – If markup=True, then markup_class must be either “start” or “end”.
   * **markup_eos** (*bool, optional* *(**default=None**)*) – Is the markup token a sentence boundary?
   * **locked** (*bool, (**default=False**)*) – Mark the token as locked.
-  * **token_class** (*str, optional* *(**default=None**)*) – The class of the token, e.g. “regular”, “emoticon”, “url”, etc.
+  * **token_class** (*{'URL', 'XML_entity', 'XML_tag', 'abbreviation', 'action_word', 'amount', 'date', 'email_address', 'emoticon', 'hashtag', 'measurement', 'mention', 'number', 'ordinal', 'regular', 'semester', 'symbol', 'time'}, optional* *(**default=None**)*) – The class of the token, e.g. “regular”, “emoticon”, “url”, etc.
   * **space_after** (*bool, (**default=True**)*) – Was there a space after the token in the original data?
   * **original_spelling** (*str, optional* *(**default=None**)*) – The original spelling of the token, if it is different from the one in text.
   * **first_in_sentence** (*bool, (**default=False**)*) – Is it the first token of a sentence?
