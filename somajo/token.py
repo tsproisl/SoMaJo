@@ -16,7 +16,7 @@ class Token:
         Is the markup token a sentence boundary?
     locked : bool, (default=False)
         Mark the token as locked.
-    token_class : str, optional (default=None)
+    token_class : {'URL', 'XML_entity', 'XML_tag', 'abbreviation', 'action_word', 'amount', 'date', 'email_address', 'emoticon', 'hashtag', 'measurement', 'mention', 'number', 'ordinal', 'regular', 'semester', 'symbol', 'time'}, optional (default=None)
         The class of the token, e.g. "regular", "emoticon", "url", etc.
     space_after : bool, (default=True)
         Was there a space after the token in the original data?
@@ -28,6 +28,28 @@ class Token:
         Is it the last token of a sentence?
 
     """
+
+    token_classes = set([
+        "URL",
+        "XML_entity",
+        "XML_tag",
+        "abbreviation",
+        "action_word",
+        "amount",
+        "date",
+        "email_address",
+        "emoticon",
+        "hashtag",
+        "measurement",
+        "mention",
+        "number",
+        "ordinal",
+        "regular",
+        "semester",
+        "symbol",
+        "time",
+    ])
+
     def __init__(self, text, *, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
         self.text = text
         if markup:
@@ -39,6 +61,8 @@ class Token:
         if markup_eos is not None:
             assert markup
             assert isinstance(markup_eos, bool)
+        if token_class is not None:
+            assert token_class in self.token_classes, f"'{token_class}' is not a recognized token class"
         self.markup = markup
         self.markup_class = markup_class
         self.markup_eos = markup_eos
