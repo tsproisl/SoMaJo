@@ -1,6 +1,7 @@
 /data/
 /dist/
-/SoMaJo.egg-info/
+/src/SoMaJo.egg-info/
+/venv/
 __pycache__/
 *~
 *.pyc
