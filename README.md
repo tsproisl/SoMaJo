@@ -62,7 +62,7 @@ and sentence splitting on well-formed XML files using the `--xml` and
 `--tag` options.
 
 The system is described in greater detail in [Proisl and Uhrig
-(2016)](http://aclweb.org/anthology/W16-2607).
+(2016)](https://aclanthology.org/W16-2607).
 
 For part-of-speech tagging, we recommend
 [SoMeWeTa](https://github.com/tsproisl/SoMeWeTa), a part-of-speech
@@ -316,6 +316,6 @@ Here are some brief notes to help you get started:
       publisher = {Association for Computational Linguistics},
       pages     = {57--62},
       doi       = {10.18653/v1/W16-2607},
-      url       = {http://aclweb.org/anthology/W16-2607},
+      url       = {https://aclanthology.org/W16-2607},
     }
     ```
