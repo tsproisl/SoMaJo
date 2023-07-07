@@ -41,7 +41,7 @@ def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
 def read_abbreviation_file(filename, to_lower=False):
     """Return the abbreviations from the given filename."""
     abbreviations = set()
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), filename), encoding="utf-8") as fh:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", filename), encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
             if line.startswith("#"):
