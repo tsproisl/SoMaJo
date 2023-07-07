@@ -5,7 +5,7 @@ import logging
 import time
 
 from somajo import SoMaJo
-from somajo.version import __version__
+from somajo import __version__
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
