@@ -1,0 +1,58 @@
+# 1. Build distribution files:
+#    python3 -m build
+#
+# 2. Upload to PyPI:
+#    twine upload dist/*
+#
+# 3. Check if everything looks all right:
+#    https://pypi.python.org/pypi/SoMaJo
+#
+# 4. Go to https://github.com/tsproisl/SoMaJo/releases/new and create
+#    a new release
+[project]
+name = "SoMaJo"
+version = "2.2.5"
+description = "A tokenizer and sentence splitter for German and English web and social media texts."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE.txt"}
+keywords = ["tokenization", "sentence splitting"]
+authors = [
+  {name = "Thomas Proisl", email = "thomas.proisl@fau.de"},
+  {name = "Peter Uhrig"}
+]
+maintainers = [
+  {name = "Thomas Proisl", email = "thomas.proisl@fau.de"}
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Natural Language :: German",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Text Processing :: Linguistic",
+]
+
+dependencies = [
+  "regex>=2019.02.18",
+]
+
+[project.urls]
+homepage = "https://github.com/tsproisl/SoMaJo"
+
+[project.scripts]
+somajo-tokenizer = "somajo.cli:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"somajo.data" = ["*.txt"]
