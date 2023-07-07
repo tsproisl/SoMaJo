@@ -1,19 +1,19 @@
-# SoMaJo #
+# SoMaJo
 
 [![PyPI](https://img.shields.io/pypi/v/SoMaJo)](https://pypi.org/project/SoMaJo/)
 [![Build](https://github.com/tsproisl/SoMaJo/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/tsproisl/SoMaJo/actions/workflows/test.yml?query=branch%3Amaster)
 
-  * [Introduction](#introduction)
-  * [Installation](#installation)
-  * [Usage](#usage)
-      * [Using the somajo-tokenizer executable](#using-the-somajo-tokenizer-executable)
-      * [Using the module](#using-the-module)
-  * [Evaluation](#evaluation)
-  * [Tokenizing English text](#tokenizing-english-text)
-  * [References](#references)
+  - [Introduction](#introduction)
+  - [Installation](#installation)
+  - [Usage](#usage)
+      - [Using the somajo-tokenizer executable](#using-the-somajo-tokenizer-executable)
+      - [Using the module](#using-the-module)
+  - [Evaluation](#evaluation)
+  - [Tokenizing English text](#tokenizing-english-text)
+  - [References](#references)
 
 
-## Introduction ##
+## Introduction
 
 SoMaJo is a state-of-the-art tokenizer and sentence splitter for
 German and English web and social media texts. It won the [EmpiriST
@@ -71,11 +71,11 @@ media texts:
     somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 
 
-## Installation ##
+## Installation
 
 SoMaJo can be easily installed using pip (pip3 in some distributions):
 
-    pip install SoMaJo
+    pip install -U SoMaJo
 
 Alternatively, you can download and decompress the [latest
 release](https://github.com/tsproisl/SoMaJo/releases/latest) or clone
@@ -85,10 +85,10 @@ the git repository:
 
 In the new directory, run the following command:
 
-    python3 setup.py install
+    pip install -U .
 
 
-## Usage ##
+## Usage
 
 ### Using the somajo-tokenizer executable
 
@@ -151,7 +151,7 @@ table.
     somajo-tokenizer --xml --split_sentences --tag h1 --tag p --tag div <xml-file>
 
 
-### Using the module ###
+### Using the module
 
 You can easily incorporate SoMaJo into your own Python projects. All
 you need to do is importing `somajo.SoMaJo`, creating a `SoMaJo`
@@ -164,9 +164,10 @@ or chunks of XML. Every tokenized chunk of text is a list of `Token`
 objects.
 
 For more details, take a look at the [API
-documentation](doc/build/markdown/somajo.md).
+documentation](https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md).
 
-Here is an example for tokenizing and sentence splitting two paragraphs:
+Here is an example for tokenizing and sentence splitting two
+paragraphs:
 
 ```python
 from somajo import SoMaJo
@@ -196,7 +197,8 @@ for sentence in sentences:
     print()
 ```
 
-For processing XML data, use the `tokenize_xml` or `tokenize_xml_file` methods:
+For processing XML data, use the `tokenize_xml` or `tokenize_xml_file`
+methods:
 
 ```python
 eos_tags = ["title", "h1", "p"]
@@ -214,7 +216,7 @@ for sentence in sentences:
     print()
 ```
 
-## Evaluation ##
+## Evaluation
 
 SoMaJo was the system with the highest average F₁ score in the
 EmpiriST 2015 shared task. The performance of the current version on
@@ -228,7 +230,7 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 | Web    | 99.91     | 99.92  | 99.91 |
 
 
-## Tokenizing English text ##
+## Tokenizing English text
 
 Starting with version 1.8.0, SoMaJo can also tokenize English text. In
 general, we follow the “new” Penn Treebank conventions described, for
@@ -258,24 +260,26 @@ Performance of the English tokenizer:
 | English Web Treebank | 99.66     | 99.64  | 99.65 |
 
 
-## References ##
+## References
 
-  * Proisl, Thomas, Peter Uhrig (2016): “SoMaJo: State-of-the-art
-    tokenization for German web and social media texts.” In:
-    Proceedings of the 10th Web as Corpus Workshop (WAC-X) and the
-    EmpiriST Shared Task. Berlin: Association for Computational
-    Linguistics (ACL), 57–62.
-    [PDF](http://aclweb.org/anthology/W16-2607).
-
-	```bibtex
+  - Proisl, Thomas, and Peter Uhrig. 2016. “SoMaJo: State-of-the-Art
+    Tokenization for German Web and Social Media Texts.” In
+    *Proceedings of the 10th Web as Corpus Workshop (WAC-X) and the
+    EmpiriST Shared Task*, edited by Paul Cook, Stefan Evert, Roland
+    Schäfer, and Egon Stemle, 57–62. Berlin: Association for
+    Computational Linguistics. <https://doi.org/10.18653/v1/W16-2607>.
+    
+    ```bibtex
     @InProceedings{Proisl_Uhrig_EmpiriST:2016,
       author    = {Proisl, Thomas and Uhrig, Peter},
       title     = {{SoMaJo}: {S}tate-of-the-art tokenization for {G}erman web and social media texts},
-      booktitle = {Proceedings of the 10th {W}eb as {C}orpus Workshop ({WAC-X}) and the {EmpiriST} Shared Task},
       year      = {2016},
+      booktitle = {Proceedings of the 10th {W}eb as {C}orpus Workshop ({WAC-X}) and the {EmpiriST} Shared Task},
+      editor    = {Cook, Paul and Evert, Stefan and Schäfer, Roland and Stemle, Egon},
       address   = {Berlin},
-      publisher = {Association for Computational Linguistics ({ACL})},
+      publisher = {Association for Computational Linguistics},
       pages     = {57--62},
+      doi       = {10.18653/v1/W16-2607},
       url       = {http://aclweb.org/anthology/W16-2607},
     }
-	```
+    ```
