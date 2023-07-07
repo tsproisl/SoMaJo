@@ -10,6 +10,7 @@
       - [Using the module](#using-the-module)
   - [Evaluation](#evaluation)
   - [Tokenizing English text](#tokenizing-english-text)
+  - [Development](#development)
   - [References](#references)
 
 
@@ -259,6 +260,41 @@ Performance of the English tokenizer:
 |----------------------|-----------|--------|-------|
 | English Web Treebank | 99.66     | 99.64  | 99.65 |
 
+
+## Development
+
+Here are some brief notes to help you get started:
+
+  - Preferably create a dedicated virtual environment.
+  - Make sure you have pip ≥ 21.3.
+  - Install the project in editable mode:
+    
+    ```sh
+    pip install -U -e .     
+    ```
+  - Install the development dependencies:
+    
+    ```sh
+    pip install -r requirements_dev.txt
+    ```
+  - To run the tests:
+    
+    ```sh
+    python3 -m unittest discover
+    ```
+  - To build the documentation:
+    
+    ```sh
+    cd doc
+    make markdown
+    ```
+    Note that the created markdown is not perfect and needs some
+    manual postprocessing.
+  - To build the distribution files:
+    
+    ```sh
+    python3 -m build
+    ```
 
 ## References
 
