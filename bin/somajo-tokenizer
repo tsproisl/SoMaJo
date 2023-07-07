@@ -1,7 +1,0 @@
-#!/usr/bin/env python3
-
-import somajo.cli
-
-
-if __name__ == "__main__":
-    somajo.cli.main()
