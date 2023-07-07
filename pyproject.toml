@@ -16,10 +16,9 @@ description = "A tokenizer and sentence splitter for German and English web and 
 readme = "README.md"
 requires-python = ">=3.8"
 license = {file = "LICENSE.txt"}
-keywords = ["tokenization", "sentence splitting"]
+keywords = ["tokenizer", "sentence-splitter"]
 authors = [
-  {name = "Thomas Proisl", email = "thomas.proisl@fau.de"},
-  {name = "Peter Uhrig"}
+  {name = "Thomas Proisl, Peter Uhrig", email = "thomas.proisl@fau.de"}
 ]
 maintainers = [
   {name = "Thomas Proisl", email = "thomas.proisl@fau.de"}
@@ -42,7 +41,8 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = "https://github.com/tsproisl/SoMaJo"
+"Homepage" = "https://github.com/tsproisl/SoMaJo"
+"API documentation" = "https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md"
 
 [project.scripts]
 somajo-tokenizer = "somajo.cli:main"
