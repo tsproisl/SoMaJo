@@ -29,7 +29,7 @@ class Token:
 
     """
 
-    token_classes = set([
+    token_classes = {
         "URL",
         "XML_entity",
         "XML_tag",
@@ -48,7 +48,7 @@ class Token:
         "semester",
         "symbol",
         "time",
-    ])
+    }
 
     def __init__(self, text, *, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
         self.text = text

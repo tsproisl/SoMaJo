@@ -21,11 +21,11 @@ class SentenceSplitter():
         self.closing_punct = re.compile(r"^(?:['\"\p{Pf}\p{Pe}])$")
         # International quotes: «» “” ‹› ‘’
         # German quotes: »« „“ ›‹ ‚‘
-        self.problematic_quotes = set(['"'])
+        self.problematic_quotes = {'"'}
         if language == "de" or language == "de_CMC":
             # German opening quotes [»›] have category Pf
             # German closing quotes [“‘«‹] have category Pi
-            self.problematic_quotes = set(['"', "»", "«", "›", "‹", "“", "‘"])
+            self.problematic_quotes = {'"', "»", "«", "›", "‹", "“", "‘"}
         self.eos_abbreviations = utils.read_abbreviation_file("eos_abbreviations.txt")
         # We match these via regular expressions because users could
         # call the split or split_xml methods with pretokenized input

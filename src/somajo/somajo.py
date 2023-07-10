@@ -31,9 +31,9 @@ class SoMaJo:
 
     """
 
-    supported_languages = set(["de_CMC", "en_PTB"])
+    supported_languages = {"de_CMC", "en_PTB"}
     _default_language = "de_CMC"
-    paragraph_separators = set(["empty_lines", "single_newlines"])
+    paragraph_separators = {"empty_lines", "single_newlines"}
     _default_parsep = "empty_lines"
 
     def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None):
