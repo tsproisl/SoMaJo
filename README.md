@@ -270,7 +270,7 @@ Here are some brief notes to help you get started:
   - Install the project in editable mode:
     
     ```sh
-    pip install -U -e .     
+    pip install -U -e .
     ```
   - Install the development dependencies:
     
