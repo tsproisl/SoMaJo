@@ -195,6 +195,9 @@ class TestMisc(TestSentenceSplitter):
     def test_misc_23(self):
         self._equal("Auf drei Schiffen des III. Geschwaders", ["Auf drei Schiffen des III. Geschwaders"])
 
+    def test_misc_24(self):
+        self._equal("Am Ende dieses Satzes steht 12.03.2023. Am Ende dieses Satzes steht 12.03.2023.", ["Am Ende dieses Satzes steht 12. 03. 2023 .", "Am Ende dieses Satzes steht 12. 03. 2023 ."])
+
 
 class TestMiscEnglish(TestSentenceSplitterEnglish):
     """"""

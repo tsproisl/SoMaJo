@@ -277,10 +277,10 @@ class Tokenizer():
         self.underline = re.compile(r"(?<!\w)(?P<left>_)(?P<middle>\w[^_]+\w)(?P<right>_)(?!\w)")
 
         # DATE, TIME, NUMBERS
-        self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?![\d.])', re.VERBOSE)
-        self.three_part_date_dmy = re.compile(r'(?<![\d.]) (?P<a_day>(?:0?[1-9]|1[0-9]|2[0-9]|3[01])([./-])) (?P<b_month>(?:0?[1-9]|1[0-2])\2) (?P<c_year>(?:\d\d){1,2}) (?![\d.])', re.VERBOSE)
-        self.three_part_date_mdy = re.compile(r'(?<![\d.]) (?P<a_month>(?:0?[1-9]|1[0-2])([./-])) (?P<b_day>(?:0?[1-9]|1[0-9]|2[0-9]|3[01])\2) (?P<c_year>(?:\d\d){1,2}) (?![\d.])', re.VERBOSE)
-        self.two_part_date = re.compile(r'(?<![\d.]) (?P<a_day_or_month>\d{1,2}([./-])) (?P<b_day_or_month>\d{1,2}\2) (?![\d.])', re.VERBOSE)
+        self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?!\d)', re.VERBOSE)
+        self.three_part_date_dmy = re.compile(r'(?<![\d.]) (?P<a_day>(?:0?[1-9]|1[0-9]|2[0-9]|3[01])([./-])) (?P<b_month>(?:0?[1-9]|1[0-2])\2) (?P<c_year>(?:\d\d){1,2}) (?!\d)', re.VERBOSE)
+        self.three_part_date_mdy = re.compile(r'(?<![\d.]) (?P<a_month>(?:0?[1-9]|1[0-2])([./-])) (?P<b_day>(?:0?[1-9]|1[0-9]|2[0-9]|3[01])\2) (?P<c_year>(?:\d\d){1,2}) (?!\d)', re.VERBOSE)
+        self.two_part_date = re.compile(r'(?<![\d.]) (?P<a_day_or_month>\d{1,2}([./-])) (?P<b_day_or_month>\d{1,2}\2) (?!\d)', re.VERBOSE)
         self.time = re.compile(r'(?<!\w)\d{1,2}(?:(?::\d{2}){1,2}){1,2}(?![\d:])')
         self.en_time = re.compile(r'(?<![\w])(?P<a_time>\d{1,2}(?:(?:[.:]\d{2})){0,2}) ?(?P<b_am_pm>(?:[ap]m\b|[ap]\.m\.(?!\w)))', re.IGNORECASE)
         self.en_us_phone_number = re.compile(r"(?<![\d-])(?:[2-9]\d{2}[/-])?\d{3}-\d{4}(?![\d-])")

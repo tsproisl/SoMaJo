@@ -950,6 +950,9 @@ class TestPunctuation(TestTokenizer):
     def test_punctuation_72(self):
         self._equal("Punkte 2-4. Das System", "Punkte 2 - 4 . Das System")
 
+    def test_punctuation_73(self):
+        self._equal("Am Ende dieses Satzes steht 12.03.2023.", "Am Ende dieses Satzes steht 12. 03. 2023 .")
+
 
 class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_01(self):
