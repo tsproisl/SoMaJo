@@ -1033,7 +1033,6 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_25(self):
         self._equal("name [at] provider [dot] com", ["name[at]provider[dot]com"])
 
-    @unittest.expectedFailure
     def test_emails_urls_26(self):
         self._equal("link: [https://one_link.com](https://other_link.com).", "link : [ https://one_link.com ] ( https://other_link.com ) .")
 
