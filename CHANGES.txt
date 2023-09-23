@@ -1,6 +1,6 @@
 # CHANGELOG #
 
-## Version ?.?.?, ??? ##
+## Version 2.3.1, 2023-09-23 ##
 
 - Fix issue #26 (markdown links that contain a URL in the link text).
 
