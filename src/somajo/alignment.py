@@ -2,6 +2,8 @@
 
 import unicodedata
 
+import regex as re
+
 
 def align_nfc(nfc, orig):
     """Character alignment from NFC version to original string."""
@@ -27,3 +29,17 @@ def align_nfc(nfc, orig):
         orig_i = orig_j
     assert orig_j == len(orig)
     return alignment
+
+
+def token_offsets(tokens, raw):
+    """Determine start and end positions of tokens in the original raw (NFC) input."""
+    offsets = []
+    raw_i = 0
+    for token in tokens:
+        pattern = ".*?(" + ".*?".join([re.escape(c) for c in token.text]) + ")"
+        m = re.search(pattern, raw, pos=raw_i)
+        assert m
+        start, end = m.span(1)
+        offsets.append((start, end))
+        raw_i = end
+    return offsets
