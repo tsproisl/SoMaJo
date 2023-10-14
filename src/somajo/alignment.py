@@ -36,7 +36,10 @@ def token_offsets(tokens, raw):
     offsets = []
     raw_i = 0
     for token in tokens:
-        pattern = ".*?(" + ".*?".join([re.escape(c) for c in token.text]) + ")"
+        text = token.text
+        if token.original_spelling is not None:
+            text = token.original_spelling
+        pattern = ".*?(" + ".*?".join([re.escape(c) for c in text]) + ")"
         m = re.search(pattern, raw, pos=raw_i)
         assert m
         start, end = m.span(1)
