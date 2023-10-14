@@ -623,10 +623,11 @@ class Tokenizer():
 
         """
         for t in token_dll:
-            if t.value.markup or t.value._locked:
-                continue
             # convert to Unicode normal form C (NFC)
             t.value.text = unicodedata.normalize("NFC", t.value.text)
+        for t in token_dll:
+            if t.value.markup or t.value._locked:
+                continue
             # normalize whitespace
             t.value.text = self.spaces.sub(" ", t.value.text)
             # get rid of control characters
