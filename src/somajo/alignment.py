@@ -46,3 +46,52 @@ def token_offsets(tokens, raw):
         offsets.append((start, end))
         raw_i = end
     return offsets
+
+
+def token_offsets_xml(tokens, raw, tokenizer):
+    """Determine start and end positions of tokens in the original raw
+    (NFC) input. Account for XML entities.
+    """
+    offsets = []
+    raw_i = 0
+    skip_pattern = "|".join([r"\s", "\uFE0F", tokenizer.controls.pattern, tokenizer.other_nasties.pattern])
+    skip = re.compile(skip_pattern)
+    for token in tokens:
+        text = token.text
+        if token.original_spelling is not None:
+            text = token.original_spelling
+        # print(text)
+        start, end = None, None
+        for i, char in enumerate(text):
+            while True:
+                # print(char, raw_i, raw[raw_i])
+                if char == raw[raw_i]:
+                    s = raw_i
+                    raw_i += 1
+                    e = raw_i
+                    break
+                elif ((char == "'") or (char == '"')) and ((raw[raw_i] == "'") or (raw[raw_i] == '"')):
+                    s = raw_i
+                    raw_i += 1
+                    e = raw_i
+                    break
+                elif raw[raw_i] == "&":
+                    # TODO: process_entities(text, i, raw, raw_i)
+                    s = raw_i
+                    while raw[raw_i] != ";":
+                        raw_i += 1
+                    raw_i += 1
+                    e = raw_i
+                    entity = raw[s:e]
+                    break
+                elif skip.match(raw[raw_i]):
+                    raw_i += 1
+                    continue
+                else:
+                    raise ValueError(f"Cannot find char {char} from {text} in {raw[raw_i:raw_i + 20]}...")
+            if i == 0:
+                start = s
+            elif i == len(text) - 1:
+                end = e
+        offsets.append((start, end))
+    return offsets

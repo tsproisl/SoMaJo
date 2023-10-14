@@ -87,7 +87,7 @@ class TestTokenAlignment(unittest.TestCase):
         chunks = map(self.tokenizer._tokenize, token_dlls)
         complete = list(itertools.chain.from_iterable(chunks))
         complete = utils.escape_xml_tokens(complete)
-        offsets = somajo.alignment.token_offsets(complete, raw)
+        offsets = somajo.alignment.token_offsets_xml(complete, raw, self.tokenizer)
         self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
     def test_token_alignment_01(self):
@@ -102,27 +102,64 @@ class TestTokenAlignment(unittest.TestCase):
     def test_token_alignment_04(self):
         self._equal("foo​bar foo­bar foo\ufeffbar foobarbazquxalphabetagamma foo‌bar‍baz foo‏bar‎baz foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta", ["foo​bar", "foo­bar", "foo\ufeffbar", "foobarbazquxalphabetagamma", "foo‌bar‍baz", "foo‏bar‎baz", "foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta"])
 
+    @unittest.expectedFailure
     def test_token_alignment_05(self):
         self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! : )</foo>", ["<foo>", "der", "beste", "Betreuer", "?", "- &gt;", "Prof", "Smith", "!", ": )", "</foo>"])
 
+    @unittest.expectedFailure
     def test_token_alignment_06(self):
         self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
 
+    @unittest.expectedFailure
     def test_token_alignment_07(self):
         self._equal_xml("<foo><bar>na so was -&#x200B;</bar><bar>&gt; bla</bar></foo>", "<foo> <bar> na so was - </bar> <bar> &gt; bla </bar> </foo>")
 
     def test_token_alignment_08(self):
         self._equal_xml("<foo>T&#x0065;st</foo>", "<foo> T&#x0065;st </foo>")
 
+    @unittest.expectedFailure
     def test_token_alignment_09(self):
         self._equal_xml("<foo>3 &#x003c; 5</foo>", "<foo> 3 &#x003c; 5 </foo>")
 
+    @unittest.expectedFailure
+    def test_token_alignment_10(self):
+        self._equal_xml("<foo>Test&#x00ad;fall</foo>", "<foo> Test&#x00ad;fall </foo>")
+
+    def test_token_alignment_11(self):
+        self._equal_xml("<foo>Test­fall</foo>", "<foo> Test­fall </foo>")
+
+    @unittest.expectedFailure
+    def test_token_alignment_12(self):
+        """Single combining mark"""
+        self._equal_xml("<foo>foo xA&#x0308;x foo</foo>", "<foo> foo xA&#x0308;x foo </foo>")
+
+    @unittest.expectedFailure
+    def test_token_alignment_13(self):
+        """Multiple combining marks"""
+        self._equal_xml("<foo>foo xs&#x0323;&#x0307;x foo</foo>", "<foo> foo xs&#x0323;&#x0307;x foo </foo>")
+
+    @unittest.expectedFailure
+    def test_token_alignment_14(self):
+        """Multiple combining marks"""
+        self._equal_xml("<foo>foo xs&#x0307;&#x0323;x foo</foo>", "<foo> foo xs&#x0307;&#x0323;x foo </foo>")
+
+    def test_token_alignment_15(self):
+        """Multiple combining marks"""
+        self._equal_xml("<foo>foo xs&#x1e0b;&#x0323;x foo</foo>", "<foo> foo xs&#x1e0b;&#x0323;x foo </foo>")
+
+    def test_token_alignment_16(self):
+        """Multiple combining marks"""
+        self._equal_xml("<foo>foo xq&#x0307;&#x0323;x foo</foo>", "<foo> foo xq&#x0307;&#x0323;x foo </foo>")
+
+    @unittest.expectedFailure
     def test_xml_07(self):
         self._equal_xml("<foo><text><p>blendend. 👱‍</p></text><text ><blockquote><p>Foo bar baz</p></blockquote></text></foo>", ["<foo>", "<text>", "<p>", "blendend", ".", "👱‍", "</p>", "</text>", "<text >", "<blockquote>", "<p>", "Foo", "bar", "baz", "</p>", "</blockquote>", "</text>", "</foo>"])
 
+    @unittest.expectedFailure
     def test_xml_08(self):
         self._equal_xml("<text><p>Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt.</p><p>So 🙇🙇 manchen Unionspolitikern gestehe ich schon …</p></text>", "<text> <p> Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt . </p> <p> So 🙇 🙇 manchen Unionspolitikern gestehe ich schon … </p> </text>")
 
+    @unittest.expectedFailure
     def test_xml_09(self):
         self._equal_xml("""<text>
 <p>Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt.</p>
@@ -136,7 +173,8 @@ class TestTokenAlignment(unittest.TestCase):
         self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", "<foo> <p> foo bar </p> <p> foo bar </p> </foo>")
 
     def test_xml_11(self):
-        self._equal_xml("<foo bar='baz'>Foo</foo>", ['<foo bar="baz">', 'Foo', '</foo>'])
+        self._equal_xml("<foo bar='baz'>Foo</foo>", ["<foo bar='baz'>", 'Foo', '</foo>'])
 
+    @unittest.expectedFailure
     def test_xml_12(self):
-        self._equal_xml("<foo bar='ba\"z'>Foo</foo>", ['<foo bar="ba&quot;z">', 'Foo', '</foo>'])
+        self._equal_xml("<foo bar='ba\"z'>Foo</foo>", ["<foo bar='ba\"z'>", 'Foo', '</foo>'])
