@@ -31,7 +31,7 @@ def align_nfc(nfc, orig):
     return alignment
 
 
-def token_offsets(tokens, raw):
+def token_offsets(tokens, raw, resolve_xml_entities=False):
     """Determine start and end positions of tokens in the original raw (NFC) input."""
     offsets = []
     raw_i = 0
@@ -39,6 +39,8 @@ def token_offsets(tokens, raw):
         text = token.text
         if token.original_spelling is not None:
             text = token.original_spelling
+        if resolve_xml_entities:
+            text, align_to_text = resolve_entities(text)
         pattern = ".*?(" + ".*?".join([re.escape(c) for c in text]) + ")"
         m = re.search(pattern, raw, pos=raw_i)
         assert m
@@ -46,6 +48,32 @@ def token_offsets(tokens, raw):
         offsets.append((start, end))
         raw_i = end
     return offsets
+
+
+def resolve_entities(xml):
+    entity = re.compile(r"&(?:#\d+|#x[0-9a-f]+|amp|apos|gt|lt|quot);", re.I)
+    named = {"&amp;": "&", "&apos;": "'", "&gt;": ">", "&lt;": "<", "&quot;": '"'}
+    outstring = ""
+    alignment = []
+    xml = xml.lower()
+    i = 0
+    for m in entity.finditer(xml):
+        start, end = m.span()
+        if xml[start + 2] == "x":
+            char = chr(int(xml[start + 3:end - 1], base=16))
+        elif xml[start + 1] == "#":
+            char = chr(int(xml[start + 2:end - 1]))
+        else:
+            char = named[xml[start:end]]
+        outstring += xml[i:start] + char
+        for j in range(i, start):
+            alignment.append((j, j + 1))
+        alignment.append((start, end))
+        i = end
+    outstring += xml[i:len(xml)]
+    for j in range(i, len(xml)):
+        alignment.append((j, j + 1))
+    return outstring, alignment
 
 
 def token_offsets_xml(tokens, raw, tokenizer):
@@ -56,42 +84,14 @@ def token_offsets_xml(tokens, raw, tokenizer):
     raw_i = 0
     skip_pattern = "|".join([r"\s", "\uFE0F", tokenizer.controls.pattern, tokenizer.other_nasties.pattern])
     skip = re.compile(skip_pattern)
-    for token in tokens:
-        text = token.text
-        if token.original_spelling is not None:
-            text = token.original_spelling
-        # print(text)
-        start, end = None, None
-        for i, char in enumerate(text):
-            while True:
-                # print(char, raw_i, raw[raw_i])
-                if char == raw[raw_i]:
-                    s = raw_i
-                    raw_i += 1
-                    e = raw_i
-                    break
-                elif ((char == "'") or (char == '"')) and ((raw[raw_i] == "'") or (raw[raw_i] == '"')):
-                    s = raw_i
-                    raw_i += 1
-                    e = raw_i
-                    break
-                elif raw[raw_i] == "&":
-                    # TODO: process_entities(text, i, raw, raw_i)
-                    s = raw_i
-                    while raw[raw_i] != ";":
-                        raw_i += 1
-                    raw_i += 1
-                    e = raw_i
-                    entity = raw[s:e]
-                    break
-                elif skip.match(raw[raw_i]):
-                    raw_i += 1
-                    continue
-                else:
-                    raise ValueError(f"Cannot find char {char} from {text} in {raw[raw_i:raw_i + 20]}...")
-            if i == 0:
-                start = s
-            elif i == len(text) - 1:
-                end = e
-        offsets.append((start, end))
+    # resolve entities
+    raw_entityless, align_to_raw = resolve_entities(raw)
+    # convert to NFC
+    raw_nfc = unicodedata.normalize("NFC", raw_entityless)
+    # align NFC
+    align_to_entityless = align_nfc(raw_nfc, raw_entityless)
+    align_starts = {k[0]: v[0] for k, v in align_to_entityless.items()}
+    align_ends = {k[1]: v[1] for k, v in align_to_entityless.items()}
+    offsets = token_offsets(tokens, raw_nfc, resolve_xml_entities=True)
+    offsets = [(align_to_raw[align_starts[s]][0], align_to_raw[align_ends[e] - 1][1]) for s, e in offsets]
     return offsets
