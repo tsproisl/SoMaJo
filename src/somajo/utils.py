@@ -11,31 +11,35 @@ from somajo.token import Token
 
 def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
+    position = 0
     if paragraph_separator == "single_newlines":
         for line in fh:
             if line.strip() != "":
-                yield line
+                yield line, position
+            position += len(line)
     elif paragraph_separator == "empty_lines":
         paragraph = []
         for line in fh:
             if line.strip() == "":
                 if len(paragraph) > 0:
-                    yield "".join(paragraph)
+                    paragraph_text = "".join(paragraph)
+                    yield paragraph_text, position
                     paragraph = []
+                    position += len(paragraph_text)
             else:
                 paragraph.append(line)
         if len(paragraph) > 0:
-            yield "".join(paragraph)
+            yield "".join(paragraph), position
 
 
 def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
     """Generator for the paragraphs in the file."""
     if isinstance(text_file, str):
         with open(text_file, encoding="utf-8") as fh:
-            for paragraph in get_paragraphs_str(fh, paragraph_separator):
+            for paragraph, position in get_paragraphs_str(fh, paragraph_separator):
                 yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)]
     else:
-        for paragraph in get_paragraphs_str(text_file, paragraph_separator):
+        for paragraph, position in get_paragraphs_str(text_file, paragraph_separator):
             yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)]
 
 

@@ -846,6 +846,7 @@ class Tokenizer():
             if parsep_empty_lines:
                 parsep = "empty_lines"
             paragraphs = utils.get_paragraphs_str(f, paragraph_separator=parsep)
+            paragraphs = (paragraph for paragraph, position in paragraphs)
             tokenized_paragraphs = map(self.tokenize_paragraph, paragraphs)
             for tp in tokenized_paragraphs:
                 if tp:
