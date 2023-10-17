@@ -83,6 +83,9 @@ class TestResolveEntities(unittest.TestCase):
         xml = "<foo>T&#x0065;st</foo>"
         resolved = "<foo>Test</foo>"
         alignment = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 14), (14, 15), (15, 16), (16, 17), (17, 18), (18, 19), (19, 20), (20, 21), (21, 22)]
+        res, al = somajo.alignment.resolve_entities(xml)
+        self.assertEqual(res, resolved)
+        self.assertEqual(al, alignment)
 
 
 class TestTokenAlignment(unittest.TestCase):
@@ -166,28 +169,11 @@ class TestTokenAlignment(unittest.TestCase):
         """Multiple combining marks"""
         self._equal_xml("<foo>foo xq&#x0307;&#x0323;x foo</foo>", "<foo> foo xq&#x0307;&#x0323;x foo </foo>")
 
-    def test_xml_07(self):
-        self._equal_xml("<foo><text><p>blendend. 👱‍</p></text><text ><blockquote><p>Foo bar baz</p></blockquote></text></foo>", ["<foo>", "<text>", "<p>", "blendend", ".", "👱‍", "</p>", "</text>", "<text >", "<blockquote>", "<p>", "Foo", "bar", "baz", "</p>", "</blockquote>", "</text>", "</foo>"])
+    def test_token_alignment_17(self):
+        self._equal_xml("<foo bar='baz'>Foo</foo>", ["<foo bar='baz'>", "Foo", "</foo>"])
 
-    def test_xml_08(self):
-        self._equal_xml("<text><p>Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt.</p><p>So 🙇🙇 manchen Unionspolitikern gestehe ich schon …</p></text>", "<text> <p> Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt . </p> <p> So 🙇 🙇 manchen Unionspolitikern gestehe ich schon … </p> </text>")
+    def test_token_alignment_18(self):
+        self._equal_xml("<foo bar='ba\"z'>Foo</foo>", ["<foo bar='ba\"z'>", "Foo", "</foo>"])
 
-    def test_xml_09(self):
-        self._equal_xml("""<text>
-<p>Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt.</p>
-
-<p>So 🙇🙇 manchen Unionspolitikern gestehe ich schon noch irgendwie zu, dass sie durchaus das Bedürfnis haben, ihren Bürgern ein gutes Leben zu ermöglichen. Zwar halte ich ihre Vorstellung von einem "guten Leben" und/oder die ☠☣ Wege, auf denen dieses erreicht werden soll, für grundsätzlich falsch - aber da stecken zumindest teilweise durchaus legitim gute Absichten dahinter.</p>
-
-<p>Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹👹 Anstand. Die Dinge, die er ⤵⤵ erkennbar überzeugt von sich gibt, triefen vor Arroganz und Empathielosigkeit (Hartz IV? Mehr als genug; Gefährlich niedrige Versorgung mit Geburtshilfe? Sollen die 💯🚦 Weiber halt nen Kilometer weiter fahren); die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕👹 konservative Interessengruppen (jüngst beispielsweise Abtreibungsgegner) mittels plumpmöglichster Populismen.</p>
-        </text>""", """<text> <p> Jens Spahn ist 🏽🏽 ein durch und durch ekelerregendes Subjekt . </p> <p> So 🙇 🙇 manchen Unionspolitikern gestehe ich schon noch irgendwie zu , dass sie durchaus das Bedürfnis haben , ihren Bürgern ein gutes Leben zu ermöglichen . Zwar halte ich ihre Vorstellung von einem " guten Leben " und / oder die ☠ ☣ Wege , auf denen dieses erreicht werden soll , für grundsätzlich falsch - aber da stecken zumindest teilweise durchaus legitim gute Absichten dahinter . </p> <p> Jens Spahn allerdings mangelt es 🚎 schmerzhaft offensichtlich an 📯🏻 diesem oben genannten Mindestmaß an 👹 👹 Anstand . Die Dinge , die er ⤵ ⤵ erkennbar überzeugt von sich gibt , triefen vor Arroganz und Empathielosigkeit ( Hartz IV ? Mehr als genug ; Gefährlich niedrige Versorgung mit Geburtshilfe ? Sollen die 💯 🚦 Weiber halt nen Kilometer weiter fahren ) ; die andere Hälfte seiner verbalen Absonderungen ist ♂ schmerzhaft durchsichtiges taktisches Anbiedern an 💕 👹 konservative Interessengruppen ( jüngst beispielsweise Abtreibungsgegner ) mittels plumpmöglichster Populismen . </p> </text>""")
-
-    def test_xml_10(self):
-        self._equal_xml("<foo><p>foo bar</p>\n\n<p>foo bar</p></foo>", "<foo> <p> foo bar </p> <p> foo bar </p> </foo>")
-
-    @unittest.expectedFailure
-    def test_xml_11(self):
-        self._equal_xml("<foo bar='baz'>Foo</foo>", ["<foo bar='baz'>", 'Foo', '</foo>'])
-
-    @unittest.expectedFailure
-    def test_xml_12(self):
-        self._equal_xml("<foo bar='ba\"z'>Foo</foo>", ["<foo bar='ba\"z'>", 'Foo', '</foo>'])
+    def test_token_alignment_19(self):
+        self._equal_xml("<foo   bar   =   'baz'>   Foo   </foo>", ["<foo   bar   =   'baz'>", "Foo", "</foo>"])

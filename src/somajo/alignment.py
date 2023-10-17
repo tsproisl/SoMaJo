@@ -31,40 +31,21 @@ def align_nfc(nfc, orig):
     return alignment
 
 
-def token_offsets(tokens, raw, resolve_xml_entities=False):
-    """Determine start and end positions of tokens in the original raw (NFC) input."""
-    offsets = []
-    raw_i = 0
-    for token in tokens:
-        text = token.text
-        if token.original_spelling is not None:
-            text = token.original_spelling
-        if resolve_xml_entities:
-            text, align_to_text = resolve_entities(text)
-        pattern = ".*?(" + ".*?".join([re.escape(c) for c in text]) + ")"
-        m = re.search(pattern, raw, pos=raw_i)
-        assert m
-        start, end = m.span(1)
-        offsets.append((start, end))
-        raw_i = end
-    return offsets
-
-
 def resolve_entities(xml):
     entity = re.compile(r"&(?:#\d+|#x[0-9a-f]+|amp|apos|gt|lt|quot);", re.I)
     named = {"&amp;": "&", "&apos;": "'", "&gt;": ">", "&lt;": "<", "&quot;": '"'}
     outstring = ""
     alignment = []
-    xml = xml.lower()
+    xml_lower = xml.lower()
     i = 0
-    for m in entity.finditer(xml):
+    for m in entity.finditer(xml_lower):
         start, end = m.span()
-        if xml[start + 2] == "x":
+        if xml_lower[start + 2] == "x":
             char = chr(int(xml[start + 3:end - 1], base=16))
-        elif xml[start + 1] == "#":
+        elif xml_lower[start + 1] == "#":
             char = chr(int(xml[start + 2:end - 1]))
         else:
-            char = named[xml[start:end]]
+            char = named[xml_lower[start:end]]
         outstring += xml[i:start] + char
         for j in range(i, start):
             alignment.append((j, j + 1))
@@ -76,14 +57,31 @@ def resolve_entities(xml):
     return outstring, alignment
 
 
+def token_offsets(tokens, raw, xml_input=False):
+    """Determine start and end positions of tokens in the original raw (NFC) input."""
+    offsets = []
+    raw_i = 0
+    for token in tokens:
+        text = token.text
+        if token.original_spelling is not None:
+            text = token.original_spelling
+        if xml_input:
+            text, align_to_text = resolve_entities(text)
+            text = text.replace("'", '"')
+            raw = raw.replace("'", '"')
+        pattern = ".*?(" + ".*?".join([re.escape(c) for c in text]) + ")"
+        m = re.search(pattern, raw, pos=raw_i)
+        assert m
+        start, end = m.span(1)
+        offsets.append((start, end))
+        raw_i = end
+    return offsets
+
+
 def token_offsets_xml(tokens, raw, tokenizer):
     """Determine start and end positions of tokens in the original raw
     (NFC) input. Account for XML entities.
     """
-    offsets = []
-    raw_i = 0
-    skip_pattern = "|".join([r"\s", "\uFE0F", tokenizer.controls.pattern, tokenizer.other_nasties.pattern])
-    skip = re.compile(skip_pattern)
     # resolve entities
     raw_entityless, align_to_raw = resolve_entities(raw)
     # convert to NFC
@@ -92,6 +90,6 @@ def token_offsets_xml(tokens, raw, tokenizer):
     align_to_entityless = align_nfc(raw_nfc, raw_entityless)
     align_starts = {k[0]: v[0] for k, v in align_to_entityless.items()}
     align_ends = {k[1]: v[1] for k, v in align_to_entityless.items()}
-    offsets = token_offsets(tokens, raw_nfc, resolve_xml_entities=True)
+    offsets = token_offsets(tokens, raw_nfc, xml_input=True)
     offsets = [(align_to_raw[align_starts[s]][0], align_to_raw[align_ends[e] - 1][1]) for s, e in offsets]
     return offsets
