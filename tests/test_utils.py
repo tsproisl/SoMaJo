@@ -21,10 +21,10 @@ class TestXmlChunkGenerator(unittest.TestCase):
         self._equal("<x><p>foo</p><p>bar</p></x>", [["<x>", "<p>", "foo", "</p>"], ["<p>", "bar", "</p>", "</x>"]])
 
     def test_xml_chunk_generator_03(self):
-        self._equal("<x>\n<p>\nfoo\n</p>\n<p>\nbar\n</p>\n</x>", [["<x>", "<p>", "foo", "</p>"], ["<p>", "bar", "</p>", "</x>"]])
+        self._equal("<x>\n<p>\nfoo\n</p>\n<p>\nbar\n</p>\n</x>", [["<x>", "\n", "<p>", "\nfoo\n", "</p>"], ["\n", "<p>", "\nbar\n", "</p>", "\n", "</x>"]])
 
     def test_xml_chunk_generator_04(self):
-        self._equal("<x>\n  <p>\n    foo\n  </p>\n  <p>\n    bar\n  </p>\n</x>", [["<x>", "  ", "<p>", "    foo  ", "</p>"], ["  ", "<p>", "    bar  ", "</p>", "</x>"]])
+        self._equal("<x>\n  <p>\n    foo\n  </p>\n  <p>\n    bar\n  </p>\n</x>", [["<x>", "\n  ", "<p>", "\n    foo\n  ", "</p>"], ["\n  ", "<p>", "\n    bar\n  ", "</p>", "\n", "</x>"]])
 
     def test_xml_chunk_generator_05(self):
         self._equal("<x><p>foo</p><i>baz</i><p>bar</p><i>baz</i></x>", [["<x>", "<p>", "foo", "</p>"], ["<i>", "baz", "</i>"], ["<p>", "bar", "</p>"], ["<i>", "baz", "</i>", "</x>"]])
@@ -39,4 +39,4 @@ class TestXmlChunkGenerator(unittest.TestCase):
         self._equal("<x><del>foo</del><p>bar</p></x>", [["<x>", "<p>", "bar", "</p>", "</x>"]], prune_tags=["del"])
 
     def test_xml_chunk_generator_09(self):
-        self._equal("<x>bar\n  <del>foo</del>\nbaz</x>", [["<x>", "bar  baz", "</x>"]], prune_tags=["del"])
+        self._equal("<x>bar\n  <del>foo</del>\nbaz</x>", [["<x>", "bar\n  \nbaz", "</x>"]], prune_tags=["del"])

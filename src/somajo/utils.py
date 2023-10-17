@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import io
 import os
 import regex as re
 import xml.sax
@@ -308,7 +309,7 @@ def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None):
             for chunk in _xml_chunk_generator(data, eos_tags, prune_tags):
                 yield chunk
     else:
-        for chunk in _xml_chunk_generator(data.split("\n"), eos_tags, prune_tags):
+        for chunk in _xml_chunk_generator(io.StringIO(data), eos_tags, prune_tags):
             yield chunk
 
 
