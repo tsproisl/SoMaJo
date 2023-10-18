@@ -6,6 +6,7 @@ import regex as re
 import xml.sax
 import xml.sax.saxutils
 
+import somajo.alignment
 from somajo.token import Token
 
 
@@ -110,21 +111,24 @@ def incremental_xml_parser(f, eos_tags=None, prune_tags=None):
     parser = xml.sax.make_parser(["xml.sax.xmlreader.IncrementalParser"])
     handler = SaxTokenHandler(eos_tags, prune_tags)
     parser.setContentHandler(handler)
+    line_buffer = []
     for line in f:
         parser.feed(line)
+        line_buffer.append(line)
         if len(handler.token_list) > 0:
-            yield handler.token_list
+            yield handler.token_list, line_buffer
             handler.token_list = []
+            line_buffer = []
     parser.close()
 
 
-def _xml_chunk_generator(f, eos_tags=None, prune_tags=None):
+def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=False):
     """Parse the XML data and yield doubly linked lists of Token objects
     that are delimited by eos_tags.
 
     """
     non_whitespace = re.compile(r"\S")
-    token_lists = incremental_xml_parser(f, eos_tags, prune_tags)
+    token_and_line_lists = incremental_xml_parser(f, eos_tags, prune_tags)
     current = []
     bos, eos = True, False
     lexical_tokens = 0
@@ -249,8 +253,19 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None):
                       +----------------------+
 """
     del algo_dot, algo_sketch
-    for token_list in token_lists:
+    input_buffer = ""
+    output_buffer = []
+    position = 0
+    for token_list, line_list in token_and_line_lists:
+        if character_offsets:
+            input_buffer += "".join(line_list)
         for token in token_list:
+            if character_offsets:
+                token_end = somajo.alignment.pretoken_offsets_xml([token], input_buffer)[0][1]
+            else:
+                token_end = 0
+            output_buffer.append(input_buffer[:token_end])
+            input_buffer = input_buffer[token_end:]
             if token.markup:
                 # markup
                 if token.markup_eos:
@@ -263,11 +278,15 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None):
                         eos = False
                         if lexical_tokens > 0:
                             # remove trailing opening tags from current
-                            temp_list = []
+                            temp_list, temp_output_buffer = [], []
                             while current[-1].markup_class == "start" or (not non_whitespace.search(current[-1].text)):
                                 temp_list.append(current.pop())
-                            yield current
+                                temp_output_buffer.append(output_buffer.pop())
+                            raw_xml = "".join(output_buffer)
+                            yield current, raw_xml, position
                             current = temp_list[::-1]
+                            output_buffer = temp_output_buffer[::-1]
+                            position += len(raw_xml)
                             lexical_tokens = 0
                     elif token.markup_class == "end":
                         eos = True
@@ -275,8 +294,11 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None):
                     if eos and token.markup_class == "start":
                         eos = False
                         if lexical_tokens > 0:
-                            yield current
+                            raw_xml = "".join(output_buffer)
+                            yield current, raw_xml, position
                             current = []
+                            output_buffer = []
+                            position += len(raw_xml)
                             lexical_tokens = 0
             else:
                 # non-markup
@@ -287,8 +309,11 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None):
                     if eos:
                         eos = False
                         if lexical_tokens > 0:
-                            yield current
+                            raw_xml = "".join(output_buffer)
+                            yield current, raw_xml, position
                             current = []
+                            output_buffer = []
+                            position += len(raw_xml)
                             lexical_tokens = 0
                     if bos:
                         bos = False
@@ -296,10 +321,11 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None):
                         lexical_tokens += 1
             current.append(token)
     if len(current) > 0:
-        yield current
+        raw_xml = "".join(output_buffer)
+        yield current, raw_xml, position
 
 
-def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None):
+def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None, character_offsets=False):
     """Parse the XML data and yield doubly linked lists of Token objects
     that are delimited by eos_tags.
 
@@ -307,13 +333,13 @@ def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None):
     if is_file:
         if isinstance(data, str):
             with open(data, encoding="utf-8") as f:
-                for chunk in _xml_chunk_generator(f, eos_tags, prune_tags):
+                for chunk, raw_xml, position in _xml_chunk_generator(f, eos_tags, prune_tags, character_offsets):
                     yield chunk
         else:
-            for chunk in _xml_chunk_generator(data, eos_tags, prune_tags):
+            for chunk, raw_xml, position in _xml_chunk_generator(data, eos_tags, prune_tags, character_offsets):
                 yield chunk
     else:
-        for chunk in _xml_chunk_generator(io.StringIO(data), eos_tags, prune_tags):
+        for chunk, raw_xml, position in _xml_chunk_generator(io.StringIO(data), eos_tags, prune_tags, character_offsets):
             yield chunk
 
 

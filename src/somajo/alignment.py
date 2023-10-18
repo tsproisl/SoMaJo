@@ -57,6 +57,14 @@ def resolve_entities(xml):
     return outstring, alignment
 
 
+def pretoken_offsets_xml(tokens, raw):
+    # resolve entities
+    raw_entityless, align_to_raw = resolve_entities(raw)
+    offsets = token_offsets(tokens, raw_entityless, xml_input=True)
+    offsets = [(align_to_raw[s][0], align_to_raw[e][1]) for s, e in offsets]
+    return offsets
+
+
 def token_offsets(tokens, raw, xml_input=False):
     """Determine start and end positions of tokens in the original raw (NFC) input."""
     offsets = []
@@ -78,7 +86,7 @@ def token_offsets(tokens, raw, xml_input=False):
     return offsets
 
 
-def token_offsets_xml(tokens, raw, tokenizer):
+def token_offsets_xml(tokens, raw):
     """Determine start and end positions of tokens in the original raw
     (NFC) input. Account for XML entities.
     """

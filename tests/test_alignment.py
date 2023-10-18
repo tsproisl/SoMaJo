@@ -113,7 +113,7 @@ class TestTokenAlignment(unittest.TestCase):
         chunks = map(self.tokenizer._tokenize, token_dlls)
         complete = list(itertools.chain.from_iterable(chunks))
         complete = utils.escape_xml_tokens(complete)
-        offsets = somajo.alignment.token_offsets_xml(complete, raw, self.tokenizer)
+        offsets = somajo.alignment.token_offsets_xml(complete, raw)
         self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
     def test_token_alignment_01(self):
