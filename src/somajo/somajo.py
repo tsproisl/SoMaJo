@@ -78,6 +78,23 @@ class SoMaJo:
             tokens = self._sentence_splitter._add_xml_tags(tokens, s_tag=self.xml_sentences)
         return tokens
 
+    def _tokenize_text(self, token_info, parallel):
+        tokens = self._parallel_tokenize(token_info, parallel=parallel)
+        if self.xml_sentences:
+            tokens = map(utils.escape_xml_tokens, tokens)
+        return tokens
+
+    def _tokenize_xml(self, xml_data, is_file, eos_tags, strip_tags, parallel, prune_tags):
+        if eos_tags is not None:
+            eos_tags = set(eos_tags)
+        if prune_tags is not None:
+            prune_tags = set(prune_tags)
+        token_lists = utils.xml_chunk_generator(xml_data, is_file, eos_tags=eos_tags, prune_tags=prune_tags)
+        tokens = self._parallel_tokenize(token_lists, parallel=parallel, strip_tags=strip_tags)
+        if not (strip_tags and self.xml_sentences is None):
+            tokens = map(utils.escape_xml_tokens, tokens)
+        return tokens
+
     def tokenize_text_file(self, text_file, paragraph_separator, *, parallel=1):
         """Split the contents of a text file into sequences of tokens.
 
@@ -157,10 +174,7 @@ class SoMaJo:
         """
         assert paragraph_separator in self.paragraph_separators
         token_lists = utils.get_paragraphs_list(text_file, paragraph_separator)
-        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
-        if self.xml_sentences:
-            tokens = map(utils.escape_xml_tokens, tokens)
-        return tokens
+        return self._tokenize_text(token_lists, parallel)
 
     def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1, prune_tags=None):
         """Split the contents of an xml file into sequences of tokens.
@@ -284,15 +298,14 @@ class SoMaJo:
         </html>
 
         """
-        if eos_tags is not None:
-            eos_tags = set(eos_tags)
-        if prune_tags is not None:
-            prune_tags = set(prune_tags)
-        token_lists = utils.xml_chunk_generator(xml_file, is_file=True, eos_tags=eos_tags, prune_tags=prune_tags)
-        tokens = self._parallel_tokenize(token_lists, parallel=parallel, strip_tags=strip_tags)
-        if not (strip_tags and self.xml_sentences is None):
-            tokens = map(utils.escape_xml_tokens, tokens)
-        return tokens
+        return self._tokenize_xml(
+            xml_file,
+            is_file=True,
+            eos_tags=eos_tags,
+            strip_tags=strip_tags,
+            parallel=parallel,
+            prune_tags=prune_tags
+        )
 
     def tokenize_text(self, paragraphs, *, parallel=1):
         """Split paragraphs of text into sequences of tokens.
@@ -396,10 +409,7 @@ class SoMaJo:
         if isinstance(paragraphs, str):
             raise TypeError("``paragraphs`` must be an iterable of strings, not a string!")
         token_lists = ([Token(p, first_in_sentence=True, last_in_sentence=True)] for p in paragraphs)
-        tokens = self._parallel_tokenize(token_lists, parallel=parallel)
-        if self.xml_sentences:
-            tokens = map(utils.escape_xml_tokens, tokens)
-        return tokens
+        return self._tokenize_text(token_lists, parallel)
 
     def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1, prune_tags=None):
         """Split a string of XML data into sequences of tokens.
@@ -534,12 +544,11 @@ class SoMaJo:
         </html>
 
         """
-        if eos_tags is not None:
-            eos_tags = set(eos_tags)
-        if prune_tags is not None:
-            prune_tags = set(prune_tags)
-        token_lists = utils.xml_chunk_generator(xml_data, is_file=False, eos_tags=eos_tags, prune_tags=prune_tags)
-        tokens = self._parallel_tokenize(token_lists, parallel=parallel, strip_tags=strip_tags)
-        if not (strip_tags and self.xml_sentences is None):
-            tokens = map(utils.escape_xml_tokens, tokens)
-        return tokens
+        return self._tokenize_xml(
+            xml_data,
+            is_file=False,
+            eos_tags=eos_tags,
+            strip_tags=strip_tags,
+            parallel=parallel,
+            prune_tags=prune_tags
+        )
