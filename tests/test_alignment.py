@@ -112,7 +112,6 @@ class TestTokenAlignment(unittest.TestCase):
         token_dlls = map(DLL, token_lists)
         chunks = map(self.tokenizer._tokenize, token_dlls)
         complete = list(itertools.chain.from_iterable(chunks))
-        complete = utils.escape_xml_tokens(complete)
         offsets = somajo.alignment.token_offsets_xml(complete, raw)
         self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
@@ -177,3 +176,6 @@ class TestTokenAlignment(unittest.TestCase):
 
     def test_token_alignment_19(self):
         self._equal_xml("<foo   bar   =   'baz'>   Foo   </foo>", ["<foo   bar   =   'baz'>", "Foo", "</foo>"])
+
+    def test_token_alignment_20(self):
+        self._equal_xml("<foo bar='ba\"z'>Foo \"Bar\" 'Baz'</foo>", ["<foo bar='ba\"z'>", "Foo", '"', "Bar", '"', "'", "Baz", "'", "</foo>"])

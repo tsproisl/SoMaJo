@@ -65,20 +65,21 @@ def pretoken_offsets_xml(tokens, raw):
     return offsets
 
 
-def token_offsets(tokens, raw, xml_input=False):
+def token_offsets(tokens, raw):
     """Determine start and end positions of tokens in the original raw (NFC) input."""
     offsets = []
     raw_i = 0
     for token in tokens:
         text = token.text
+        local_raw = raw
         if token.original_spelling is not None:
             text = token.original_spelling
-        if xml_input:
+        if token.markup:
             text, align_to_text = resolve_entities(text)
             text = text.replace("'", '"')
-            raw = raw.replace("'", '"')
+            local_raw = raw.replace("'", '"')
         pattern = ".*?(" + ".*?".join([re.escape(c) for c in text]) + ")"
-        m = re.search(pattern, raw, pos=raw_i)
+        m = re.search(pattern, local_raw, pos=raw_i)
         assert m
         start, end = m.span(1)
         offsets.append((start, end))
@@ -98,6 +99,6 @@ def token_offsets_xml(tokens, raw):
     align_to_entityless = align_nfc(raw_nfc, raw_entityless)
     align_starts = {k[0]: v[0] for k, v in align_to_entityless.items()}
     align_ends = {k[1]: v[1] for k, v in align_to_entityless.items()}
-    offsets = token_offsets(tokens, raw_nfc, xml_input=True)
+    offsets = token_offsets(tokens, raw_nfc)
     offsets = [(align_to_raw[align_starts[s]][0], align_to_raw[align_ends[e] - 1][1]) for s, e in offsets]
     return offsets
