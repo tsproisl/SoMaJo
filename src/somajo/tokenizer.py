@@ -7,9 +7,11 @@ import unicodedata
 
 import regex as re
 
-from somajo import doubly_linked_list
-from somajo import utils
-from somajo.token import Token
+from . import (
+    doubly_linked_list,
+    utils
+)
+from .token import Token
 
 
 class Tokenizer():

@@ -6,8 +6,8 @@ import regex as re
 import xml.sax
 import xml.sax.saxutils
 
-import somajo.alignment
-from somajo.token import Token
+from . import alignment
+from .token import Token
 
 
 def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
@@ -261,7 +261,7 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=Fa
             input_buffer += "".join(line_list)
         for token in token_list:
             if character_offsets:
-                token_end = somajo.alignment.pretoken_offsets_xml([token], input_buffer)[0][1]
+                token_end = alignment.pretoken_offsets_xml([token], input_buffer)[0][1]
             else:
                 token_end = 0
             output_buffer.append(input_buffer[:token_end])

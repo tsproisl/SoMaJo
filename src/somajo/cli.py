@@ -4,8 +4,10 @@ import argparse
 import logging
 import time
 
-from somajo import SoMaJo
-from somajo import __version__
+from . import (
+    SoMaJo,
+    __version__
+)
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 

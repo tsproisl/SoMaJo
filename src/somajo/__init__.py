@@ -1,8 +1,10 @@
 import importlib.metadata
 
-from somajo import tokenizer
-from somajo import sentence_splitter
-from somajo import somajo
+from . import (
+    sentence_splitter,
+    somajo,
+    tokenizer
+)
 
 __version__ = importlib.metadata.version(__package__ or __name__)
 

@@ -3,9 +3,11 @@
 import collections
 import regex as re
 
-from somajo import doubly_linked_list
-from somajo import token
-from somajo import utils
+from . import (
+    doubly_linked_list,
+    token,
+    utils
+)
 
 
 class SentenceSplitter():

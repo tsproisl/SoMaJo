@@ -4,11 +4,14 @@ import functools
 import itertools
 import multiprocessing
 
-from somajo import doubly_linked_list
-from somajo import utils
-from somajo.sentence_splitter import SentenceSplitter
-from somajo.token import Token
-from somajo.tokenizer import Tokenizer
+from . import (
+    alignment,
+    doubly_linked_list,
+    utils
+)
+from .sentence_splitter import SentenceSplitter
+from .token import Token
+from .tokenizer import Tokenizer
 
 
 class SoMaJo:
