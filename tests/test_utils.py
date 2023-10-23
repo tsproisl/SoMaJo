@@ -10,9 +10,10 @@ class TestXmlChunkGenerator(unittest.TestCase):
         eos_tags = set(["p"])
         if prune_tags is not None:
             prune_tags = set(prune_tags)
-        gen_chunks = list(utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags, prune_tags=prune_tags))
-        gen_chunks = [[t.text for t in gc] for gc in gen_chunks]
-        self.assertEqual(gen_chunks, chunks)
+        chunk_info = list(utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags, prune_tags=prune_tags))
+        chunk_lists = (ci[0] for ci in chunk_info)
+        chunk_lists = [[t.text for t in gc] for gc in chunk_lists]
+        self.assertEqual(chunk_lists, chunks)
 
     def test_xml_chunk_generator_01(self):
         self._equal("<x>foo bar</x>", [["<x>", "foo bar", "</x>"]])

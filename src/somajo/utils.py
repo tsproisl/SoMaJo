@@ -38,10 +38,10 @@ def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
     if isinstance(text_file, str):
         with open(text_file, encoding="utf-8") as fh:
             for paragraph, position in get_paragraphs_str(fh, paragraph_separator):
-                yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)]
+                yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)], paragraph, position
     else:
         for paragraph, position in get_paragraphs_str(text_file, paragraph_separator):
-            yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)]
+            yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)], paragraph, position
 
 
 def read_abbreviation_file(filename, to_lower=False):
@@ -334,13 +334,13 @@ def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None, char
         if isinstance(data, str):
             with open(data, encoding="utf-8") as f:
                 for chunk, raw_xml, position in _xml_chunk_generator(f, eos_tags, prune_tags, character_offsets):
-                    yield chunk
+                    yield chunk, raw_xml, position
         else:
             for chunk, raw_xml, position in _xml_chunk_generator(data, eos_tags, prune_tags, character_offsets):
-                yield chunk
+                yield chunk, raw_xml, position
     else:
         for chunk, raw_xml, position in _xml_chunk_generator(io.StringIO(data), eos_tags, prune_tags, character_offsets):
-            yield chunk
+            yield chunk, raw_xml, position
 
 
 def escape_xml(string):

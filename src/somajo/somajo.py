@@ -3,6 +3,7 @@
 import functools
 import itertools
 import multiprocessing
+import unicodedata
 
 from . import (
     alignment,
@@ -32,6 +33,9 @@ class SoMaJo:
         this might lead to minor changes to the original tags to
         guarantee well-formed output (tags might need to be closed and
         re-opened at sentence boundaries).
+    character_offsets : bool, (default=False)
+        Compute for each token the character offsets in the input.
+        This allows for stand-off tokenization.
 
     """
 
@@ -40,12 +44,13 @@ class SoMaJo:
     paragraph_separators = {"empty_lines", "single_newlines"}
     _default_parsep = "empty_lines"
 
-    def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None):
+    def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None, character_offsets=False):
         assert language in self.supported_languages
         self.language = language
         self.split_camel_case = split_camel_case
         self.split_sentences = split_sentences
         self.xml_sentences = xml_sentences
+        self.character_offsets = character_offsets
         self._tokenizer = Tokenizer(split_camel_case=self.split_camel_case, language=self.language)
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
@@ -58,9 +63,23 @@ class SoMaJo:
         # align nfc
         # tokenize
         # find character offsets
-        token_list = token_info
+        token_list, raw, position = token_info
         token_dll = doubly_linked_list.DLL(token_list)
         tokens = self._tokenizer._tokenize(token_dll)
+        if self.character_offsets:
+            if xml_input:
+                raw, align_to_entities = alignment.resolve_entities(raw)
+            raw_nfc = unicodedata.normalize("NFC", raw)
+            align_to_raw = alignment.align_nfc(raw_nfc, raw)
+            align_starts = {k[0]: v[0] for k, v in align_to_raw.items()}
+            align_ends = {k[1]: v[1] for k, v in align_to_raw.items()}
+            offsets = alignment.token_offsets(tokens, raw_nfc)
+            offsets = [(align_to_raw[align_starts[s]][0], align_to_raw[align_ends[e] - 1][1]) for s, e in offsets]
+            if xml_input:
+                offsets = [(align_to_entities[s][0], align_to_entities[e][1]) for s, e in offsets]
+            assert len(tokens) == len(offsets)
+            for i in range(len(tokens)):
+                tokens[i].character_offset = offsets[i]
         if self.split_sentences:
             tokens = self._sentence_splitter._split_sentences(tokens)
         return tokens
@@ -107,7 +126,13 @@ class SoMaJo:
             eos_tags = set(eos_tags)
         if prune_tags is not None:
             prune_tags = set(prune_tags)
-        token_info = utils.xml_chunk_generator(xml_data, is_file, eos_tags=eos_tags, prune_tags=prune_tags)
+        token_info = utils.xml_chunk_generator(
+            xml_data,
+            is_file,
+            eos_tags=eos_tags,
+            prune_tags=prune_tags,
+            character_offsets=self.character_offsets
+        )
         tokens = self._parallel_tokenize(token_info, parallel=parallel, strip_tags=strip_tags, xml_input=True)
         if not (strip_tags and self.xml_sentences is None):
             tokens = map(utils.escape_xml_tokens, tokens)
@@ -191,8 +216,8 @@ class SoMaJo:
 
         """
         assert paragraph_separator in self.paragraph_separators
-        token_lists = utils.get_paragraphs_list(text_file, paragraph_separator)
-        return self._tokenize_text(token_lists, parallel)
+        token_info = utils.get_paragraphs_list(text_file, paragraph_separator)
+        return self._tokenize_text(token_info, parallel)
 
     def tokenize_xml_file(self, xml_file, eos_tags, *, strip_tags=False, parallel=1, prune_tags=None):
         """Split the contents of an xml file into sequences of tokens.
@@ -426,8 +451,8 @@ class SoMaJo:
         """
         if isinstance(paragraphs, str):
             raise TypeError("``paragraphs`` must be an iterable of strings, not a string!")
-        token_lists = ([Token(p, first_in_sentence=True, last_in_sentence=True)] for p in paragraphs)
-        return self._tokenize_text(token_lists, parallel)
+        token_info = (([Token(p, first_in_sentence=True, last_in_sentence=True)], p, 0) for p in paragraphs)
+        return self._tokenize_text(token_info, parallel)
 
     def tokenize_xml(self, xml_data, eos_tags, *, strip_tags=False, parallel=1, prune_tags=None):
         """Split a string of XML data into sequences of tokens.

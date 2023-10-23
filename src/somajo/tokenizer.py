@@ -847,7 +847,8 @@ class Tokenizer():
             parsep = "single_newlines"
             if parsep_empty_lines:
                 parsep = "empty_lines"
-            paragraphs = utils.get_paragraphs_str(f, paragraph_separator=parsep)
+            paragraph_info = utils.get_paragraphs_str(f, paragraph_separator=parsep)
+            paragraphs = (pi[0] for pi in paragraph_info)
             paragraphs = (paragraph for paragraph, position in paragraphs)
             tokenized_paragraphs = map(self.tokenize_paragraph, paragraphs)
             for tp in tokenized_paragraphs:
@@ -873,7 +874,9 @@ class Tokenizer():
 
         """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
-        token_dlls = map(doubly_linked_list.DLL, utils.xml_chunk_generator(xml, is_file, eos_tags))
+        chunk_info = utils.xml_chunk_generator(xml, is_file, eos_tags)
+        chunk_lists = (ci[0] for ci in chunk_info)
+        token_dlls = map(doubly_linked_list.DLL, chunk_lists)
         tokens = map(self._tokenize, token_dlls)
         tokens = map(utils.escape_xml_tokens, tokens)
         tokens = map(self._convert_to_legacy, tokens)

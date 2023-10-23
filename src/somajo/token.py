@@ -50,7 +50,7 @@ class Token:
         "time",
     }
 
-    def __init__(self, text, *, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False):
+    def __init__(self, text, *, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False, character_offset=None):
         self.text = text
         if markup:
             assert markup_class is not None
@@ -72,6 +72,7 @@ class Token:
         self.original_spelling = original_spelling
         self.first_in_sentence = first_in_sentence
         self.last_in_sentence = last_in_sentence
+        self.character_offset = character_offset
 
     def __str__(self):
         return self.text
