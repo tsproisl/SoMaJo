@@ -82,7 +82,9 @@ class TestResolveEntities(unittest.TestCase):
     def test_entities_02(self):
         xml = "<foo>T&#x0065;st</foo>"
         resolved = "<foo>Test</foo>"
-        alignment = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6), (6, 14), (14, 15), (15, 16), (16, 17), (17, 18), (18, 19), (19, 20), (20, 21), (21, 22)]
+        alignment = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6),
+                     (6, 14), (14, 15), (15, 16), (16, 17), (17, 18),
+                     (18, 19), (19, 20), (20, 21), (21, 22)]
         res, al = somajo.alignment.resolve_entities(xml)
         self.assertEqual(res, resolved)
         self.assertEqual(al, alignment)
@@ -180,3 +182,8 @@ class TestTokenAlignment(unittest.TestCase):
 
     def test_token_alignment_20(self):
         self._equal_xml("<foo bar='ba\"z'>Foo \"Bar\" 'Baz'</foo>", ["<foo bar='ba\"z'>", "Foo", '"', "Bar", '"', "'", "Baz", "'", "</foo>"])
+
+
+# :\n)
+# <foo bar="baz"\nspam="eggs">
+# <br/>

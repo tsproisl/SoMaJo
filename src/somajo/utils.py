@@ -260,12 +260,6 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=Fa
         if character_offsets:
             input_buffer += "".join(line_list)
         for token in token_list:
-            if character_offsets:
-                token_end = alignment.pretoken_offsets_xml([token], input_buffer)[0][1]
-            else:
-                token_end = 0
-            output_buffer.append(input_buffer[:token_end])
-            input_buffer = input_buffer[token_end:]
             if token.markup:
                 # markup
                 if token.markup_eos:
@@ -319,6 +313,15 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=Fa
                         bos = False
                         token.first_in_sentence = True
                         lexical_tokens += 1
+            if character_offsets:
+                token_start, token_end = alignment.pretoken_offset_xml(token, input_buffer)
+                if token.markup:
+                    len_output_buffer = sum(len(o) for o in output_buffer)
+                    token.character_offset = (token_start + position + len_output_buffer, token_end + position + len_output_buffer)
+            else:
+                token_end = 0
+            output_buffer.append(input_buffer[:token_end])
+            input_buffer = input_buffer[token_end:]
             current.append(token)
     if len(current) > 0:
         raw_xml = "".join(output_buffer)
