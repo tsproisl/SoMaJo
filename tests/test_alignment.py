@@ -101,7 +101,7 @@ class TestTokenAlignment(unittest.TestCase):
             tokenized = tokenized.split()
         dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
         tokens = self.tokenizer._tokenize(dll)
-        offsets = somajo.alignment.token_offsets(tokens, raw)
+        offsets = somajo.alignment.token_offsets(tokens, raw, position=0)
         self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
     def _equal_xml(self, raw, tokenized):

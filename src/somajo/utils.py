@@ -38,10 +38,10 @@ def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
     if isinstance(text_file, str):
         with open(text_file, encoding="utf-8") as fh:
             for paragraph, position in get_paragraphs_str(fh, paragraph_separator):
-                yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)], paragraph, position
+                yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True, character_offset=(position, position + len(paragraph)))], paragraph, position
     else:
         for paragraph, position in get_paragraphs_str(text_file, paragraph_separator):
-            yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True)], paragraph, position
+            yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True, character_offset=(position, position + len(paragraph)))], paragraph, position
 
 
 def read_abbreviation_file(filename, to_lower=False):

@@ -5,17 +5,27 @@ import unicodedata
 import regex as re
 
 
+ranges = [
+    (0x0000, 0x001F),
+    (0x007F, 0x009F),
+    (0x2000, 0x200A),           # whitespace
+    (0x200B, 0x200F),
+    (0x202A, 0x202E),
+    (0x2066, 0x2069)
+]
+single_characters = ["\u00AD", "\u061C", "\u2060", "\uFEFF", "\uFE0F"]
+whitespace = [" ", "\u00A0", "\u1680", "\u2028", "\u2029", "\u202F", "\u205F", "\u3000"]
+skipable_characters = set(single_characters + whitespace + [chr(i) for start, end in ranges for i in range(start, end + 1)])
+
+
 def align_nfc(nfc, orig):
     """Character alignment from NFC version to original string."""
-    assert len(nfc) <= len(orig), f"len({nfc}) > len({orig})"
     alignment = {}
     if nfc == "":
         assert orig == ""
         return alignment
     nfc_i, nfc_j = 0, 0
     orig_i, orig_j = 0, 0
-    assert unicodedata.combining(nfc[0]) == 0
-    assert unicodedata.combining(orig[0]) == 0
     while nfc_j < len(nfc):
         nfc_j = nfc_i + 1
         while (nfc_j < len(nfc)) and (unicodedata.combining(nfc[nfc_j]) > 0):
@@ -23,7 +33,7 @@ def align_nfc(nfc, orig):
         orig_j = orig_i + 1
         while (orig_j < len(orig)) and (unicodedata.combining(orig[orig_j]) > 0):
             orig_j += 1
-        # assert nfc[nfc_i:nfc_j] == unicodedata.normalize("NFC", orig[orig_i:orig_j])
+        assert nfc[nfc_i:nfc_j] == unicodedata.normalize("NFC", orig[orig_i:orig_j])
         alignment[(nfc_i, nfc_j)] = (orig_i, orig_j)
         nfc_i = nfc_j
         orig_i = orig_j
@@ -66,24 +76,26 @@ def pretoken_offset_xml(token, raw):
     if token.markup:
         text, align_to_text = resolve_entities(text)
         text = text.replace("'", '"')
-        pattern = "(" + re.escape(text) + ")"
-        pattern = pattern.replace(r"\ ", r"\s+")
-        pattern = pattern.replace("=", r"\s*=\s*")
-        if not text.startswith("</"):
-            pattern = pattern[:-2] + r"\s*/?\s*" + pattern[-2:]
-        local_raw = raw.replace("'", '"')
-        m = re.match(pattern, local_raw)
-        if text.startswith("</") and not m:
-            start, end = 0, 0
+        if raw.startswith(text):
+            start = 0
+            end = len(text)
         else:
-            assert m, f"'{text}' not found in '{local_raw}'"
-            start, end = m.span(1)
+            pattern = "(" + re.escape(text) + ")"
+            pattern = pattern.replace(r"\ ", r"\s+")
+            pattern = pattern.replace("=", r"\s*=\s*")
+            if not text.startswith("</"):
+                pattern = pattern[:-2] + r"\s*/?\s*" + pattern[-2:]
+            local_raw = raw.replace("'", '"')
+            m = re.match(pattern, local_raw)
+            if text.startswith("</") and not m:
+                start, end = 0, 0
+            else:
+                assert m, f"'{text}' not found in '{local_raw}'"
+                start, end = m.span(1)
     else:
         assert raw.startswith(text), f"'{raw}' does not start with '{text}'"
-        pattern = "(" + re.escape(text) + ")"
-        m = re.search(pattern, raw)
-        assert m, f"'{text}' not found in '{raw}'"
-        start, end = m.span(1)
+        start = 0
+        end = len(text)
     if start == end:
         return (align_to_raw[start][0], align_to_raw[start][0])
     else:
@@ -92,8 +104,6 @@ def pretoken_offset_xml(token, raw):
 
 def token_offsets(tokens, raw, position):
     """Determine start and end positions of tokens in the original raw (NFC) input."""
-    skipable_characters = r"[\s\u0000-\u001F\u007F-\u009F\u00AD\u061C\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF\uFE0F]*?"
-    # skipable_characters = r".*?"
     offsets = []
     raw_i = 0
     raw = re.sub(r"\s", " ", raw)
@@ -106,24 +116,19 @@ def token_offsets(tokens, raw, position):
             start, end = token.character_offset
             start -= position
             end -= position
-            # text, align_to_text = resolve_entities(text)
-            # text = text.replace("'", '"')
-            # pattern = skipable_characters + "(" + skipable_characters.join([re.escape(c) for c in text])
-            # if not text.startswith("</"):
-            #     pattern = pattern[:-1] + "/??" + skipable_characters + pattern[-1]
-            # pattern += ")"
-            # local_raw = raw.replace("'", '"')
-            # m = re.search(pattern, local_raw, pos=raw_i)
-            # if text.startswith("</") and not m:
-            #     start, end = raw_i, raw_i
-            # else:
-            #     assert m, f"'{text}' not found in '{local_raw[raw_i:]}'"
-            #     start, end = m.span(1)
         else:
-            pattern = skipable_characters + "(" + skipable_characters.join([re.escape(c) for c in text]) + ")"
-            m = re.search(pattern, raw, pos=raw_i)
-            assert m, f"'{text}' not found in '{raw[raw_i:]}'\n{[ord(c) for c in text]} not found in {[ord(c) for c in raw[raw_i:]]}"
-            start, end = m.span(1)
+            raw_start = raw_i
+            for i, char in enumerate(text):
+                for j in range(raw_start, len(raw)):
+                    if raw[j] == char:
+                        if i == 0:
+                            start = j
+                        if i == len(text) - 1:
+                            end = j + 1
+                        break
+                    else:
+                        assert raw[j] in skipable_characters, f"'{raw[j]}' ({hex(ord(raw[j]))}) not a skipable character; token: '{text}', raw: '{raw[raw_i:]}'"
+                raw_start = j + 1
         offsets.append((start, end))
         raw_i = end
     return offsets

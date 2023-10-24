@@ -44,7 +44,7 @@ class SoMaJo:
     paragraph_separators = {"empty_lines", "single_newlines"}
     _default_parsep = "empty_lines"
 
-    def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None, character_offsets=True):
+    def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None, character_offsets=False):
         assert language in self.supported_languages
         self.language = language
         self.split_camel_case = split_camel_case
@@ -66,57 +66,37 @@ class SoMaJo:
         token_list, raw, position = token_info
         token_dll = doubly_linked_list.DLL(token_list)
         tokens = self._tokenizer._tokenize(token_dll)
-        print([t.text for t in tokens])
-        print(raw)
         if self.character_offsets:
             if xml_input:
-                # print(len(raw), raw)
+                chunk_offsets = [(t.markup, t.character_offset[0] - position, t.character_offset[1] - position) for t in token_list]
                 raw, align_to_entities = alignment.resolve_entities(raw)
-                align_from_entities = {i: v for v, k in enumerate(align_to_entities) for i in range(k[0], k[1])}
-                # print(raw)
-                # print(align_to_entities)
-                last = 0
-                chunks = []
-                for end in [t.character_offset[1] for t in tokens if t.markup]:
-                    end -= position
-                    # print(end, len(align_to_entities))
-                    end = align_from_entities[end - 1] + 1
-                    # print(end)
-                    chunks.append(raw[last:end])
-                    # print((last, end))
-                    last = end
-                if last != len(raw):
-                    chunks.append(raw[last:len(raw)])
-                chunks = [unicodedata.normalize("NFC", c) for c in chunks]
-                raw_nfc = "".join(chunks)
+                align_from_entities = {i: char_i for char_i, (start, end) in enumerate(align_to_entities) for i in range(start, end)}
+                chunks = [raw[align_from_entities[start]:align_from_entities[end - 1] + 1] for markup, start, end in chunk_offsets]
+                chunks_nfc = [unicodedata.normalize("NFC", c) for c in chunks]
+                alignments = [alignment.align_nfc(chunk_nfc, chunk) for chunk, chunk_nfc in zip(chunks, chunks_nfc)]
+                align_to_raw = alignments[0]
+                for i in range(1, len(alignments)):
+                    o1 = sum(len(c) for c in chunks_nfc[:i])
+                    o2 = sum(len(c) for c in chunks[:i])
+                    align_to_raw.update({(k[0] + o1, k[1] + o1): (v[0] + o2, v[1] + o2) for k, v in alignments[i].items()})
+                raw_nfc = "".join(chunks_nfc)
             else:
                 raw_nfc = unicodedata.normalize("NFC", raw)
-            align_to_raw = alignment.align_nfc(raw_nfc, raw)
+                align_to_raw = alignment.align_nfc(raw_nfc, raw)
             align_from_raw = {i: k for k, v in align_to_raw.items() for i in range(v[0], v[1])}
             # align_starts = {k[0]: v[0] for k, v in align_to_raw.items()}
             # align_ends = {k[1]: v[1] for k, v in align_to_raw.items()}
             align_to_starts = {i: v[0] for k, v in align_to_raw.items() for i in range(k[0], k[1])}
             align_to_ends = {i: v[1] for k, v in align_to_raw.items() for i in range(k[0], k[1])}
-            # print(align_to_starts)
-            # print(align_to_ends)
-            print(align_from_entities)
-            print(align_from_raw)
             for i in range(len(tokens)):
                 if tokens[i].markup:
                     s, e = tokens[i].character_offset
-                    print(s, e)
                     s -= position
                     e -= position
-                    print(s, e)
                     tokens[i].character_offset = (align_from_raw[align_from_entities[s]][0] + position, align_from_raw[align_from_entities[e - 1]][1] + position)
             offsets = alignment.token_offsets(tokens, raw_nfc, position)
             assert len(tokens) == len(offsets)
-            # print(offsets)
-            # print(align_to_raw)
-            # print(align_to_starts)
-            # print(align_to_ends)
             offsets = [(align_to_starts[s], align_to_ends[e - 1]) for s, e in offsets]
-            # print(offsets)
             if xml_input:
                 offsets = [(align_to_entities[s][0], align_to_entities[e - 1][1]) for s, e in offsets]
             for i in range(len(tokens)):
