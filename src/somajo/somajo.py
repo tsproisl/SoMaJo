@@ -3,7 +3,6 @@
 import functools
 import itertools
 import multiprocessing
-import unicodedata
 
 from . import (
     alignment,

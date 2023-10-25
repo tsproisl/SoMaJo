@@ -26,6 +26,10 @@ class Token:
         Is it the first token of a sentence?
     last_in_sentence : bool, (default=False)
         Is it the last token of a sentence?
+    character_offset : tuple, (default=None)
+        Character offset of the token in the input as tuple `(start, end)`
+        such that `input[start:end] == text` (if there are no changes to
+        the token text during tokenization)
 
     """
 
@@ -50,19 +54,33 @@ class Token:
         "time",
     }
 
-    def __init__(self, text, *, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False, character_offset=None):
+    def __init__(
+            self,
+            text,
+            *,
+            markup=False,
+            markup_class=None,
+            markup_eos=None,
+            locked=False,
+            token_class=None,
+            space_after=True,
+            original_spelling=None,
+            first_in_sentence=False,
+            last_in_sentence=False,
+            character_offset=None
+    ):
         self.text = text
         if markup:
-            assert markup_class is not None
-            assert markup_eos is not None
+            assert markup_class is not None, "You need to specify a `markup_class` for markup tokens."
+            assert markup_eos is not None, "You need to provide a value for `markup_eos` for markup tokens."
         if markup_class is not None:
-            assert markup
-            assert markup_class == "start" or markup_class == "end"
+            assert markup, "You can only specify a `markup_class` for markup tokens."
+            assert markup_class == "start" or markup_class == "end", f"'{markup_class}' is not a recognized markup class."
         if markup_eos is not None:
-            assert markup
-            assert isinstance(markup_eos, bool)
+            assert markup, "You can only use `markup_eos` for markup tokens."
+            assert isinstance(markup_eos, bool), f"'{markup_eos}' is not a Boolean value."
         if token_class is not None:
-            assert token_class in self.token_classes, f"'{token_class}' is not a recognized token class"
+            assert token_class in self.token_classes, f"'{token_class}' is not a recognized token class."
         self.markup = markup
         self.markup_class = markup_class
         self.markup_eos = markup_eos

@@ -90,7 +90,7 @@ class TestResolveEntities(unittest.TestCase):
         self.assertEqual(al, alignment)
 
 
-class TestTokenAlignment(unittest.TestCase):
+class TestDetermineOffsets(unittest.TestCase):
     def setUp(self):
         """Necessary preparations"""
         self.tokenizer = Tokenizer(split_camel_case=True, language="de_CMC")
@@ -102,20 +102,6 @@ class TestTokenAlignment(unittest.TestCase):
         dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
         tokens = self.tokenizer._tokenize(dll)
         offsets = somajo.alignment._determine_offsets(tokens, raw, position=0)
-        self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
-
-    def _equal_xml(self, raw, tokenized):
-        raw = unicodedata.normalize("NFC", raw)
-        if isinstance(tokenized, str):
-            tokenized = tokenized.split()
-        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
-        eos_tags = set(eos_tags)
-        chunk_info = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags, character_offsets=True)
-        chunk_lists = [ci[0] for ci in chunk_info]
-        token_dlls = map(DLL, chunk_lists)
-        chunks = map(self.tokenizer._tokenize, token_dlls)
-        complete = list(itertools.chain.from_iterable(chunks))
-        offsets = somajo.alignment.token_offsets(list(itertools.chain.from_iterable(chunk_lists)), raw, 0, True, complete)
         self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
     def test_token_alignment_01(self):
@@ -135,6 +121,22 @@ class TestTokenAlignment(unittest.TestCase):
             "foo​bar foo­bar foo\ufeffbar foobarbazquxalphabetagamma foo‌bar‍baz foo‏bar‎baz foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta",
             ["foo​bar", "foo­bar", "foo\ufeffbar", "foobarbazquxalphabetagamma", "foo‌bar‍baz", "foo‏bar‎baz", "foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta"]
         )
+
+
+class TestTokenOffsets(unittest.TestCase):
+    def _equal_xml(self, raw, tokenized):
+        raw = unicodedata.normalize("NFC", raw)
+        if isinstance(tokenized, str):
+            tokenized = tokenized.split()
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        eos_tags = set(eos_tags)
+        chunk_info = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags, character_offsets=True)
+        chunk_lists = [ci[0] for ci in chunk_info]
+        token_dlls = map(DLL, chunk_lists)
+        chunks = map(self.tokenizer._tokenize, token_dlls)
+        complete = list(itertools.chain.from_iterable(chunks))
+        offsets = somajo.alignment.token_offsets(list(itertools.chain.from_iterable(chunk_lists)), raw, 0, True, complete)
+        self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
     def test_token_alignment_05(self):
         self._equal_xml(
