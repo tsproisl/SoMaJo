@@ -17,49 +17,49 @@ class TestNfcAlignment(unittest.TestCase):
         orig = "xÅx"
         nfc = unicodedata.normalize("NFC", orig)
         alignment = {(0, 1): (0, 1), (1, 2): (1, 2), (2, 3): (2, 3)}
-        self.assertEqual(somajo.alignment.align_nfc(nfc, orig), alignment)
+        self.assertEqual(somajo.alignment._align_nfc(nfc, orig), alignment)
 
     def test_nfc_02(self):
         """Single combining mark"""
         orig = "xA\u0308x"
         nfc = unicodedata.normalize("NFC", orig)
         alignment = {(0, 1): (0, 1), (1, 2): (1, 3), (2, 3): (3, 4)}
-        self.assertEqual(somajo.alignment.align_nfc(nfc, orig), alignment)
+        self.assertEqual(somajo.alignment._align_nfc(nfc, orig), alignment)
 
     def test_nfc_03(self):
         """Multiple combining marks"""
         orig = "xs\u0323\u0307x"
         nfc = unicodedata.normalize("NFC", orig)
         alignment = {(0, 1): (0, 1), (1, 2): (1, 4), (2, 3): (4, 5)}
-        self.assertEqual(somajo.alignment.align_nfc(nfc, orig), alignment)
+        self.assertEqual(somajo.alignment._align_nfc(nfc, orig), alignment)
 
     def test_nfc_04(self):
         """Multiple combining marks"""
         orig = "xs\u0307\u0323x"
         nfc = unicodedata.normalize("NFC", orig)
         alignment = {(0, 1): (0, 1), (1, 2): (1, 4), (2, 3): (4, 5)}
-        self.assertEqual(somajo.alignment.align_nfc(nfc, orig), alignment)
+        self.assertEqual(somajo.alignment._align_nfc(nfc, orig), alignment)
 
     def test_nfc_05(self):
         """Multiple combining marks"""
         orig = "x\u1e0b\u0323x"
         nfc = unicodedata.normalize("NFC", orig)
         alignment = {(0, 1): (0, 1), (1, 3): (1, 3), (3, 4): (3, 4)}
-        self.assertEqual(somajo.alignment.align_nfc(nfc, orig), alignment)
+        self.assertEqual(somajo.alignment._align_nfc(nfc, orig), alignment)
 
     def test_nfc_06(self):
         """Multiple combining marks"""
         orig = "q\u0307\u0323x"
         nfc = unicodedata.normalize("NFC", orig)
         alignment = {(0, 3): (0, 3), (3, 4): (3, 4)}
-        self.assertEqual(somajo.alignment.align_nfc(nfc, orig), alignment)
+        self.assertEqual(somajo.alignment._align_nfc(nfc, orig), alignment)
 
     def test_nfc_07(self):
         """Empty string"""
         orig = ""
         nfc = unicodedata.normalize("NFC", orig)
         alignment = {}
-        self.assertEqual(somajo.alignment.align_nfc(nfc, orig), alignment)
+        self.assertEqual(somajo.alignment._align_nfc(nfc, orig), alignment)
 
 
 class TestResolveEntities(unittest.TestCase):
@@ -75,7 +75,7 @@ class TestResolveEntities(unittest.TestCase):
                      (45, 46), (46, 47), (47, 51), (51, 52), (52, 53),
                      (53, 54), (54, 55), (55, 56), (56, 57), (57, 58),
                      (58, 59), (59, 60), (60, 61)]
-        res, al = somajo.alignment.resolve_entities(xml)
+        res, al = somajo.alignment._resolve_entities(xml)
         self.assertEqual(res, resolved)
         self.assertEqual(al, alignment)
 
@@ -85,7 +85,7 @@ class TestResolveEntities(unittest.TestCase):
         alignment = [(0, 1), (1, 2), (2, 3), (3, 4), (4, 5), (5, 6),
                      (6, 14), (14, 15), (15, 16), (16, 17), (17, 18),
                      (18, 19), (19, 20), (20, 21), (21, 22)]
-        res, al = somajo.alignment.resolve_entities(xml)
+        res, al = somajo.alignment._resolve_entities(xml)
         self.assertEqual(res, resolved)
         self.assertEqual(al, alignment)
 
@@ -101,7 +101,7 @@ class TestTokenAlignment(unittest.TestCase):
             tokenized = tokenized.split()
         dll = DLL([Token(raw, first_in_sentence=True, last_in_sentence=True)])
         tokens = self.tokenizer._tokenize(dll)
-        offsets = somajo.alignment.token_offsets(tokens, raw, position=0)
+        offsets = somajo.alignment._determine_offsets(tokens, raw, position=0)
         self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
     def _equal_xml(self, raw, tokenized):
@@ -110,12 +110,12 @@ class TestTokenAlignment(unittest.TestCase):
             tokenized = tokenized.split()
         eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
         eos_tags = set(eos_tags)
-        chunk_info = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags)
-        chunk_lists = (ci[0] for ci in chunk_info)
+        chunk_info = utils.xml_chunk_generator(raw, is_file=False, eos_tags=eos_tags, character_offsets=True)
+        chunk_lists = [ci[0] for ci in chunk_info]
         token_dlls = map(DLL, chunk_lists)
         chunks = map(self.tokenizer._tokenize, token_dlls)
         complete = list(itertools.chain.from_iterable(chunks))
-        offsets = somajo.alignment.token_offsets_xml(complete, raw)
+        offsets = somajo.alignment.token_offsets(list(itertools.chain.from_iterable(chunk_lists)), raw, 0, True, complete)
         self.assertEqual([raw[s:e] for s, e in offsets], tokenized)
 
     def test_token_alignment_01(self):
@@ -127,11 +127,20 @@ class TestTokenAlignment(unittest.TestCase):
     def test_token_alignment_03(self):
         self._equal("foo (bar) baz?", "foo ( bar ) baz ?")
 
+    def test_token_alignment_03a(self):
+        self._equal("foo:\n) bar", ["foo", ":\n)", "bar"])
+
     def test_token_alignment_04(self):
-        self._equal("foo​bar foo­bar foo\ufeffbar foobarbazquxalphabetagamma foo‌bar‍baz foo‏bar‎baz foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta", ["foo​bar", "foo­bar", "foo\ufeffbar", "foobarbazquxalphabetagamma", "foo‌bar‍baz", "foo‏bar‎baz", "foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta"])
+        self._equal(
+            "foo​bar foo­bar foo\ufeffbar foobarbazquxalphabetagamma foo‌bar‍baz foo‏bar‎baz foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta",
+            ["foo​bar", "foo­bar", "foo\ufeffbar", "foobarbazquxalphabetagamma", "foo‌bar‍baz", "foo‏bar‎baz", "foo\u202bbar\u202abaz\u202cqux\u202ealpha\u202dbeta"]
+        )
 
     def test_token_alignment_05(self):
-        self._equal_xml("<foo>der beste Betreuer? - &gt;ProfSmith! : )</foo>", ["<foo>", "der", "beste", "Betreuer", "?", "- &gt;", "Prof", "Smith", "!", ": )", "</foo>"])
+        self._equal_xml(
+            "<foo>der beste Betreuer? - &gt;ProfSmith! : )</foo>",
+            ["<foo>", "der", "beste", "Betreuer", "?", "- &gt;", "Prof", "Smith", "!", ": )", "</foo>"]
+        )
 
     def test_token_alignment_06(self):
         self._equal_xml("<foo>das steht auf S.&#x00ad;5</foo>", "<foo> das steht auf S. 5 </foo>")
@@ -183,7 +192,17 @@ class TestTokenAlignment(unittest.TestCase):
     def test_token_alignment_20(self):
         self._equal_xml("<foo bar='ba\"z'>Foo \"Bar\" 'Baz'</foo>", ["<foo bar='ba\"z'>", "Foo", '"', "Bar", '"', "'", "Baz", "'", "</foo>"])
 
+    def test_token_alignment_21(self):
+        self._equal_xml('<foo bar="baz"\n  spam="eggs">\n    Foo\n</foo>', ['<foo bar="baz"\n  spam="eggs">', "Foo", "</foo>"])
 
-# :\n)
-# <foo bar="baz"\nspam="eggs">
-# <br/>
+    def test_token_alignment_22(self):
+        self._equal_xml("<foo>Hallo<br/>Tschüß</foo>", ["<foo>", "Hallo", "<br/>", "", "Tschüß", "</foo>"])
+
+    def test_token_alignment_23(self):
+        self._equal_xml("<foo>Hallo<br />Tschüß</foo>", ["<foo>", "Hallo", "<br />", "", "Tschüß", "</foo>"])
+
+    def test_token_alignment_24(self):
+        self._equal_xml("<foo>\u0303foo</foo>", ["<foo>", "\u0303foo", "</foo>"])
+
+    def test_token_alignment_25(self):
+        self._equal_xml("<foo>foo<p>bar</p></foo>", ["<foo>", "foo", "<p>", "bar", "</p>", "</foo>"])
