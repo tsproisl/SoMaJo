@@ -17,6 +17,8 @@ _single_characters = ["\u00AD", "\u061C", "\u2060", "\uFEFF", "\uFE0F"]
 _whitespace = [" ", "\u00A0", "\u1680", "\u2028", "\u2029", "\u202F", "\u205F", "\u3000"]
 _skipable_characters = set(_single_characters + _whitespace + [chr(i) for start, end in _ranges for i in range(start, end + 1)])
 
+_xml_entity = re.compile(r"&(?:#\d+|#x[0-9a-f]+|amp|apos|gt|lt|quot);", re.I)
+
 
 def _align_nfc(nfc, orig):
     """Character alignment from NFC version to original string."""
@@ -24,6 +26,8 @@ def _align_nfc(nfc, orig):
     if nfc == "":
         assert orig == "", "NFC string is empty - expected original string to be also empty; it is '{orig}' instead"
         return alignment
+    if nfc == orig:
+        return {(i, i + 1): (i, i + 1) for i in range(len(nfc))}
     nfc_i, nfc_j = 0, 0
     orig_i, orig_j = 0, 0
     while nfc_j < len(nfc):
@@ -47,27 +51,34 @@ def _determine_offsets(tokens, raw, position):
     raw_i = 0
     raw = re.sub(r"\s", " ", raw)
     for token in tokens:
-        text = token.text
-        if token.original_spelling is not None:
-            text = token.original_spelling
-        text = re.sub(r"\s", " ", text)
         if token.markup:
             start, end = token.character_offset
             start -= position
             end -= position
         else:
-            raw_start = raw_i
-            for i, char in enumerate(text):
-                for j in range(raw_start, len(raw)):
-                    if raw[j] == char:
-                        if i == 0:
-                            start = j
-                        if i == len(text) - 1:
-                            end = j + 1
-                        break
-                    else:
-                        assert raw[j] in _skipable_characters, f"'{raw[j]}' ({hex(ord(raw[j]))}) is not a skipable character; token: '{text}', raw: '{raw[raw_i:]}'"
-                raw_start = j + 1
+            text = token.text
+            if token.original_spelling is not None:
+                text = token.original_spelling
+            text = re.sub(r"\s", " ", text)
+            if raw[raw_i:].startswith(text):
+                start = raw_i
+                end = start + len(text)
+            elif raw[raw_i:].startswith(" " + text):
+                start = raw_i + 1
+                end = start + len(text)
+            else:
+                raw_start = raw_i
+                for i, char in enumerate(text):
+                    for j in range(raw_start, len(raw)):
+                        if raw[j] == char:
+                            if i == 0:
+                                start = j
+                            if i == len(text) - 1:
+                                end = j + 1
+                            break
+                        else:
+                            assert raw[j] in _skipable_characters, f"'{raw[j]}' ({hex(ord(raw[j]))}) is not a skipable character; token: '{text}', raw: '{raw[raw_i:]}'"
+                    raw_start = j + 1
         offsets.append((start, end))
         raw_i = end
     return offsets
@@ -75,13 +86,12 @@ def _determine_offsets(tokens, raw, position):
 
 def _resolve_entities(xml):
     """Resolve XML entities and provide an alignment from output string to input string."""
-    entity = re.compile(r"&(?:#\d+|#x[0-9a-f]+|amp|apos|gt|lt|quot);", re.I)
     named = {"&amp;": "&", "&apos;": "'", "&gt;": ">", "&lt;": "<", "&quot;": '"'}
     outstring = ""
     alignment = []
     xml_lower = xml.lower()
     i = 0
-    for m in entity.finditer(xml_lower):
+    for m in _xml_entity.finditer(xml_lower):
         start, end = m.span()
         if xml_lower[start + 2] == "x":
             char = chr(int(xml[start + 3:end - 1], base=16))

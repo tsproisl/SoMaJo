@@ -124,6 +124,10 @@ class TestDetermineOffsets(unittest.TestCase):
 
 
 class TestTokenOffsets(unittest.TestCase):
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = Tokenizer(split_camel_case=True, language="de_CMC")
+
     def _equal_xml(self, raw, tokenized):
         raw = unicodedata.normalize("NFC", raw)
         if isinstance(tokenized, str):
