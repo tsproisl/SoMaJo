@@ -16,60 +16,72 @@
 
 ## Introduction
 
-SoMaJo is a state-of-the-art tokenizer and sentence splitter for
-German and English web and social media texts. It won the [EmpiriST
-2015 shared task](https://sites.google.com/site/empirist2015/) on
-automatic linguistic annotation of computer-mediated communication /
-social media. As such, it is particularly well-suited to perform
-tokenization on all kinds of written discourse, for example chats,
-forums, wiki talk pages, tweets, blog comments, social networks, SMS
-and WhatsApp dialogues.
+```
+echo 'Wow, superTool!;)' | somajo-tokenizer -
+Wow
+,
+superTool
+!
+;)
+```
 
-In addition to tokenizing the input text, SoMaJo can also output token
-class information for each token, i.e. if it is a number, an emoticon,
-an abbreviation, etc.:
+SoMaJo is a rule-based tokenizer and sentence splitter that implements
+tokenization guidelines for German and English. It has a strong focus
+on web and social media texts (it was originally created as the
+winning submission to the [EmpiriST 2015 shared
+task](https://sites.google.com/site/empirist2015/) on automatic
+linguistic annotation of computer-mediated communication / social
+media) and is particularly well-suited to perform tokenization on all
+kinds of written discourse, for example chats, forums, wiki talk
+pages, tweets, blog comments, social networks, SMS and WhatsApp
+dialogues. Of course it also works on more formal texts.
 
-    echo 'Wow, superTool!;)' | somajo-tokenizer -c -t -
-    Wow	regular
-    ,	symbol
-    super	regular
-    Tool	regular
-    !	symbol
-    ;)	emoticon
+Version 1 of the tokenizer is described in greater detail in [Proisl
+and Uhrig (2016)](https://aclanthology.org/W16-2607).
 
-SoMaJo can also output additional information for each token that can
-help to reconstruct the original untokenized text (to a certain
-extent):
+For part-of-speech tagging (in particular of German web and social
+media texts), we recommend
+[SoMeWeTa](https://github.com/tsproisl/SoMeWeTa):
 
-    echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -e -
-    der	
-    beste	
-    Betreuer	SpaceAfter=No
-    ?	
-    ->	SpaceAfter=No, OriginalSpelling="- >"
-    Prof	SpaceAfter=No
-    Smith	SpaceAfter=No
-    !	
-    :)	OriginalSpelling=": )"
+```
+somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
+```
 
-The `-t` and `-e` options can also be used in combination, of course.
+Features:
 
-SoMaJo can split the input text into sentences using the
-`--split_sentences` option.
-
-SoMaJo has full XML support, i.e. it can perform sensible tokenization
-and sentence splitting on well-formed XML files using the `--xml` and
-`--tag` options.
-
-The system is described in greater detail in [Proisl and Uhrig
-(2016)](https://aclanthology.org/W16-2607).
-
-For part-of-speech tagging, we recommend
-[SoMeWeTa](https://github.com/tsproisl/SoMeWeTa), a part-of-speech
-tagger with state-of-the-art performance on German web and social
-media texts:
-
-    somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
+   - Rule-based tokenization and sentence-splitting:
+    - [EmpiriST 2015 tokenization
+      guidelines](https://github.com/fau-klue/empirist-corpus/blob/9f00233951f7d1503ba4c3dd4af975d3c73cba80/doc/EmpiriST_Guideline-Tokenisierung.pdf)
+      for German
+    - “New” Penn Treebank conventions for English (described, for
+      example, in the guidelines for ETTB 2.0 [(Mott et al.,
+      2009)](https://web.archive.org/web/20110727133755/http://projects.ldc.upenn.edu/gale/task_specifications/ettb_guidelines.pdf)
+      and CLEAR [(Warner et al.,
+      2012)](https://clear.colorado.edu/compsem/documents/treebank_guidelines.pdf))
+    - Optionally split camel-cased tokens
+    - Optionally output token class information for each token, i.e.
+      if it is a number, an emoticon, an abbreviation, etc.
+    - Optionally output additional information for each token, e.g. if
+      it was followed by whitespace or if it contained internal
+      whitespace
+    - Optionally split the tokenized text into sentences
+    - Optionally determine the character offsets of the tokens in the
+      input, allowing for stand-off tokenization
+  - Text preprocessing/cleaning:
+    - Normalize text to [Unicode Normalization Form C (NFC)](https://unicode.org/reports/tr15/)
+    - Remove control characters and other usually unwanted characters,
+      such as soft hyphens and zero-width spaces
+  - XML support:
+    - Transparent processing of XML: Tokenize the textual content of
+      an XML file while preserving the XML structure
+    - Optionally delimit sentence boundaries by XML tags
+    - Optionally prune tags, i.e. subtrees, from the XML before
+      tokenization (for example to remove `<script>` and `<style>`
+      tags from HTML input)
+    - Optionally strip all tags from the output, effectively turning
+      the XML into plain text
+  - Parallelization: Optionally run multiple worker processes to speed
+    up tokenization
 
 
 ## Installation
@@ -92,6 +104,44 @@ In the new directory, run the following command:
 ## Usage
 
 ### Using the somajo-tokenizer executable
+
+**TODO:** Insert help message
+
+<!-- In addition to tokenizing the input text, SoMaJo can also output token -->
+<!-- class information for each token, i.e. if it is a number, an emoticon, -->
+<!-- an abbreviation, etc.: -->
+
+<!--     echo 'Wow, superTool!;)' | somajo-tokenizer -c -t - -->
+<!--     Wow	regular -->
+<!--     ,	symbol -->
+<!--     super	regular -->
+<!--     Tool	regular -->
+<!--     !	symbol -->
+<!--     ;)	emoticon -->
+
+<!-- SoMaJo can also output additional information for each token that can -->
+<!-- help to reconstruct the original untokenized text (to a certain -->
+<!-- extent): -->
+
+<!--     echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -e - -->
+<!--     der	 -->
+<!--     beste	 -->
+<!--     Betreuer	SpaceAfter=No -->
+<!--     ?	 -->
+<!--     ->	SpaceAfter=No, OriginalSpelling="- >" -->
+<!--     Prof	SpaceAfter=No -->
+<!--     Smith	SpaceAfter=No -->
+<!--     !	 -->
+<!--     :)	OriginalSpelling=": )" -->
+
+<!-- The `-t` and `-e` options can also be used in combination, of course. -->
+
+<!-- SoMaJo can split the input text into sentences using the -->
+<!-- `--split_sentences` option. -->
+
+<!-- SoMaJo has full XML support, i.e. it can perform sensible tokenization -->
+<!-- and sentence splitting on well-formed XML files using the `--xml` and -->
+<!-- `--tag` options. -->
 
 You can use the tokenizer as a standalone program from the command
 line. General usage information is available via the `-h` option:
@@ -297,6 +347,9 @@ Here are some brief notes to help you get started:
     ```
 
 ## References
+
+If you use SoMaJo for academic research, please consider citing the
+following paper:
 
   - Proisl, Thomas, and Peter Uhrig. 2016. “SoMaJo: State-of-the-Art
     Tokenization for German Web and Social Media Texts.” In
