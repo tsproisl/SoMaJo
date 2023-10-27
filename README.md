@@ -47,7 +47,7 @@ media texts), we recommend
 somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 ```
 
-Features:
+## Features
 
   - Rule-based tokenization and sentence-splitting:
     - [EmpiriST 2015 tokenization
@@ -109,6 +109,7 @@ You can use the tokenizer as a standalone program from the command
 line. General usage information is available via the `-h` option:
 
 ```
+somajo-tokenizer -h
 usage: somajo-tokenizer [-h] [-l {en_PTB,de_CMC}]
                         [-s {single_newlines,empty_lines}] [-x] [--tag TAG]
                         [--prune PRUNE] [--strip-tags] [-c]
