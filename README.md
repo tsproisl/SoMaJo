@@ -49,7 +49,7 @@ somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 
 Features:
 
-   - Rule-based tokenization and sentence-splitting:
+  - Rule-based tokenization and sentence-splitting:
     - [EmpiriST 2015 tokenization
       guidelines](https://github.com/fau-klue/empirist-corpus/blob/9f00233951f7d1503ba4c3dd4af975d3c73cba80/doc/EmpiriST_Guideline-Tokenisierung.pdf)
       for German
