@@ -105,7 +105,74 @@ In the new directory, run the following command:
 
 ### Using the somajo-tokenizer executable
 
-**TODO:** Insert help message
+You can use the tokenizer as a standalone program from the command
+line. General usage information is available via the `-h` option:
+
+```
+usage: somajo-tokenizer [-h] [-l {en_PTB,de_CMC}]
+                        [-s {single_newlines,empty_lines}] [-x] [--tag TAG]
+                        [--prune PRUNE] [--strip-tags] [-c]
+                        [--split_sentences] [--sentence_tag SENTENCE_TAG] [-t]
+                        [-e] [--parallel N] [-v]
+                        FILE
+
+A tokenizer and sentence splitter for German and English texts. Currently, two
+tokenization guidelines are implemented: The EmpiriST guidelines for German
+web and social media texts (de_CMC) and the "new" Penn Treebank conventions
+for English texts (en_PTB).
+
+positional arguments:
+  FILE                  The input file (UTF-8-encoded) or "-" to read from
+                        STDIN.
+
+options:
+  -h, --help            show this help message and exit
+  -l {en_PTB,de_CMC}, --language {en_PTB,de_CMC}
+                        Choose a language. Currently supported are German
+                        EmpiriST-style tokenization (de_CMC) and English Penn-
+                        Treebank-style tokenization(en_PTB). (Default: de_CMC)
+  -s {single_newlines,empty_lines}, --paragraph_separator {single_newlines,empty_lines}
+                        How are paragraphs separated in the input text? Will
+                        be ignored if option -x/--xml is used. (Default:
+                        empty_lines)
+  -x, --xml             The input is an XML file. You can specify tags that
+                        always constitute a sentence break (e.g. HTML p tags)
+                        via the --tag option.
+  --tag TAG             Start and end tags of this type constitute sentence
+                        breaks, i.e. they do not occur in the middle of a
+                        sentence. Can be used multiple times to specify
+                        multiple tags, e.g. --tag p --tag br. Implies option
+                        -x/--xml. (Default: --tag title --tag h1 --tag h2
+                        --tag h3 --tag h4 --tag h5 --tag h6 --tag p --tag br
+                        --tag hr --tag div --tag ol --tag ul --tag dl --tag
+                        table)
+  --prune PRUNE         Tags of this type will be removed from the input
+                        before tokenization. Can be used multiple times to
+                        specify multiple tags, e.g. --tag script --tag style.
+                        Implies option -x/--xml. By default, no tags are
+                        pruned.
+  --strip-tags          Suppresses output of XML tags. Implies option
+                        -x/--xml.
+  -c, --split_camel_case
+                        Split items in written in camelCase (excluding
+                        established names and terms).
+  --split_sentences, --split-sentences
+                        Also split the input into sentences.
+  --sentence_tag SENTENCE_TAG, --sentence-tag SENTENCE_TAG
+                        Tag name for sentence boundaries (e.g. --sentence_tag
+                        s). If this option is specified, sentences will be
+                        delimited by XML tags (e.g. <s>…</s>) instead of empty
+                        lines. This option implies --split_sentences
+  -t, --token_classes   Output the token classes (number, XML tag,
+                        abbreviation, etc.) in addition to the tokens.
+  -e, --extra_info      Output additional information for each token:
+                        SpaceAfter=No if the token was not followed by a space
+                        and OriginalSpelling="…" if the token contained
+                        whitespace.
+  --parallel N          Run N worker processes (up to the number of CPUs) to
+                        speed up tokenization.
+  -v, --version         Output version information and exit.
+```
 
 <!-- In addition to tokenizing the input text, SoMaJo can also output token -->
 <!-- class information for each token, i.e. if it is a number, an emoticon, -->
@@ -142,11 +209,6 @@ In the new directory, run the following command:
 <!-- SoMaJo has full XML support, i.e. it can perform sensible tokenization -->
 <!-- and sentence splitting on well-formed XML files using the `--xml` and -->
 <!-- `--tag` options. -->
-
-You can use the tokenizer as a standalone program from the command
-line. General usage information is available via the `-h` option:
-
-    somajo-tokenizer -h
 
 To tokenize a text file according to the guidelines of the EmpiriST
 2015 shared task, just call the tokenizer like this:
