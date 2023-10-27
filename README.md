@@ -234,6 +234,22 @@ guidelines, things like “: )” get normalized to “:)”):
 
     somajo-tokenizer -e <file>
 
+<details><summary>Show example</summary>
+
+    echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -e -
+    der
+    beste
+    Betreuer	SpaceAfter=No
+    ?
+    ->	SpaceAfter=No, OriginalSpelling="- >"
+    Prof	SpaceAfter=No
+    Smith	SpaceAfter=No
+    !
+    :)	OriginalSpelling=": )"
+
+</details>
+
+
 SoMaJo assumes that paragraphs are delimited by empty lines in the
 input file. If your input file uses single newlines instead, you have
 to tell that to the tokenizer via the `-s` or `--paragraph_separator`
