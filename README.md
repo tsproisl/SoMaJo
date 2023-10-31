@@ -4,6 +4,7 @@
 [![Build](https://github.com/tsproisl/SoMaJo/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/tsproisl/SoMaJo/actions/workflows/test.yml?query=branch%3Amaster)
 
   - [Introduction](#introduction)
+  - [Features](#features)
   - [Installation](#installation)
   - [Usage](#usage)
       - [Using the somajo-tokenizer executable](#using-the-somajo-tokenizer-executable)
@@ -17,10 +18,11 @@
 ## Introduction
 
 ```
-echo 'Wow, superTool!;)' | somajo-tokenizer -
+echo 'Wow, superTool!;)' | somajo-tokenizer -c -
 Wow
 ,
-superTool
+super
+Tool
 !
 ;)
 ```
@@ -46,6 +48,7 @@ media texts), we recommend
 ```
 somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 ```
+
 
 ## Features
 
@@ -88,17 +91,23 @@ somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 
 SoMaJo can be easily installed using pip (pip3 in some distributions):
 
-    pip install -U SoMaJo
+```sh
+pip install -U SoMaJo
+```
 
 Alternatively, you can download and decompress the [latest
 release](https://github.com/tsproisl/SoMaJo/releases/latest) or clone
 the git repository:
 
-    git clone https://github.com/tsproisl/SoMaJo.git
+```sh
+git clone https://github.com/tsproisl/SoMaJo.git
+```
 
 In the new directory, run the following command:
 
-    pip install -U .
+```sh
+pip install -U .
+```
 
 
 ## Usage
@@ -210,6 +219,46 @@ options:
 <!-- SoMaJo has full XML support, i.e. it can perform sensible tokenization -->
 <!-- and sentence splitting on well-formed XML files using the `--xml` and -->
 <!-- `--tag` options. -->
+
+Here are some common use cases
+
+  - To tokenize a text file according to the guidelines of the
+    EmpiriST 2015 shared task:
+	```
+	somajo-tokenizer -c <file>
+	```
+	<details><summary>Show example</summary>
+	```
+	echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -c -
+	der
+	beste
+	Betreuer
+	?
+	->
+	Prof
+	Smith
+	!
+	:)
+	```
+	</details>
+  - If you do not want to split camel-cased tokens, simply drop the `-c` option:
+	```
+    somajo-tokenizer <file>
+	```
+	<details><summary>Show example</summary>
+	```
+	echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -
+	der
+	beste
+	Betreuer
+	?
+	->
+	ProfSmith
+	!
+	:)
+	```
+	</details>
+
 
 To tokenize a text file according to the guidelines of the EmpiriST
 2015 shared task, just call the tokenizer like this:
