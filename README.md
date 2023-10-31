@@ -224,10 +224,13 @@ Here are some common use cases
 
   - To tokenize a text file according to the guidelines of the
     EmpiriST 2015 shared task:
+    
     ```
     somajo-tokenizer -c <file>
     ```
+    
     <details><summary>Show example</summary>
+    
     ```
     echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -c -
     der
@@ -248,6 +251,7 @@ Here are some common use cases
     ```
     
     <details><summary>Show example</summary>
+    
     ```
     echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -
     der
