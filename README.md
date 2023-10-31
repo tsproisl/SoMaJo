@@ -224,40 +224,42 @@ Here are some common use cases
 
   - To tokenize a text file according to the guidelines of the
     EmpiriST 2015 shared task:
-	```
-	somajo-tokenizer -c <file>
-	```
-	<details><summary>Show example</summary>
-	```
-	echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -c -
-	der
-	beste
-	Betreuer
-	?
-	->
-	Prof
-	Smith
-	!
-	:)
-	```
-	</details>
+    ```
+    somajo-tokenizer -c <file>
+    ```
+    <details><summary>Show example</summary>
+    ```
+    echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -c -
+    der
+    beste
+    Betreuer
+    ?
+    ->
+    Prof
+    Smith
+    !
+    :)
+    ```
+    </details>
   - If you do not want to split camel-cased tokens, simply drop the `-c` option:
-	```
+    
+    ```
     somajo-tokenizer <file>
-	```
-	<details><summary>Show example</summary>
-	```
-	echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -
-	der
-	beste
-	Betreuer
-	?
-	->
-	ProfSmith
-	!
-	:)
-	```
-	</details>
+    ```
+    
+    <details><summary>Show example</summary>
+    ```
+    echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -
+    der
+    beste
+    Betreuer
+    ?
+    ->
+    ProfSmith
+    !
+    :)
+    ```
+    </details>
 
 
 To tokenize a text file according to the guidelines of the EmpiriST
