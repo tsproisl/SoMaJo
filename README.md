@@ -184,43 +184,7 @@ options:
   -v, --version         Output version information and exit.
 ```
 
-<!-- In addition to tokenizing the input text, SoMaJo can also output token -->
-<!-- class information for each token, i.e. if it is a number, an emoticon, -->
-<!-- an abbreviation, etc.: -->
-
-<!--     echo 'Wow, superTool!;)' | somajo-tokenizer -c -t - -->
-<!--     Wow	regular -->
-<!--     ,	symbol -->
-<!--     super	regular -->
-<!--     Tool	regular -->
-<!--     !	symbol -->
-<!--     ;)	emoticon -->
-
-<!-- SoMaJo can also output additional information for each token that can -->
-<!-- help to reconstruct the original untokenized text (to a certain -->
-<!-- extent): -->
-
-<!--     echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -e - -->
-<!--     der	 -->
-<!--     beste	 -->
-<!--     Betreuer	SpaceAfter=No -->
-<!--     ?	 -->
-<!--     ->	SpaceAfter=No, OriginalSpelling="- >" -->
-<!--     Prof	SpaceAfter=No -->
-<!--     Smith	SpaceAfter=No -->
-<!--     !	 -->
-<!--     :)	OriginalSpelling=": )" -->
-
-<!-- The `-t` and `-e` options can also be used in combination, of course. -->
-
-<!-- SoMaJo can split the input text into sentences using the -->
-<!-- `--split_sentences` option. -->
-
-<!-- SoMaJo has full XML support, i.e. it can perform sensible tokenization -->
-<!-- and sentence splitting on well-formed XML files using the `--xml` and -->
-<!-- `--tag` options. -->
-
-Here are some common use cases
+Here are some common use cases:
 
   - To tokenize a text file according to the guidelines of the
     EmpiriST 2015 shared task:
@@ -244,7 +208,8 @@ Here are some common use cases
     :)
     ```
     </details>
-  - If you do not want to split camel-cased tokens, simply drop the `-c` option:
+  - If you do not want to split camel-cased tokens, simply drop the
+    `-c` option:
     
     ```
     somajo-tokenizer <file>
@@ -264,76 +229,124 @@ Here are some common use cases
     :)
     ```
     </details>
-
-
-To tokenize a text file according to the guidelines of the EmpiriST
-2015 shared task, just call the tokenizer like this:
-
-    somajo-tokenizer -c <file>
-
-If you do not want to split camel-cased tokens, simply drop the `-c`
-option:
-
-    somajo-tokenizer <file>
-
-The tokenizer can also output token class information for each token,
-i.e. if it is a number, an emoticon, an abbreviation, etc.:
-
-    somajo-tokenizer -t <file>
-
-If you want to be able to reconstruct the untokenized input to a
-certain extent, SoMaJo can also provide you with additional details
-for each token, i.e. if the token was followed by whitespace or if it
-contained internal whitespace (according to the EmpiriST tokenization
-guidelines, things like “: )” get normalized to “:)”):
-
-    somajo-tokenizer -e <file>
-
-<details><summary>Show example</summary>
-
-    echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -e -
-    der
-    beste
-    Betreuer	SpaceAfter=No
-    ?
-    ->	SpaceAfter=No, OriginalSpelling="- >"
-    Prof	SpaceAfter=No
-    Smith	SpaceAfter=No
-    !
-    :)	OriginalSpelling=": )"
-
-</details>
-
-
-SoMaJo assumes that paragraphs are delimited by empty lines in the
-input file. If your input file uses single newlines instead, you have
-to tell that to the tokenizer via the `-s` or `--paragraph_separator`
-option:
-
+  - Your input delimits paragraphs by single newlines instead of empty
+    lines? Tell the tokenizer via the `-s`/`--paragraph_separator`
+    option:
+    
+    ```
     somajo-tokenizer --paragraph_separator single_newlines <file>
-
-To speed up tokenization, you can specify the number of worker
-processes used via the `--parallel` option:
-
-    somajo-tokenizer --parallel <number> <file>
-
-SoMaJo can split the input paragraphs into sentences:
-
-    somajo-tokenizer --split_sentences <file>
-
-SoMaJo can also process XML files. Use the `-x` or `--xml` option to
-tell the tokenizer that your input is an XML file:
-
+    ```
+  - In addition to tokenizing the input, SoMaJo can also split it into
+    sentences:
+    
+    ```
+    somajo-tokenizer --split-sentences <file>
+    ``` 
+    
+    <details><summary>Show example</summary>
+    
+    ```
+    echo "Palim, Palim! Ich hätte gerne eine Flasche Pommes Frites." | somajo-tokenizer --split-sentences -
+    Palim
+    ,
+    Palim
+    !
+    
+    Ich
+    hätte
+    gerne
+    eine
+    Flasche
+    Pommes
+    Frites
+    .
+    
+    ``` 
+  - To tokenize English text according to the “new” Penn Treebank
+    conventions, explicitly specify the tokenization guideline using
+    the `-l`/`--language` option:
+    
+    ```
+    somajo-tokenizer -l en_PTB <file>
+    ```
+    
+    <details><summary>Show example</summary>
+    
+    ```
+    echo "Dont you wanna come?" | somajo-tokenizer -l en_PTB -
+    Do
+    nt
+    you
+    wan
+    na
+    come
+    ?
+    ```
+    </details>
+  - SoMaJo can also process XML files. Use the `-x`/`--xml` option to
+    tell the tokenizer that your input is an XML file:
+    
+    ```
     somajo-tokenizer --xml <xml-file>
-
-If you also want to do sentence splitting, you can use (multiple
-instances of) the `--tag` option to specify XML tags that are always
-sentence breaks, i.e. that can never occur in the middle of a
-sentence. Per default, the sentence splitter uses the following list
-of tags: title, h1, h2, h3, h4, h5, h6, p, br, hr, div, ol, ul, dl and
-table.
-
+    ```
+    
+    <details><summary>Show example</summary>
+    
+    ```
+    echo '<html><head><title>Weihnachten</title></head><body><p>Fr&#x00fc;her war mehr Lametta!</p></body></html>' | somajo-tokenizer --xml -
+    <html>
+    <head>
+    <title>
+    Weihnachten
+    </title>
+    </head>
+    <body>
+    <p>
+    Früher
+    war
+    mehr
+    Lametta
+    !
+    </p>
+    </body>
+    </html>
+    ```
+    </details>
+  - For XML input, you can use (multiple instances of) the `--tag`
+    option to specify XML tags that are always sentence breaks, i.e.
+    that can never occur in the middle of a sentence. See the help
+    message for the default list of tags.
+    
+    ```
     somajo-tokenizer --xml --split_sentences --tag h1 --tag p --tag div <xml-file>
+    ```
+  - Via option `-t`/`--token_classes`, SoMaJo can output token class
+    information for each token, i.e. if it is a number, an emoticon,
+    an abbreviation, etc. Via option `-e`/`--extra_info`, additional
+    information is available, e.g. if a token was followed by
+    whitespace or if it contained internal whitespace.
+    
+    <details><summary>Show example</summary>
+    
+    ```
+    echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -c -e -t -
+    der      regular
+    beste    regular
+    Betreuer regular    SpaceAfter=No
+    ?        symbol
+    ->       symbol     SpaceAfter=No, OriginalSpelling="- >"
+    Prof     regular    SpaceAfter=No
+    Smith    regular    SpaceAfter=No
+    !        symbol
+    :)       emoticon   OriginalSpelling=": )"
+    ```
+    </details>
+  - To speed up tokenization, you can specify the number of worker
+    processes used via the `--parallel` option:
+    
+    ```
+    somajo-tokenizer --parallel <number> <file>
+    ```
 
 
 ### Using the module
