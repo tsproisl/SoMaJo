@@ -196,7 +196,7 @@ Here are some common use cases:
     <details><summary>Show example</summary>
     
     ```
-    echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -c -
+    echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -
     der
     beste
     Betreuer
@@ -218,7 +218,7 @@ Here are some common use cases:
     <details><summary>Show example</summary>
     
     ```
-    echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -
+    echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -
     der
     beste
     Betreuer
@@ -246,7 +246,7 @@ Here are some common use cases:
     <details><summary>Show example</summary>
     
     ```
-    echo "Palim, Palim! Ich hätte gerne eine Flasche Pommes Frites." | somajo-tokenizer --split-sentences -
+    echo 'Palim, Palim! Ich hätte gerne eine Flasche Pommes Frites.' | somajo-tokenizer --split-sentences -
     Palim
     ,
     Palim
@@ -273,7 +273,7 @@ Here are some common use cases:
     <details><summary>Show example</summary>
     
     ```
-    echo "Dont you wanna come?" | somajo-tokenizer -l en_PTB -
+    echo 'Dont you wanna come?' | somajo-tokenizer -l en_PTB -
     Do
     nt
     you
@@ -329,7 +329,7 @@ Here are some common use cases:
     <details><summary>Show example</summary>
     
     ```
-    echo "der beste Betreuer? - >ProfSmith! : )" | somajo-tokenizer -c -e -t -
+    echo 'der beste Betreuer? - >ProfSmith! : )' | somajo-tokenizer -c -e -t -
     der      regular
     beste    regular
     Betreuer regular    SpaceAfter=No
@@ -351,18 +351,17 @@ Here are some common use cases:
 
 ### Using the module
 
-You can easily incorporate SoMaJo into your own Python projects. All
-you need to do is importing `somajo.SoMaJo`, creating a `SoMaJo`
-object and calling one of its tokenizer functions: `tokenize_text`,
-`tokenize_text_file`, `tokenize_xml` or `tokenize_xml_file`. These
-functions return a generator that yields tokenized chunks of text. By
-default, these chunks of text are sentences. If you set
-`split_sentences=False`, then the chunks of text are either paragraphs
-or chunks of XML. Every tokenized chunk of text is a list of `Token`
-objects.
-
-For more details, take a look at the [API
+Take a look at the [API
 documentation](https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md).
+
+You can incorporate SoMaJo into your own Python projects. All you need
+to do is importing `somajo`, creating a `SoMaJo` object and calling
+one of its tokenizer functions: `tokenize_text`, `tokenize_text_file`,
+`tokenize_xml` or `tokenize_xml_file`. These functions return a
+generator that yields tokenized chunks of text. By default, these
+chunks of text are sentences. If you set `split_sentences=False`, then
+the chunks of text are either paragraphs or chunks of XML. Every
+tokenized chunk of text is a list of `Token` objects.
 
 Here is an example for tokenizing and sentence splitting two
 paragraphs:
@@ -379,7 +378,7 @@ paragraphs = ["der beste Betreuer?\n-- ProfSmith! : )",
 sentences = tokenizer.tokenize_text(paragraphs)
 for sentence in sentences:
     for token in sentence:
-        print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
+        print(f"{token.text}\t{token.token_class}\t{token.extra_info}")
     print()
 ```
 
@@ -413,6 +412,7 @@ for sentence in sentences:
         print(token.text)
     print()
 ```
+
 
 ## Evaluation
 

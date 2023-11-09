@@ -33,7 +33,7 @@ class SoMaJo:
         guarantee well-formed output (tags might need to be closed and
         re-opened at sentence boundaries).
     character_offsets : bool, (default=False)
-        Compute for each token the character offsets in the input.
+        Compute the character offsets in the input for each token.
         This allows for stand-off tokenization.
 
     """
@@ -159,7 +159,7 @@ class SoMaJo:
         >>> sentences = tokenizer.tokenize_text_file("example_empty_lines.txt", paragraph_separator="single_newlines")
         >>> for sentence in sentences:
         ...     for token in sentence:
-        ...         print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
+        ...         print("{token.text}\t{token.token_class}\t{token.extra_info}")
         ...     print()
         ... 
         Heyi	regular	SpaceAfter=No
@@ -383,7 +383,7 @@ class SoMaJo:
         >>> sentences = tokenizer.tokenize_text(paragraphs)
         >>> for sentence in sentences:
         ...     for token in sentence:
-        ...         print("{}\t{}\t{}".format(token.text, token.token_class, token.extra_info))
+        ...         print("{token.text}\t{token.token_class}\t{token.extra_info}")
         ...     print()
         ... 
         Heyi	regular	SpaceAfter=No
