@@ -420,7 +420,7 @@ SoMaJo was the system with the highest average F₁ score in the
 EmpiriST 2015 shared task. The performance of the current version on
 the two test sets is summarized in the following table (Training and
 test sets are available from the [official
-website](https://sites.google.com/site/empirist2015/home/gold)):
+website](https://sites.google.com/site/empirist2015/gscl-shared-task-automatic-linguistic-annotation-of-computer-mediated-communication-social-media/gold-standard)):
 
 | Corpus | Precision | Recall | F₁    |
 |--------|-----------|--------|-------|
@@ -430,9 +430,9 @@ website](https://sites.google.com/site/empirist2015/home/gold)):
 
 ## Tokenizing English text
 
-Starting with version 1.8.0, SoMaJo can also tokenize English text. In
-general, we follow the “new” Penn Treebank conventions described, for
-example, in the guidelines for ETTB 2.0 [(Mott et al.,
+SoMaJo can also tokenize English text. In general, we follow the “new”
+Penn Treebank conventions described, for example, in the guidelines
+for ETTB 2.0 [(Mott et al.,
 2009)](https://web.archive.org/web/20110727133755/http://projects.ldc.upenn.edu/gale/task_specifications/ettb_guidelines.pdf)
 and CLEAR [(Warner et al.,
 2012)](https://clear.colorado.edu/compsem/documents/treebank_guidelines.pdf).
