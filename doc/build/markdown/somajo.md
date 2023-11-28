@@ -11,7 +11,7 @@
 
 ## somajo.somajo module
 
-### *class* somajo.somajo.SoMaJo(language, \*, split_camel_case=False, split_sentences=True, xml_sentences=None)
+### *class* somajo.somajo.SoMaJo(language, \*, split_camel_case=False, split_sentences=True, xml_sentences=None, character_offsets=False)
 
 Bases: `object`
 
@@ -27,6 +27,8 @@ Tokenization and sentence splitting.
     this might lead to minor changes to the original tags to
     guarantee well-formed output (tags might need to be closed and
     re-opened at sentence boundaries).
+  * **character_offsets** (*bool, (**default=False**)*) – Compute the character offsets in the input for each token.
+    This allows for stand-off tokenization.
 
 #### tokenize_text(paragraphs, \*, parallel=1)
 
@@ -76,7 +78,7 @@ after each sentence:
 >>> sentences = tokenizer.tokenize_text(paragraphs)
 >>> for sentence in sentences:
 ...     for token in sentence:
-...         print("{}   {}      {}".format(token.text, token.token_class, token.extra_info))
+...         print("{token.text}\t{token.token_class}\t{token.extra_info}")
 ...     print()
 ...
 Heyi    regular SpaceAfter=No
@@ -159,7 +161,7 @@ Was machst du morgen Abend?! Lust auf Film?;-)
 >>> sentences = tokenizer.tokenize_text_file("example_empty_lines.txt", paragraph_separator="single_newlines")
 >>> for sentence in sentences:
 ...     for token in sentence:
-...         print("{}   {}      {}".format(token.text, token.token_class, token.extra_info))
+...         print("{token.text}\t{token.token_class}\t{token.extra_info}")
 ...     print()
 ...
 Heyi    regular SpaceAfter=No
@@ -452,7 +454,7 @@ Film
 
 ## somajo.token module
 
-### *class* somajo.token.Token(text, \*, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False)
+### *class* somajo.token.Token(text, \*, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False, character_offset=None)
 
 Bases: `object`
 
@@ -469,6 +471,9 @@ Token objects store a piece of text (in the end a single token) with additional 
   * **original_spelling** (*str, optional* *(**default=None**)*) – The original spelling of the token, if it is different from the one in text.
   * **first_in_sentence** (*bool, (**default=False**)*) – Is it the first token of a sentence?
   * **last_in_sentence** (*bool, (**default=False**)*) – Is it the last token of a sentence?
+  * **character_offset** (*tuple, (**default=None**)*) – Character offset of the token in the input as tuple (start, end)
+    such that input[start:end] == text (if there are no changes to
+    the token text during tokenization)
 
 #### *property* extra_info
 
