@@ -351,8 +351,7 @@ Here are some common use cases:
 
 ### Using the module
 
-Take a look at the [API
-documentation](https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md).
+Take a look at the [API documentation](doc/build/markdown/somajo.md).
 
 You can incorporate SoMaJo into your own Python projects. All you need
 to do is importing `somajo`, creating a `SoMaJo` object and calling
