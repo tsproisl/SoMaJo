@@ -179,6 +179,7 @@ options:
                         SpaceAfter=No if the token was not followed by a space
                         and OriginalSpelling="…" if the token contained
                         whitespace.
+  --character-offsets   Output character offsets in the input for each token.
   --parallel N          Run N worker processes (up to the number of CPUs) to
                         speed up tokenization.
   -v, --version         Output version information and exit.
