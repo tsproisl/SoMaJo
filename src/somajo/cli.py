@@ -26,6 +26,7 @@ def arguments():
     parser.add_argument("--sentence_tag", "--sentence-tag", type=str, help="Tag name for sentence boundaries (e.g. --sentence_tag s). If this option is specified, sentences will be delimited by XML tags (e.g. <s>…</s>) instead of empty lines. This option implies --split_sentences")
     parser.add_argument("-t", "--token_classes", action="store_true", help="Output the token classes (number, XML tag, abbreviation, etc.) in addition to the tokens.")
     parser.add_argument("-e", "--extra_info", action="store_true", help='Output additional information for each token: SpaceAfter=No if the token was not followed by a space and OriginalSpelling="…" if the token contained whitespace.')
+    parser.add_argument("--character-offsets", action="store_true", help='Output character offsets in the input for each token.')
     parser.add_argument("--parallel", type=int, default=1, metavar="N", help="Run N worker processes (up to the number of CPUs) to speed up tokenization.")
     parser.add_argument("-v", "--version", action="version", version="SoMaJo %s" % __version__, help="Output version information and exit.")
     parser.add_argument("FILE", type=argparse.FileType("r", encoding="utf-8"), help="The input file (UTF-8-encoded) or \"-\" to read from STDIN.")
@@ -43,7 +44,13 @@ def main():
         is_xml = True
     if args.sentence_tag:
         args.split_sentences = True
-    tokenizer = SoMaJo(args.language, split_camel_case=args.split_camel_case, split_sentences=args.split_sentences, xml_sentences=args.sentence_tag)
+    tokenizer = SoMaJo(
+        args.language,
+        split_camel_case=args.split_camel_case,
+        split_sentences=args.split_sentences,
+        xml_sentences=args.sentence_tag,
+        character_offsets=args.character_offsets
+    )
     if is_xml:
         eos_tags = args.tag
         if eos_tags is None:
@@ -61,6 +68,8 @@ def main():
                     output += "\t" + token.token_class
                 if args.extra_info:
                     output += "\t" + token.extra_info
+                if args.character_offsets:
+                    output += f"\t{token.character_offset[0]}, {token.character_offset[1]}"
             print(output)
         if args.split_sentences and args.sentence_tag is None:
             print()
