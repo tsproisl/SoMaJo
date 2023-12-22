@@ -145,6 +145,7 @@ def token_offsets(token_list, raw, position, xml_input, tokens):
     offsets = [(align_to_starts[s], align_to_ends[e - 1]) for s, e in offsets]
     if xml_input:
         offsets = [(align_to_entities[s][0], align_to_entities[e - 1][1]) for s, e in offsets]
+    offsets = [(s + position, e + position) for s, e in offsets]
     return offsets
 
 

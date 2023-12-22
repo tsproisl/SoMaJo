@@ -21,14 +21,13 @@ def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
     elif paragraph_separator == "empty_lines":
         paragraph = []
         for line in fh:
+            paragraph.append(line)
             if line.strip() == "":
                 if len(paragraph) > 0:
                     paragraph_text = "".join(paragraph)
                     yield paragraph_text, position
                     paragraph = []
                     position += len(paragraph_text)
-            else:
-                paragraph.append(line)
         if len(paragraph) > 0:
             yield "".join(paragraph), position
 
