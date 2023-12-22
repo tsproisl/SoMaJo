@@ -153,3 +153,39 @@ class TestXMLPruneTags(TestSoMaJo):
 
     def test_xml_02(self):
         self._equal_xml_file("<html>\n  <head>\n    Spam\n  </head>\n  <body>\n    <p>Foo bar. Baz qux</p>\n    <p>alpha. Beta gamma</p>\n  </body>\n</html>", ["<html> <body> <p> Foo bar .", "Baz qux </p>", "<p> alpha .", "Beta gamma </p> </body> </html>"], prune_tags=["head"])
+
+
+class TestCharacterOffsets(TestSoMaJo):
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = SoMaJo("de_CMC", character_offsets=True)
+
+    def _equal_offsets_text_file(self, paragraphs, tokenized_sentences, parallel=1):
+        raw = "\n\n".join(paragraphs)
+        pseudofile = io.StringIO(raw)
+        sentences = self.tokenizer.tokenize_text_file(pseudofile, paragraph_separator="empty_lines", parallel=parallel)
+        sentences = list(sentences)
+        tokens = [[t.text for t in s] for s in sentences]
+        self.assertEqual(tokens, [ts.split() for ts in tokenized_sentences])
+        offsets = [[t.character_offset for t in s] for s in sentences]
+        extracted = [[raw[s:e] for s, e in sent] for sent in offsets]
+        self.assertEqual(tokens, extracted)
+
+    def _equal_offsets_xml(self, xml, tokenized_sentences, strip_tags=False, parallel=1, prune_tags=None):
+        eos_tags = "title h1 h2 h3 h4 h5 h6 p br hr div ol ul dl table".split()
+        sentences = self.tokenizer.tokenize_xml(xml, eos_tags, strip_tags=strip_tags, parallel=parallel, prune_tags=prune_tags)
+        sentences = list(sentences)
+        tokens = [[t.text for t in s] for s in sentences]
+        self.assertEqual(tokens, [ts.split() for ts in tokenized_sentences])
+        offsets = [[t.character_offset for t in s] for s in sentences]
+        extracted = [[xml[s:e] for s, e in sent] for sent in offsets]
+        self.assertEqual(tokens, extracted)
+
+    def test_text_offsets_01(self):
+        self._equal_offsets_text_file(["Foo bar. Baz qux", "alpha. Beta gamma"], ["Foo bar .", "Baz qux", "alpha .", "Beta gamma"])
+
+    def test_xml_offsets_01(self):
+        self._equal_offsets_xml("<foo><p>bar</p><p>baz</p></foo>", ["<foo> <p> bar </p>", "<p> baz </p> </foo>"])
+
+    def test_xml_offsets_02(self):
+        self._equal_offsets_xml("<foo>\n<p>\nbar\n</p>\n<p>\nbaz\n</p>\n</foo>", ["<foo> <p> bar </p>", "<p> baz </p> </foo>"])

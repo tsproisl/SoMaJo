@@ -212,3 +212,6 @@ class TestTokenOffsets(unittest.TestCase):
 
     def test_token_alignment_25(self):
         self._equal_xml("<foo>foo<p>bar</p></foo>", ["<foo>", "foo", "<p>", "bar", "</p>", "</foo>"])
+
+    def test_token_alignment_26(self):
+        self._equal_xml("<foo><p>bar</p><p>baz</p></foo>", ["<foo>", "<p>", "bar", "</p>", "<p>", "baz", "</p>", "</foo>"])
