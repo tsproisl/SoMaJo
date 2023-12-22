@@ -7,8 +7,8 @@
   to the constructor or use the option `--character-offsets` on the
   command line to enable the feature. The character offsets are
   determined by aligning the tokenized output with the input,
-  therefore activating the feature incurs a noticeable runtime
-  increase.
+  therefore activating the feature incurs a noticeable increase in
+  processing time.
 
 ## Version 2.3.1, 2023-09-23 ##
 
