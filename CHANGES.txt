@@ -1,6 +1,6 @@
 # CHANGELOG #
 
-## Version 2.4.0, ???? ##
+## Version 2.4.0, 2023-12-23 ##
 
 - New feature: SoMaJo can output character offsets for tokens,
   allowing for stand-off tokenization. Pass `character_offsets=True`
