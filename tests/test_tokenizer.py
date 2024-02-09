@@ -1040,6 +1040,9 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_27(self):
         self._equal("link: [Linktext „viel“ Text](https://other_link.com).", "link : [ Linktext „ viel “ Text ] ( https://other_link.com ) .")
 
+    def test_emails_urls_28(self):
+        self._equal("link: <https://one_link.com>.", "link : < https://one_link.com > .")
+
 
 class TestAbbreviations(TestTokenizer):
     def test_abbreviations_01(self):

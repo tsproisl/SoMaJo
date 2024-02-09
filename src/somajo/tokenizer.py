@@ -88,8 +88,8 @@ class Tokenizer():
         self.email = re.compile(r"\b[\w.%+-]+(?:@| \[at\] )[\w.-]+(?:\.| \[?dot\]? )\p{L}{2,}\b")
         # simple regex for urls that start with http or www
         # no square brackets and spaces in URL: [^][ ]
-        self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][ ]+?\(\S*?\)[^][ ]*(?=$|[\'. "!?,;])', re.IGNORECASE)
-        self.simple_url = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][ ]+[^][\'. "!?,;:()]', re.IGNORECASE)
+        self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][<> ]+?\(\S*?\)[^][<> ]*(?=$|[\'. "!?,;])', re.IGNORECASE)
+        self.simple_url = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][<> ]+[^][<>\'. "!?,;:()]', re.IGNORECASE)
         self.doi = re.compile(r'\bdoi:10\.\d+/\S+', re.IGNORECASE)
         self.doi_with_space = re.compile(r'(?<=\bdoi: )10\.\d+/\S+', re.IGNORECASE)
         # regex for ISBNs adapted from:

@@ -1,5 +1,9 @@
 # CHANGELOG #
 
+## Version 2.4.1, 2024-02-09 ##
+
+- Fix issue #27 (URLs in angle brackets).
+
 ## Version 2.4.0, 2023-12-23 ##
 
 - New feature: SoMaJo can output character offsets for tokens,
