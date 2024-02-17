@@ -1043,6 +1043,12 @@ class TestEmailsURLs(TestTokenizer):
     def test_emails_urls_28(self):
         self._equal("link: <https://one_link.com>.", "link : < https://one_link.com > .")
 
+    def test_emails_urls_29(self):
+        self._equal("*[Neubau](https://www.some-link.com)*", "* [ Neubau ] ( https://www.some-link.com ) *")
+
+    def test_emails_urls_30(self):
+        self._equal("[Konfiguration](https://a-link.com)\\\\", "[ Konfiguration ] ( https://a-link.com ) \\\\")
+
 
 class TestAbbreviations(TestTokenizer):
     def test_abbreviations_01(self):

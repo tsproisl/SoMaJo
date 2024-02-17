@@ -88,6 +88,7 @@ class Tokenizer():
         self.email = re.compile(r"\b[\w.%+-]+(?:@| \[at\] )[\w.-]+(?:\.| \[?dot\]? )\p{L}{2,}\b")
         # simple regex for urls that start with http or www
         # no square brackets and spaces in URL: [^][ ]
+        self.markdown_links = re.compile(r"(?P<lsb>\[)[^]]+(?P<rsb>\])(?P<lrb>\()(?:(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^)]+)(?P<rrb>\))", re.IGNORECASE)
         self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][<> ]+?\(\S*?\)[^][<> ]*(?=$|[\'. "!?,;])', re.IGNORECASE)
         self.simple_url = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][<> ]+[^][<>\'. "!?,;:()]', re.IGNORECASE)
         self.doi = re.compile(r'\bdoi:10\.\d+/\S+', re.IGNORECASE)
@@ -657,6 +658,7 @@ class Tokenizer():
         self._split_all_matches(self.email, token_dll, "email_address", delete_whitespace=True)
 
         # urls
+        self._split_all_matches(self.markdown_links, token_dll, "symbol")
         self._split_all_matches(self.simple_url_with_brackets, token_dll, "URL")
         self._split_all_matches(self.simple_url, token_dll, "URL")
         self._split_all_matches(self.doi, token_dll, "URL")
