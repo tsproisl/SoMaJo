@@ -276,7 +276,7 @@ class Tokenizer():
         self.single_hashtag = re.compile(r'[#]\w(?:[\w-]*\w)?(?!\w)')
         self.action_word = re.compile(r'(?<!\w)(?P<a_open>[*+])(?P<b_middle>[^\s*]+)(?P<c_close>[*])(?!\w)')
         # a pair of underscores can be used to "underline" some text
-        self.underline = re.compile(r"(?<!\w)(?P<left>_)(?P<middle>\w[^_]+\w)(?P<right>_)(?!\w)")
+        self.underline = re.compile(r"(?<!\w)(?P<left>_)(?:\w[^_]+\w)(?P<right>_)(?!\w)")
 
         # DATE, TIME, NUMBERS
         self.three_part_date_year_first = re.compile(r'(?<![\d.]) (?P<a_year>\d{4}) (?P<b_month_or_day>([/-])\d{1,2}) (?P<c_day_or_month>\3\d{1,2}) (?!\d)', re.VERBOSE)
@@ -399,8 +399,8 @@ class Tokenizer():
         # L'Enfer, d'accord, O'Connor
         self.letter_apostrophe_word = re.compile(r"\b([dlo]['’]\p{L}+)\b", re.IGNORECASE)
         self.double_latex_quote = re.compile(r"(?:(?<!`)``(?!`))|(?:(?<!')''(?!'))")
-        self.paired_single_latex_quote = re.compile(r"(?<!`)(?P<left>`)(?P<middle>[^`']+)(?P<right>')(?!')")
-        self.paired_single_quot_mark = re.compile(r"(?<!\p{L})(?P<left>['])(?P<middle>[^']+)(?P<right>['])(?!\p{L})")
+        self.paired_single_latex_quote = re.compile(r"(?<!`)(?P<left>`)(?:[^`']+)(?P<right>')(?!')")
+        self.paired_single_quot_mark = re.compile(r"(?<!\p{L})(?P<left>['])(?:[^']+)(?P<right>['])(?!\p{L})")
         # Musical notes, two programming languages
         self.letter_sharp = re.compile(r"\b[acdfg]#(?:-\p{L}+)?(?!\w)", re.IGNORECASE)
         self.other_punctuation = re.compile(r'([#<>%‰€$£₤¥°@~*„“”‚‘"»«›‹,;:+×÷±≤≥=&–—])')
@@ -588,20 +588,6 @@ class Tokenizer():
                     boundaries.append((m.start(), m.end(), None))
             self._split_on_boundaries(t, boundaries, "abbreviation")
 
-    def _split_paired(self, regex, token_dll, token_class="regular"):
-        """Split off paired elements (with capture groups named "left" and
-        "right"). Currently, this only operates on a single segment.
-
-        """
-        for t in token_dll:
-            if t.value.markup or t.value._locked:
-                continue
-            boundaries = []
-            for m in regex.finditer(t.value.text):
-                boundaries.append((m.start("left"), m.end("left"), None))
-                boundaries.append((m.start("right"), m.end("right"), None))
-            self._split_on_boundaries(t, boundaries, token_class)
-
     def _remove_empty_tokens(self, token_dll):
         for t in token_dll:
             if t.value.markup or t.value._locked:
@@ -692,7 +678,7 @@ class Tokenizer():
         # action words
         self._split_all_matches(self.action_word, token_dll, "action_word")
         # underline
-        self._split_paired(self.underline, token_dll)
+        self._split_all_matches(self.underline, token_dll)
         # textual representations of emoji
         self._split_all_matches(self.emoji, token_dll, "emoticon")
 
@@ -791,9 +777,9 @@ class Tokenizer():
         self._split_all_matches(self.letter_apostrophe_word, token_dll)
         # LaTeX-style quotation marks
         self._split_all_matches(self.double_latex_quote, token_dll, "symbol")
-        self._split_paired(self.paired_single_latex_quote, token_dll, "symbol")
+        self._split_all_matches(self.paired_single_latex_quote, token_dll, "symbol")
         # single quotation marks, apostrophes
-        self._split_paired(self.paired_single_quot_mark, token_dll, "symbol")
+        self._split_all_matches(self.paired_single_quot_mark, token_dll, "symbol")
         # other punctuation symbols
         # paragraph = self._replace_regex(paragraph, self.dividing_line, "symbol")
         self._split_all_matches(self.letter_sharp, token_dll, "regular")

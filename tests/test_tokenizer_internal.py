@@ -111,32 +111,32 @@ class TestSplitPaired(unittest.TestCase):
 
     def test_split_paired_01(self):
         token_dll = DLL([Token("babbbab")])
-        self.tokenizer._split_paired(self.regex, token_dll)
+        self.tokenizer._split_all_matches(self.regex, token_dll)
         self.assertEqual([t.text for t in token_dll.to_list()], "b a bbb a b".split())
 
     def test_split_paired_02(self):
         token_dll = DLL([Token("abbba")])
-        self.tokenizer._split_paired(self.regex, token_dll)
+        self.tokenizer._split_all_matches(self.regex, token_dll)
         self.assertEqual([t.text for t in token_dll.to_list()], "a bbb a".split())
 
     def test_split_paired_03(self):
         token_dll = DLL([Token("babbbababbab")])
-        self.tokenizer._split_paired(self.regex, token_dll)
+        self.tokenizer._split_all_matches(self.regex, token_dll)
         self.assertEqual([t.text for t in token_dll.to_list()], "b a bbb a b a bb a b".split())
 
     def test_split_paired_04(self):
         token_dll = DLL([Token("babbbababbb")])
-        self.tokenizer._split_paired(self.regex, token_dll)
+        self.tokenizer._split_all_matches(self.regex, token_dll)
         self.assertEqual([t.text for t in token_dll.to_list()], "b a bbb a babbb".split())
 
     def test_split_paired_05(self):
         token_dll = DLL([Token("bbb")])
-        self.tokenizer._split_paired(self.regex, token_dll)
+        self.tokenizer._split_all_matches(self.regex, token_dll)
         self.assertEqual([t.text for t in token_dll.to_list()], "bbb".split())
 
     def test_split_paired_06(self):
         token_dll = DLL([Token("")])
-        self.tokenizer._split_paired(self.regex, token_dll)
+        self.tokenizer._split_all_matches(self.regex, token_dll)
         self.assertEqual([t.text for t in token_dll.to_list()], [""])
 
 
