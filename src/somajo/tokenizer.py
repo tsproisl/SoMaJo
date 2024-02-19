@@ -88,9 +88,38 @@ class Tokenizer():
         self.email = re.compile(r"\b[\w.%+-]+(?:@| \[at\] )[\w.-]+(?:\.| \[?dot\]? )\p{L}{2,}\b")
         # simple regex for urls that start with http or www
         # no square brackets and spaces in URL: [^][ ]
-        self.markdown_links = re.compile(r"(?P<lsb>\[)[^]]+(?P<rsb>\])(?P<lrb>\()(?:(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^)]+)(?P<rrb>\))", re.IGNORECASE)
-        self.simple_url_with_brackets = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][<> ]+?\(\S*?\)[^][<> ]*(?=$|[\'. "!?,;])', re.IGNORECASE)
-        self.simple_url = re.compile(r'\b(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^][<> ]+[^][<>\'. "!?,;:()]', re.IGNORECASE)
+        self.markdown_links = re.compile(r"""
+                                             (?P<lsb>\[)                                             # [
+                                             [^]]+                                                   # link description
+                                             (?P<rsb>\])                                             # ]
+                                             (?P<lrb>\()                                             # (
+                                             (?:(?:(?:https?|ftp|svn)://|(?:https?://)?www\.)[^)]+)  # URL
+                                             (?P<rrb>\))                                             # )
+        """, re.VERBOSE | re.IGNORECASE)
+        self.simple_url_with_brackets = re.compile(r"""
+                                                       \b
+                                                       (?:
+                                                         (?:https?|ftp|svn)://
+                                                         |
+                                                         (?:https?://)?www\.
+                                                       )
+                                                       [^][<> ]+?
+                                                       \(
+                                                       \S*?
+                                                       \)
+                                                       [^][<> ]*
+                                                       (?=$|[\'. "!?,;])
+        """, re.VERBOSE | re.IGNORECASE)
+        self.simple_url = re.compile(r"""
+                                         \b
+                                         (?:
+                                           (?:https?|ftp|svn)://
+                                           |
+                                           (?:https?://)?www\.
+                                         )
+                                         [^][<> ]+                # no square or angle brackets
+                                         [^][<>\'. "!?,;:()]      # last character
+        """, re.VERBOSE | re.IGNORECASE)
         self.doi = re.compile(r'\bdoi:10\.\d+/\S+', re.IGNORECASE)
         self.doi_with_space = re.compile(r'(?<=\bdoi: )10\.\d+/\S+', re.IGNORECASE)
         # regex for ISBNs adapted from:
