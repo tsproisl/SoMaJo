@@ -1,5 +1,10 @@
 # CHANGELOG #
 
+## Version 2.4.2, 2024-02-10 ##
+
+- Fix issues #28 and #29 (markdown links with trailing symbols after
+  URL part).
+
 ## Version 2.4.1, 2024-02-09 ##
 
 - Fix issue #27 (URLs in angle brackets).
