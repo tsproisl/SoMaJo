@@ -19,7 +19,7 @@ class Tokenizer():
     _supported_languages = {"de", "de_CMC", "en", "en_PTB"}
     _default_language = "de_CMC"
 
-    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de_CMC"):
+    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de_CMC",custom_abbreviations=[]):
         """Create a Tokenizer object. If split_camel_case is set to True,
         tokens written in CamelCase will be split. If token_classes is
         set to true, the tokenizer will output the token class for
@@ -287,6 +287,8 @@ class Tokenizer():
         self.multipart_abbreviation = re.compile(r'(?:\p{L}+\.){2,}')
         # only abbreviations that are not matched by (?:\p{L}\.)+
         abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language[:2], to_lower=True)
+        if custom_abbreviations:
+            abbreviation_list += custom_abbreviations
         # abbrev_simple = [(a, re.search(r"^\p{L}{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])\p{L}{2,}\.(?!\p{L}{1,3}\.)")
