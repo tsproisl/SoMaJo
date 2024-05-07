@@ -43,14 +43,14 @@ class SoMaJo:
     paragraph_separators = {"empty_lines", "single_newlines"}
     _default_parsep = "empty_lines"
 
-    def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None, character_offsets=False):
+    def __init__(self, language, *, split_camel_case=False, split_sentences=True, xml_sentences=None, character_offsets=False,custom_abbreviations=[]):
         assert language in self.supported_languages
         self.language = language
         self.split_camel_case = split_camel_case
         self.split_sentences = split_sentences
         self.xml_sentences = xml_sentences
         self.character_offsets = character_offsets
-        self._tokenizer = Tokenizer(split_camel_case=self.split_camel_case, language=self.language)
+        self._tokenizer = Tokenizer(split_camel_case=self.split_camel_case, language=self.language,custom_abbreviations=custom_abbreviations)
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
 

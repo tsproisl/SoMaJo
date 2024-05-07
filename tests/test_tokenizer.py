@@ -42,6 +42,11 @@ class TestEnglishTokenizer(TestTokenizer):
     def setUp(self):
         """Necessary preparations"""
         self.tokenizer = Tokenizer(language="en_PTB", split_camel_case=True)
+        
+class TestCustomTokenizer(TestTokenizer):
+    def setUp(self):
+        """Necessary preparations"""
+        self.tokenizer = Tokenizer(language="de_CMC", split_camel_case=True,custom_abbreviations=['Brem.','GBl.'])
 
 
 class TestTokenizerDeprecated(TestTokenizer):
@@ -1438,6 +1443,9 @@ class TestEnglish(TestEnglishTokenizer):
     def test_english_31(self):
         self._equal("I prefer La Porte de l'Enfer to L'Éternelle idole", "I prefer La Porte de l'Enfer to L'Éternelle idole")
 
+class TesttCustomAbbreviation(TestCustomTokenizer):
+        def test_abbreviations_custom(self):
+            self._equal("Brem.GBl.", "Brem. GBl.")
 
 class TestDeprecated(TestTokenizerDeprecated):
     def test_deprecated_01(self):
