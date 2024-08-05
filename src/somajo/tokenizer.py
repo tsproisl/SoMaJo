@@ -162,6 +162,10 @@ class Tokenizer():
                                          \#x[0-9a-f]+         # hexadecimal entities
                                       );""", re.VERBOSE | re.IGNORECASE)
 
+        # high priority single tokens
+        single_token_list = utils.read_abbreviation_file(f"single_tokens_{self.language[:2]}.txt")
+        self.single_tokens = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_list]) + r')(?!\p{L})', re.IGNORECASE)
+
         # EMOTICONS
         emoticon_set = {"(-.-)", "(T_T)", "(♥_♥)", ")':", ")-:",
                         "(-:", ")=", ")o:", ")x", ":'C", ":/", ":<",
@@ -697,6 +701,9 @@ class Tokenizer():
 
         # XML entities
         self._split_all_matches(self.entity, token_dll, "XML_entity")
+
+        # high priority single tokens
+        self._split_all_matches(self.single_tokens, token_dll)
 
         # emoticons
         self._split_all_matches(self.heart_emoticon, token_dll, "emoticon")

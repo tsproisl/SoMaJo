@@ -9,6 +9,3 @@ a.m.
 p.m.
 P.S.
 T.V.
-
-# These should be moved to another file:
-tl;dr

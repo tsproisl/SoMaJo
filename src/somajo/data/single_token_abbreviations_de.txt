@@ -40,15 +40,3 @@ T.V.
 Uni-Kl.
 USt-IdNr.
 Zeitschr.titel
-
-# These should be moved to another file:
-.Net
-/rant
-/s
-E/E
-tl;dr
-zl;ng
-
-# SAP Versions
-S/4
-R/3

@@ -1,0 +1,10 @@
+# A list of tokens that should not be split.
+#
+# Lines starting with “#” are treated as comments and will be ignored.
+
+tl;dr
+
+# mobile telephony
+3G
+4G
+5G
