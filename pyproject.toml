@@ -11,7 +11,7 @@
 #    a new release
 [project]
 name = "SoMaJo"
-version = "2.4.2"
+version = "2.4.3"
 description = "A tokenizer and sentence splitter for German and English web and social media texts."
 readme = "README.md"
 requires-python = ">=3.8"
