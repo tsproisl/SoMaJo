@@ -281,12 +281,12 @@ class Tokenizer():
         self.nr_abbreviations = re.compile(r"(?<![\w.])(\w+\.-?Nr\.)(?!\p{L}{1,3}\.)", re.IGNORECASE)
         self.single_letter_abbreviation = re.compile(r"(?<![\w.])\p{L}\.(?!\p{L}{1,3}\.)")
         # abbreviations with multiple dots that constitute tokens
-        single_token_abbreviation_list = utils.read_abbreviation_file("single_token_abbreviations_%s.txt" % self.language[:2])
+        single_token_abbreviation_list = utils.read_abbreviation_file(f"single_token_abbreviations_{self.language[:2]}.txt")
         self.single_token_abbreviation = re.compile(r"(?<![\w.])(?:" + r'|'.join([re.escape(_) for _ in single_token_abbreviation_list]) + r')(?!\p{L})', re.IGNORECASE)
         self.ps = re.compile(r"(?<!\d[ ])\bps\.", re.IGNORECASE)
         self.multipart_abbreviation = re.compile(r'(?:\p{L}+\.){2,}')
         # only abbreviations that are not matched by (?:\p{L}\.)+
-        abbreviation_list = utils.read_abbreviation_file("abbreviations_%s.txt" % self.language[:2], to_lower=True)
+        abbreviation_list = utils.read_abbreviation_file(f"abbreviations_{self.language[:2]}.txt", to_lower=True)
         # abbrev_simple = [(a, re.search(r"^\p{L}{2,}\.$", a)) for a in abbreviation_list]
         # self.simple_abbreviations = set([a[0].lower() for a in abbrev_simple if a[1]])
         # self.simple_abbreviation_candidates = re.compile(r"(?<![\w.])\p{L}{2,}\.(?!\p{L}{1,3}\.)")
@@ -416,9 +416,9 @@ class Tokenizer():
         self.en_threepart_contractions = [re.compile(contr, re.IGNORECASE) for contr in en_threepart_contractions]
         # English hyphenated words
         if self.language == "en" or self.language == "en_PTB":
-            nonbreaking_prefixes = utils.read_abbreviation_file("non-breaking_prefixes_%s.txt" % self.language[:2])
-            nonbreaking_suffixes = utils.read_abbreviation_file("non-breaking_suffixes_%s.txt" % self.language[:2])
-            nonbreaking_words = utils.read_abbreviation_file("non-breaking_hyphenated_words_%s.txt" % self.language[:2])
+            nonbreaking_prefixes = utils.read_abbreviation_file(f"non-breaking_prefixes_{self.language[:2]}.txt")
+            nonbreaking_suffixes = utils.read_abbreviation_file(f"non-breaking_suffixes_{self.language[:2]}.txt")
+            nonbreaking_words = utils.read_abbreviation_file(f"non-breaking_hyphenated_words_{self.language[:2]}.txt")
             self.en_nonbreaking_prefixes = re.compile(r"(?<![\w-])(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_prefixes]) + r")-[\w-]+", re.IGNORECASE)
             self.en_nonbreaking_suffixes = re.compile(r"\b[\w-]+-(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_suffixes]) + r")(?![\w-])", re.IGNORECASE)
             self.en_nonbreaking_words = re.compile(r"\b(?:" + r'|'.join([re.escape(_) for _ in nonbreaking_words]) + r")\b", re.IGNORECASE)
