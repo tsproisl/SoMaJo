@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
+"""Character alignment utilities for token offset calculation."""
+
+from __future__ import annotations
 
 import unicodedata
 
 import regex as re
 
+from .token import Token
 
 _ranges = [
     (0x0000, 0x001F),
@@ -15,14 +19,23 @@ _ranges = [
 ]
 _single_characters = ["\u00AD", "\u061C", "\u2060", "\uFEFF", "\uFE0F"]
 _whitespace = [" ", "\u00A0", "\u1680", "\u2028", "\u2029", "\u202F", "\u205F", "\u3000"]
-_skipable_characters = set(_single_characters + _whitespace + [chr(i) for start, end in _ranges for i in range(start, end + 1)])
+_skipable_characters: set[str] = set(_single_characters + _whitespace + [chr(i) for start, end in _ranges for i in range(start, end + 1)])
 
 _xml_entity = re.compile(r"&(?:#\d+|#x[0-9a-f]+|amp|apos|gt|lt|quot);", re.I)
 
 
-def _align_nfc(nfc, orig):
-    """Character alignment from NFC version to original string."""
-    alignment = {}
+def _align_nfc(nfc: str, orig: str) -> dict[tuple[int, int], tuple[int, int]]:
+    """Character alignment from NFC version to original string.
+
+    Args:
+        nfc: NFC normalized string.
+        orig: Original string.
+
+    Returns:
+        dict: Mapping from (start, end) positions in nfc to (start, end) positions in orig.
+
+    """
+    alignment: dict[tuple[int, int], tuple[int, int]] = {}
     if nfc == "":
         assert orig == "", "NFC string is empty - expected original string to be also empty; it is '{orig}' instead"
         return alignment
@@ -45,14 +58,24 @@ def _align_nfc(nfc, orig):
     return alignment
 
 
-def _determine_offsets(tokens, raw, position):
-    """Determine start and end positions of tokens in the original raw (NFC) input."""
-    offsets = []
+def _determine_offsets(tokens: list[Token], raw: str, position: int) -> list[tuple[int, int]]:
+    """Determine start and end positions of tokens in the original raw (NFC) input.
+
+    Args:
+        tokens: List of Token objects.
+        raw: The raw text input.
+        position: Starting position offset.
+
+    Returns:
+        list: List of (start, end) tuples for each token.
+
+    """
+    offsets: list[tuple[int, int]] = []
     raw_i = 0
     raw = re.sub(r"\s", " ", raw)
     for token in tokens:
         if token.markup:
-            start, end = token.character_offset
+            start, end = token.character_offset  # type: ignore
             start -= position
             end -= position
         else:
@@ -84,11 +107,19 @@ def _determine_offsets(tokens, raw, position):
     return offsets
 
 
-def _resolve_entities(xml):
-    """Resolve XML entities and provide an alignment from output string to input string."""
+def _resolve_entities(xml: str) -> tuple[str, list[tuple[int, int]]]:
+    """Resolve XML entities and provide an alignment from output string to input string.
+
+    Args:
+        xml: XML string potentially containing entities.
+
+    Returns:
+        tuple: (resolved_xml_string, alignment_list) where alignment_list maps positions.
+
+    """
     named = {"&amp;": "&", "&apos;": "'", "&gt;": ">", "&lt;": "<", "&quot;": '"'}
-    outstring = ""
-    alignment = []
+    outstring: str = ""
+    alignment: list[tuple[int, int]] = []
     xml_lower = xml.lower()
     i = 0
     for m in _xml_entity.finditer(xml_lower):
@@ -110,10 +141,28 @@ def _resolve_entities(xml):
     return outstring, alignment
 
 
-def token_offsets(token_list, raw, position, xml_input, tokens):
-    """Determine character offsets for tokens."""
+def token_offsets(
+    token_list: list[Token],
+    raw: str,
+    position: int,
+    xml_input: bool,
+    tokens: list[Token]
+) -> list[tuple[int, int]]:
+    """Determine character offsets for tokens.
+
+    Args:
+        token_list: Original list of tokens from the chunk.
+        raw: Raw text from the chunk.
+        position: Starting position of the chunk.
+        xml_input: Whether the input is XML.
+        tokens: List of tokenized tokens.
+
+    Returns:
+        list: List of (start, end) character offset tuples for each token.
+
+    """
     if xml_input:
-        chunk_offsets = [(t.character_offset[0] - position, t.character_offset[1] - position) for t in token_list]
+        chunk_offsets = [(t.character_offset[0] - position, t.character_offset[1] - position) for t in token_list]  # type: ignore
         raw, align_to_entities = _resolve_entities(raw)
         align_from_entities = {i: char_i for char_i, (start, end) in enumerate(align_to_entities) for i in range(start, end)}
         chunks = [raw[align_from_entities[start]:align_from_entities[end - 1] + 1] for start, end in chunk_offsets]
@@ -135,7 +184,7 @@ def token_offsets(token_list, raw, position, xml_input, tokens):
     if xml_input:
         for i in range(len(tokens)):
             if tokens[i].markup:
-                s, e = tokens[i].character_offset
+                s, e = tokens[i].character_offset  # type: ignore
                 tokens[i].character_offset = (
                     align_from_raw[align_from_entities[s - position]][0] + position,
                     align_from_raw[align_from_entities[e - position - 1]][1] + position
@@ -149,8 +198,17 @@ def token_offsets(token_list, raw, position, xml_input, tokens):
     return offsets
 
 
-def xml_chunk_offset(token, raw):
-    """Determine character offset for an XML chunk created by `utils._xml_chunk_generator`."""
+def xml_chunk_offset(token: Token, raw: str) -> tuple[int, int]:
+    """Determine character offset for an XML chunk created by utils._xml_chunk_generator.
+
+    Args:
+        token: Token to find offset for.
+        raw: Raw XML string.
+
+    Returns:
+        tuple: (start, end) character offset tuple.
+
+    """
     raw, align_to_raw = _resolve_entities(raw)
     raw = re.sub(r"\s", " ", raw)
     text = token.text

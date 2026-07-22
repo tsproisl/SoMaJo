@@ -1,17 +1,30 @@
 #!/usr/bin/env python3
+"""Utility functions for tokenization and XML processing."""
+
+from __future__ import annotations
 
 import io
 import os
 import regex as re
 import xml.sax
 import xml.sax.saxutils
+from typing import IO, Generator, Iterable, Iterator, Literal
 
 from . import alignment
 from .token import Token
 
 
-def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
-    """Generator for the paragraphs in the file."""
+def get_paragraphs_str(fh: IO[str], paragraph_separator: str = "empty_lines") -> Generator[tuple[str, int]]:
+    """Generator for the paragraphs in the file.
+
+    Args:
+        fh: File handle to read from.
+        paragraph_separator: How paragraphs are separated. Either "single_newlines" or "empty_lines".
+
+    Yields:
+        tuple: (paragraph_text, position) tuples.
+
+    """
     position = 0
     if paragraph_separator == "single_newlines":
         for line in fh:
@@ -19,7 +32,7 @@ def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
                 yield line, position
             position += len(line)
     elif paragraph_separator == "empty_lines":
-        paragraph = []
+        paragraph: list[str] = []
         for line in fh:
             paragraph.append(line)
             if line.strip() == "":
@@ -32,8 +45,17 @@ def get_paragraphs_str(fh, paragraph_separator="empty_lines"):
             yield "".join(paragraph), position
 
 
-def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
-    """Generator for the paragraphs in the file."""
+def get_paragraphs_list(text_file: str | IO[str], paragraph_separator: str = "empty_lines") -> Generator[tuple[list[Token], str, int], None, None]:
+    """Generator for the paragraphs in the file.
+
+    Args:
+        text_file: Either a filename or a file-like object.
+        paragraph_separator: How paragraphs are separated. Either "single_newlines" or "empty_lines".
+
+    Yields:
+        tuple: (token_list, paragraph_text, position) tuples.
+
+    """
     if isinstance(text_file, str):
         with open(text_file, encoding="utf-8") as fh:
             for paragraph, position in get_paragraphs_str(fh, paragraph_separator):
@@ -43,9 +65,18 @@ def get_paragraphs_list(text_file, paragraph_separator="empty_lines"):
             yield [Token(paragraph, first_in_sentence=True, last_in_sentence=True, character_offset=(position, position + len(paragraph)))], paragraph, position
 
 
-def read_abbreviation_file(filename, to_lower=False):
-    """Return the abbreviations from the given filename."""
-    abbreviations = set()
+def read_abbreviation_file(filename: str, to_lower: bool = False) -> list[str]:
+    """Return the abbreviations from the given filename.
+
+    Args:
+        filename: Name of the abbreviation file in the data directory.
+        to_lower: Whether to convert abbreviations to lowercase. Defaults to False.
+
+    Returns:
+        list: Sorted list of abbreviations, longest first.
+
+    """
+    abbreviations: set[str] = set()
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", filename), encoding="utf-8") as fh:
         for line in fh:
             line = line.strip()
@@ -60,16 +91,32 @@ def read_abbreviation_file(filename, to_lower=False):
 
 
 class SaxTokenHandler(xml.sax.handler.ContentHandler):
-    def __init__(self, eos_tags=None, prune_tags=None):
+    """SAX handler for parsing XML and creating tokens.
+
+    Args:
+        eos_tags: Set of XML tags that constitute sentence breaks.
+        prune_tags: Set of XML tags to prune (remove) from the input.
+
+    """
+
+    def __init__(self, eos_tags: set[str] | None = None, prune_tags: set[str] | None = None) -> None:
         super().__init__()
         self.eos_tags = eos_tags
         self.prune_tags = prune_tags
-        self.token_list = []
-        self.content = ""
-        self.sentence_start = True
-        self.open_prune_tags = []
+        self.token_list: list[Token] = []
+        self.content: str = ""
+        self.sentence_start: bool = True
+        self.open_prune_tags: list[str] = []
 
-    def _insert_element(self, name, text, markup_class):
+    def _insert_element(self, name: str, text: str, markup_class: Literal['start', 'end']) -> None:
+        """Insert an element (content or markup) into the token list.
+
+        Args:
+            name: Tag name.
+            text: Text content of the element.
+            markup_class: Either "start" or "end".
+
+        """
         sentence_boundary = False
         if self.eos_tags is not None and name in self.eos_tags:
             sentence_boundary = True
@@ -83,11 +130,11 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
         if sentence_boundary:
             self.sentence_start = True
 
-    def characters(self, data):
+    def characters(self, data: str) -> None:
         if not self.open_prune_tags:
             self.content += data
 
-    def startElement(self, name, attrs):
+    def startElement(self, name: str, attrs) -> None:
         if self.prune_tags is not None and name in self.prune_tags:
             self.open_prune_tags.append(name)
         if not self.open_prune_tags:
@@ -97,7 +144,7 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
                 text = "<%s>" % name
             self._insert_element(name, text, "start")
 
-    def endElement(self, name):
+    def endElement(self, name: str) -> None:
         if not self.open_prune_tags:
             text = "</%s>" % name
             self._insert_element(name, text, "end")
@@ -106,11 +153,23 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
             assert top == name
 
 
-def incremental_xml_parser(f, eos_tags=None, prune_tags=None):
+def incremental_xml_parser(f: IO[str], eos_tags: set[str] | None = None, prune_tags: set[str] | None = None) -> Generator[tuple[list[Token], list[str]], None, None]:
+    """Parse XML incrementally and yield token lists and line buffers.
+
+    Args:
+        f: File handle to read XML from.
+        eos_tags: Set of XML tags that constitute sentence breaks.
+        prune_tags: Set of XML tags to prune from the input.
+
+    Yields:
+        tuple: (token_list, line_buffer) tuples.
+
+    """
     parser = xml.sax.make_parser(["xml.sax.xmlreader.IncrementalParser"])
+    assert isinstance(parser, xml.sax.xmlreader.IncrementalParser)  # for mypy
     handler = SaxTokenHandler(eos_tags, prune_tags)
     parser.setContentHandler(handler)
-    line_buffer = []
+    line_buffer: list[str] = []
     for line in f:
         parser.feed(line)
         line_buffer.append(line)
@@ -121,14 +180,22 @@ def incremental_xml_parser(f, eos_tags=None, prune_tags=None):
     parser.close()
 
 
-def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=False):
-    """Parse the XML data and yield doubly linked lists of Token objects
-    that are delimited by eos_tags.
+def _xml_chunk_generator(f: IO[str], eos_tags: set[str] | None, prune_tags: set[str] | None, character_offsets: bool) -> Generator[tuple[list[Token], str, int], None, None]:
+    """Parse the XML data and yield doubly linked lists of Token objects that are delimited by eos_tags.
+
+    Args:
+        f: File handle to read XML from.
+        eos_tags: Set of XML tags that constitute sentence breaks.
+        prune_tags: Set of XML tags to prune from the input.
+        character_offsets: Whether to compute character offsets.
+
+    Yields:
+        tuple: (token_list, raw_xml, position) tuples.
 
     """
     non_whitespace = re.compile(r"\S")
     token_and_line_lists = incremental_xml_parser(f, eos_tags, prune_tags)
-    current = []
+    current: list[Token] = []
     bos, eos = True, False
     lexical_tokens = 0
     # yield chunks delimited by eos_tags
@@ -140,11 +207,11 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=Fa
     is_eos_tag [label="eos_tag?"]
     eos_markup_class [label="markup_class"]
     non_eos_markup_class [label="markup_class"]
-    yield_token [label="eos = False\nyield\nreset"];
-    yield_non_eos [label="eos = False\nyield\nreset"];
-    fis [label = "first_in_sentence = True\nbos = False"];
-    eos_start [label="eos = False\nbos = True\nset last_in_sentence\nyield\nreset"];
-    eos_end [label="eos = True\nbos = True\nset last_in_sentence"];
+    yield_token [label="eos = False\nyield\nreset"]
+    yield_non_eos [label="eos = False\nyield\nreset"]
+    fis [label = "first_in_sentence = True\nbos = False"]
+    eos_start [label="eos = False\nbos = True\nset last_in_sentence\nyield\nreset"]
+    eos_end [label="eos = True\nbos = True\nset last_in_sentence"]
 
     start -> is_tag [label = "read"];
         is_tag -> tok_is_eos [label = "no"];
@@ -219,14 +286,6 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=Fa
   |    +-------+----> |     markup_class     | -+---------+--------------+---------+--------------------------------+
   |            |      +----------------------+  |         |              |         |                                |
   |            |        |                       |         |              |         |                                |
-  |            |        | end                   |         |              |         |                                |
-  |            |        v                       |         |              |         |                                |
-  |            |      +----------------------+  |         |              |         |                                |
-  |            |      |      eos = True      |  |         |              |         |                                |
-  |            | no   |      bos = True      |  |         |              |         |                                |
-  |            |      | set last_in_sentence |  |         |              |         |                                |
-  |            |      +----------------------+  |         |              |         |                                |
-  |            |        |                       |         |              |         |                                |
   |            |        |                       | no      | end          +---------+---------------------------+    |
   |            |        v                       v         v                        |                           |    |
   |            |      +-----------------------------------------------+            |                           |    |
@@ -252,8 +311,8 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=Fa
                       +----------------------+
 """
     del algo_dot, algo_sketch
-    input_buffer = ""
-    output_buffer = []
+    input_buffer: str = ""
+    output_buffer: list[str] = []
     position = 0
     for token_list, line_list in token_and_line_lists:
         if character_offsets:
@@ -326,9 +385,18 @@ def _xml_chunk_generator(f, eos_tags=None, prune_tags=None, character_offsets=Fa
         yield current, raw_xml, position
 
 
-def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None, character_offsets=False):
-    """Parse the XML data and yield doubly linked lists of Token objects
-    that are delimited by eos_tags.
+def xml_chunk_generator(data: str | IO[str], is_file: bool = True, eos_tags: set[str] | None = None, prune_tags: set[str] | None = None, character_offsets: bool = False) -> Generator[tuple[list[Token], str, int], None, None]:
+    """Parse the XML data and yield doubly linked lists of Token objects that are delimited by eos_tags.
+
+    Args:
+        data: XML data as string or file-like object.
+        is_file: Whether data is a file path/object. Defaults to True.
+        eos_tags: Set of XML tags that constitute sentence breaks.
+        prune_tags: Set of XML tags to prune from the input.
+        character_offsets: Whether to compute character offsets. Defaults to False.
+
+    Yields:
+        tuple: (token_list, raw_xml, position) tuples.
 
     """
     if is_file:
@@ -340,16 +408,34 @@ def xml_chunk_generator(data, is_file=True, eos_tags=None, prune_tags=None, char
             for chunk, raw_xml, position in _xml_chunk_generator(data, eos_tags, prune_tags, character_offsets):
                 yield chunk, raw_xml, position
     else:
+        assert isinstance(data, str)  # for mypy
         for chunk, raw_xml, position in _xml_chunk_generator(io.StringIO(data), eos_tags, prune_tags, character_offsets):
             yield chunk, raw_xml, position
 
 
-def escape_xml(string):
-    """Escape "&", "<" and ">" in string."""
+def escape_xml(string: str) -> str:
+    """Escape "&", "<" and ">" in string.
+
+    Args:
+        string: String to escape.
+
+    Returns:
+        str: Escaped string.
+
+    """
     return xml.sax.saxutils.escape(string)
 
 
-def escape_xml_tokens(tokens):
+def escape_xml_tokens(tokens: list[Token]) -> list[Token]:
+    """Escape XML special characters in token text and original_spelling.
+
+    Args:
+        tokens: List of Token objects.
+
+    Returns:
+        list: List of Token objects with escaped text.
+
+    """
     for t in tokens:
         if not t.markup:
             t.text = escape_xml(t.text)

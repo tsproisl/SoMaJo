@@ -1,4 +1,6 @@
 build
+mypy
 sphinx
 sphinx-markdown-builder
 twine
+types-regex

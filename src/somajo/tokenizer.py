@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+"""Tokenizer implementation for SoMaJo."""
+
+from __future__ import annotations
 
 import itertools
 import logging
@@ -6,6 +9,7 @@ import operator
 import unicodedata
 
 import regex as re
+from typing import Generator
 
 from . import (
     doubly_linked_list,
@@ -14,24 +18,34 @@ from . import (
 from .token import Token
 
 
-class Tokenizer():
+class Tokenizer:
+    """Tokenizer for text processing.
 
-    _supported_languages = {"de", "de_CMC", "en", "en_PTB"}
-    _default_language = "de_CMC"
+    Args:
+        split_camel_case: Whether to split camelCase tokens. Defaults to False.
+        token_classes: Whether to output token classes. Defaults to False.
+        extra_info: Whether to output extra information. Defaults to False.
+        language: Language for tokenization. Defaults to "de_CMC".
 
-    def __init__(self, split_camel_case=False, token_classes=False, extra_info=False, language="de_CMC"):
-        """Create a Tokenizer object. If split_camel_case is set to True,
-        tokens written in CamelCase will be split. If token_classes is
-        set to true, the tokenizer will output the token class for
-        each token (if it is a number, an XML tag, an abbreviation,
-        etc.). If extra_info is set to True, the tokenizer will output
-        information about the original spelling of the tokens.
+    """
 
-        """
+    _supported_languages: set[str] = {"de", "de_CMC", "en", "en_PTB"}
+    _default_language: str = "de_CMC"
+
+    def __init__(
+        self,
+        split_camel_case: bool = False,
+        token_classes: bool = False,
+        extra_info: bool = False,
+        language: str = "de_CMC"
+    ) -> None:
         self.split_camel_case = split_camel_case
         self.token_classes = token_classes
         self.extra_info = extra_info
-        self.language = language if language in self._supported_languages else self.default_language
+        if language in self._supported_languages:
+            self.language = language
+        else:
+            self.language = self._default_language
 
         self.spaces = re.compile(r"\s+")
         self.spaces_or_empty = re.compile(r"^\s*$")
@@ -446,12 +460,30 @@ class Tokenizer():
         self.dot = re.compile(r'(\.)')
         # Soft hyphen ­ „“
 
-    def _split_on_boundaries(self, node, boundaries, token_class, *, lock_match=True, delete_whitespace=False):
-        """"""
+    def _split_on_boundaries(
+        self,
+        node: doubly_linked_list.DLLElement,
+        boundaries: list,
+        token_class: str,
+        *,
+        lock_match: bool = True,
+        delete_whitespace: bool = False
+    ) -> None:
+        """Split a node at specified boundaries.
+
+        Args:
+            node: The DLL element to split.
+            boundaries: List of (start, end, replacement) tuples.
+            token_class: Token class to assign.
+            lock_match: Whether to lock the matched tokens. Defaults to True.
+            delete_whitespace: Whether to delete whitespace. Defaults to False.
+
+        """
         n = len(boundaries)
         if n == 0:
             return
         token_dll = node.list
+        assert isinstance(token_dll, doubly_linked_list.DLL)  # for mypy
         prev_end = 0
         for i, (start, end, replacement) in enumerate(boundaries):
             original_spelling = None
@@ -637,7 +669,16 @@ class Tokenizer():
                         previous_non_markup.value.last_in_sentence = True
                 token_dll.remove(t)
 
-    def _tokenize(self, token_dll):
+    def _tokenize(self, token_dll: doubly_linked_list.DLL) -> list[Token]:
+        """Tokenize a doubly linked list of tokens.
+
+        Args:
+            token_dll: Doubly linked list of tokens to process.
+
+        Returns:
+            list: List of processed Token objects.
+
+        """
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
@@ -848,24 +889,57 @@ class Tokenizer():
 
         return token_dll.to_list()
 
-    def _convert_to_legacy(self, tokens):
+    def _convert_to_legacy(self, tokens: list[Token]) -> list:
+        """Convert tokens to legacy format.
+
+        Args:
+            tokens: List of Token objects.
+
+        Returns:
+            list: List of tokens in legacy format (strings or tuples).
+
+        """
         if self.token_classes and self.extra_info:
-            tokens = [(t.text, t.token_class, t.extra_info) for t in tokens]
+            tokens = [(t.text, t.token_class, t.extra_info) for t in tokens]  # type: ignore
         elif self.token_classes:
-            tokens = [(t.text, t.token_class) for t in tokens]
+            tokens = [(t.text, t.token_class) for t in tokens]  # type: ignore
         elif self.extra_info:
-            tokens = [(t.text, t.extra_info) for t in tokens]
+            tokens = [(t.text, t.extra_info) for t in tokens]  # type: ignore
         else:
-            tokens = [t.text for t in tokens]
+            tokens = [t.text for t in tokens]  # type: ignore
         return tokens
 
-    def tokenize(self, paragraph):
-        """An alias for tokenize_paragraph"""
+    def tokenize(self, paragraph: str) -> list:
+        """An alias for tokenize_paragraph.
+
+        Deprecated:
+            Since version 2.0.0. Please use somajo.SoMaJo.tokenize_text() instead.
+
+        Args:
+            paragraph: Paragraph to tokenize.
+
+        Returns:
+            list: Tokenized paragraph in legacy format.
+
+        """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         return self.tokenize_paragraph(paragraph)
 
-    def tokenize_file(self, filename, parsep_empty_lines=True):
-        """Tokenize utf-8-encoded text file and yield tokenized paragraphs."""
+    def tokenize_file(self, filename: str, parsep_empty_lines: bool = True) -> Generator[list, None, None]:
+        """Tokenize utf-8-encoded text file and yield tokenized paragraphs.
+
+        Deprecated:
+            Since version 2.0.0. Please use somajo.SoMaJo.tokenize_text_file() instead.
+
+        Args:
+            filename: Path to the file to tokenize.
+            parsep_empty_lines: Whether paragraphs are separated by empty lines.
+                Defaults to True.
+
+        Yields:
+            list: Tokenized paragraphs in legacy format.
+
+        """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_file() is deprecated. Please use somajo.SoMaJo.tokenize_text_file() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         with open(filename, encoding="utf-8") as f:
             parsep = "single_newlines"
@@ -873,17 +947,25 @@ class Tokenizer():
                 parsep = "empty_lines"
             paragraph_info = utils.get_paragraphs_str(f, paragraph_separator=parsep)
             paragraphs = (pi[0] for pi in paragraph_info)
-            paragraphs = (paragraph for paragraph, position in paragraphs)
             tokenized_paragraphs = map(self.tokenize_paragraph, paragraphs)
             for tp in tokenized_paragraphs:
                 if tp:
                     yield tp
 
-    def tokenize_paragraph(self, paragraph):
+    def tokenize_paragraph(self, paragraph: str) -> list:
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
         social media.
+
+        Deprecated:
+            Since version 2.0.0. Please use somajo.SoMaJo.tokenize_text() instead.
+
+        Args:
+            paragraph: Paragraph to tokenize.
+
+        Returns:
+            list: Tokenized paragraph in legacy format.
 
         """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_paragraph() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
@@ -891,14 +973,27 @@ class Tokenizer():
         tokens = self._tokenize(token_dll)
         return self._convert_to_legacy(tokens)
 
-    def tokenize_xml(self, xml, is_file=True, eos_tags=None):
+    def tokenize_xml(self, xml: str, is_file: bool = True, eos_tags: list[str] | None = None) -> list:
         """Tokenize XML file or XML string according to the guidelines of the
         EmpiriST 2015 shared task on automatic linguistic annotation
         of computer-mediated communication / social media.
 
+        Deprecated:
+            Since version 2.0.0. Please use somajo.SoMaJo.tokenize_xml() instead.
+
+        Args:
+            xml: XML string or file path.
+            is_file: Whether xml is a file path. Defaults to True.
+            eos_tags: List of XML tags that constitute sentence breaks.
+
+        Returns:
+            list: Tokenized XML in legacy format.
+
         """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
-        chunk_info = utils.xml_chunk_generator(xml, is_file, eos_tags)
+        if eos_tags is not None:
+            eos_tags = set(eos_tags)  # type: ignore
+        chunk_info = utils.xml_chunk_generator(xml, is_file, eos_tags)  # type: ignore
         chunk_lists = (ci[0] for ci in chunk_info)
         token_dlls = map(doubly_linked_list.DLL, chunk_lists)
         tokens = map(self._tokenize, token_dlls)

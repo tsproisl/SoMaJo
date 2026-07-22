@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
+"""Sentence splitting functionality for tokenized text."""
+
+from __future__ import annotations
 
 import collections
 import regex as re
+from typing import Iterable, Iterator
 
 from . import (
     doubly_linked_list,
@@ -10,12 +14,17 @@ from . import (
 )
 
 
-class SentenceSplitter():
-    def __init__(self, is_tuple=False, language="de_CMC"):
-        """Create a SentenceSplitter object. If the tokenized paragraphs
-        contain token classes or extra info, set is_tuple=True.
+class SentenceSplitter:
+    """Sentence splitter for tokenized text.
 
-        """
+    Args:
+        is_tuple: If the tokenized paragraphs contain token classes or extra info,
+            set is_tuple=True. Defaults to False.
+        language: Language for sentence splitting. Defaults to "de_CMC".
+
+    """
+
+    def __init__(self, is_tuple: bool = False, language: str = "de_CMC") -> None:
         self.is_tuple = is_tuple
         # full stop, ellipsis, exclamation and question marks
         self.sentence_ending_punct = re.compile(r"^(?:\.+|…+\.*|[!?]+)$")
@@ -35,7 +44,16 @@ class SentenceSplitter():
         self.mention = re.compile(r'^[@]\w+$')
         self.hashtag = re.compile(r'^[#]\w(?:[\w-]*\w)?$')
 
-    def _get_sentence_boundaries(self, tokens):
+    def _get_sentence_boundaries(self, tokens: list[token.Token]) -> list[int]:
+        """Get sentence boundary positions from tokens.
+
+        Args:
+            tokens: List of Token objects.
+
+        Returns:
+            list: List of boundary indices.
+
+        """
         sentence_boundaries = []
         n = len(tokens)
         for i, t in enumerate(tokens, start=1):
@@ -53,26 +71,37 @@ class SentenceSplitter():
             sentence_boundaries[-1] = n
         return sentence_boundaries
 
-    def _add_xml_tags(self, tokens, s_tag="s"):
-        """Mark sentence boundaries with XML tags."""
+    def _add_xml_tags(self, tokens: Iterable[list[token.Token]], s_tag: str = "s") -> Iterator[list[token.Token]]:
+        """Mark sentence boundaries with XML tags.
+
+        Args:
+            tokens: Iterable of token lists (sentences).
+            s_tag: Tag name for sentence markers. Defaults to "s".
+
+        Yields:
+            list: Token lists with XML sentence tags added.
+
+        """
         # Positions of XML tags w.r.t. the actual sentence:
         start, inside, end, na = 1, 2, 3, 4
-        open_tags = collections.deque()
-        reopen_after_start = collections.deque()
-        reopen_after_end = collections.deque()
+        open_tags: collections.deque[dict] = collections.deque()
+        reopen_after_start: collections.deque[dict] = collections.deque()
+        reopen_after_end: collections.deque[dict] = collections.deque()
         start_tag = re.compile(r"^<([^ ]+)[ ]?[^>]*>$")
         end_tag = re.compile(r"^</(.+)>$")
         for sentence in tokens:
             # print([(t.text, t.first_in_sentence, t.last_in_sentence) for t in sentence])
             sentence_dll = doubly_linked_list.DLL(sentence)
             position = start
-            tags = collections.deque()
-            first_token, last_token = None, None
+            tags: collections.deque[dict] = collections.deque()
+            first_token: doubly_linked_list.DLLElement | None = None
+            last_token: doubly_linked_list.DLLElement | None = None
             for tag in reversed(reopen_after_end):
                 top = open_tags.pop()
                 assert top is tag
             while len(reopen_after_end) > 0:
                 tag = reopen_after_end.pop()
+                assert isinstance(sentence_dll.first, doubly_linked_list.DLLElement)  # for mypy
                 sentence_dll.insert_left(tag["start_token"], sentence_dll.first)
             for tok in sentence_dll:
                 if tok.value.markup:
@@ -111,10 +140,12 @@ class SentenceSplitter():
                 if tag["start"] == na:
                     if tag["end"] == inside:
                         ft = sentence_dll.first
+                        assert isinstance(ft, doubly_linked_list.DLLElement)  # for mypy
                         # close tag
                         closing_tag = token.Token("</%s>" % tag["tag_name"], markup=True, markup_class="end", markup_eos=False, locked=True)
                         sentence_dll.insert_left(closing_tag, ft)
                         # put starting s-tag to the right
+                        assert isinstance(ft.prev, doubly_linked_list.DLLElement)  # for mypy
                         assert sentence_dll.is_right_of(s_start, ft.prev)
                         # re-open tag
                         reopen_after_start.append(tag)
@@ -126,13 +157,17 @@ class SentenceSplitter():
                 elif tag["start"] == inside:
                     if tag["end"] == end:
                         # put ending s-tag to the right
+                        assert isinstance(s_end, doubly_linked_list.DLLElement)  # for mypy
                         if not sentence_dll.is_right_of(s_end, tag["end_token"]):
                             s_end = tag["end_token"]
                     elif tag["end"] == na:
                         # close tag
                         closing_tag = token.Token("</%s>" % tag["tag_name"], markup=True, markup_class="end", markup_eos=False, locked=True)
+                        assert isinstance(lot, doubly_linked_list.DLLElement)  # for mypy
                         sentence_dll.insert_right(closing_tag, lot)
                         # put ending s-tag
+                        assert isinstance(s_end, doubly_linked_list.DLLElement)  # for mypy
+                        assert isinstance(lot.next, doubly_linked_list.DLLElement)  # for mypy
                         if not sentence_dll.is_right_of(s_end, lot.next):
                             # s_end = sentence_dll.last
                             s_end = lot.next
@@ -144,6 +179,7 @@ class SentenceSplitter():
                 tag = reopen_after_start.popleft()
                 sentence_dll.insert_left(tag["start_token"], s_start)
             # ending s-tag
+            assert isinstance(s_end, doubly_linked_list.DLLElement)  # for mypy
             sentence_dll.insert_right(token.Token("</%s>" % s_tag, markup=True, markup_class="end", markup_eos=True, locked=True), s_end)
             # for all tags on the stack, change start to na
             for tag in open_tags:
@@ -151,10 +187,18 @@ class SentenceSplitter():
             yield sentence_dll.to_list()
         assert len(open_tags) == 0
 
-    def _merge_empty_sentences(self, tokens):
-        """Merge empty sentences with preceding sentence"""
+    def _merge_empty_sentences(self, tokens: Iterable[list[token.Token]]) -> Iterator[list[token.Token]]:
+        """Merge empty sentences with preceding sentence.
+
+        Args:
+            tokens: Iterable of token lists (sentences).
+
+        Yields:
+            list: Merged token lists.
+
+        """
         empty_first = True
-        previous = []
+        previous: list[token.Token] = []
         for sentence in tokens:
             empty_sentence = not any([tok.first_in_sentence for tok in sentence])
             if empty_first:
@@ -168,13 +212,29 @@ class SentenceSplitter():
                     previous = sentence
         yield previous
 
-    def _split_sentences(self, tokens):
-        """Split list of Token objects into sentences."""
+    def _split_sentences(self, tokens: list[token.Token]) -> list[list[token.Token]]:
+        """Split list of Token objects into sentences.
+
+        Args:
+            tokens: List of Token objects.
+
+        Returns:
+            list: List of token lists, one per sentence.
+
+        """
         tokens, sentence_boundaries = self._split_token_objects(tokens)
         return [tokens[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
-    def split(self, tokenized_paragraph):
-        """Split tokenized_paragraph into sentences."""
+    def split(self, tokenized_paragraph: list) -> list:
+        """Split tokenized_paragraph into sentences.
+
+        Args:
+            tokenized_paragraph: List of token strings or tuples.
+
+        Returns:
+            list: List of sentences, where each sentence is a list of tokens.
+
+        """
         if self.is_tuple:
             tokens = [token.Token(t[0]) for t in tokenized_paragraph]
         else:
@@ -182,8 +242,17 @@ class SentenceSplitter():
         tokens, sentence_boundaries = self._split_token_objects(tokens)
         return [tokenized_paragraph[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
-    def split_xml(self, tokenized_xml, eos_tags=set()):
-        """Split tokenized XML into sentences."""
+    def split_xml(self, tokenized_xml: list, eos_tags: set = set()) -> list:
+        """Split tokenized XML into sentences.
+
+        Args:
+            tokenized_xml: List of token strings or tuples.
+            eos_tags: Set of XML tags that constitute sentence breaks.
+
+        Returns:
+            list: List of XML chunks, one per sentence.
+
+        """
         opening_tag = re.compile(r"""<(?:[^\s:]+:)?([_A-Z][-.\w]*)(?:\s+[_:A-Z][-.:\w]*\s*=\s*(?:"[^"]*"|'[^']*'))*\s*/?>""", re.IGNORECASE)
         closing_tag = re.compile(r"^</([_:A-Z][-.:\w]*)\s*>$", re.IGNORECASE)
         if self.is_tuple:
@@ -218,7 +287,17 @@ class SentenceSplitter():
         tokens, sentence_boundaries = self._split_token_objects(tokens)
         return [tokenized_xml[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
-    def _split_token_objects(self, tokens):
+    def _split_token_objects(self, tokens: list[token.Token]) -> tuple[list[token.Token], list[int]]:
+        """Split token objects into sentences.
+
+        Args:
+            tokens: List of Token objects.
+
+        Returns:
+            tuple: (tokens, sentence_boundaries) where tokens may have been modified
+                and sentence_boundaries is a list of boundary indices.
+
+        """
         n = len(tokens)
         # the first non-markup token is first_in_sentence
         for tok in tokens:

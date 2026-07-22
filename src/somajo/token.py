@@ -1,39 +1,36 @@
 #!/usr/bin/env python3
 
+from typing import Literal, Tuple
+
 
 class Token:
     """Token objects store a piece of text (in the end a single token) with additional information.
 
-    Parameters
-    ----------
-    text : str
-        The text that makes up the token object
-    markup : bool, (default=False)
-        Is the token a markup token?
-    markup_class : {'start', 'end'}, optional (default=None)
-        If `markup=True`, then `markup_class` must be either "start" or "end".
-    markup_eos : bool, optional (default=None)
-        Is the markup token a sentence boundary?
-    locked : bool, (default=False)
-        Mark the token as locked.
-    token_class : {'URL', 'XML_entity', 'XML_tag', 'abbreviation', 'action_word', 'amount', 'date', 'email_address', 'emoticon', 'hashtag', 'measurement', 'mention', 'number', 'ordinal', 'regular', 'semester', 'symbol', 'time'}, optional (default=None)
-        The class of the token, e.g. "regular", "emoticon", "URL", etc.
-    space_after : bool, (default=True)
-        Was there a space after the token in the original data?
-    original_spelling : str, optional (default=None)
-        The original spelling of the token, if it is different from the one in `text`.
-    first_in_sentence : bool, (default=False)
-        Is it the first token of a sentence?
-    last_in_sentence : bool, (default=False)
-        Is it the last token of a sentence?
-    character_offset : tuple, (default=None)
-        Character offset of the token in the input as tuple `(start, end)`
-        such that `input[start:end] == text` (if there are no changes to
-        the token text during tokenization)
+    Args:
+        text: The text that makes up the token object.
+        markup: Is the token a markup token? Defaults to False.
+        markup_class: If `markup=True`, then `markup_class` must be either "start" or "end".
+            Defaults to None.
+        markup_eos: Is the markup token a sentence boundary? Defaults to None.
+        locked: Mark the token as locked. Defaults to False.
+        token_class: The class of the token, e.g. "regular", "emoticon", "URL", etc.
+            Must be one of: 'URL', 'XML_entity', 'XML_tag', 'abbreviation', 'action_word',
+            'amount', 'date', 'email_address', 'emoticon', 'hashtag', 'measurement',
+            'mention', 'number', 'ordinal', 'regular', 'semester', 'symbol', 'time'.
+            Defaults to None.
+        space_after: Was there a space after the token in the original data?
+            Defaults to True.
+        original_spelling: The original spelling of the token, if it is different from
+            the one in `text`. Defaults to None.
+        first_in_sentence: Is it the first token of a sentence? Defaults to False.
+        last_in_sentence: Is it the last token of a sentence? Defaults to False.
+        character_offset: Character offset of the token in the input as tuple `(start, end)`
+            such that `input[start:end] == text` (if there are no changes to the token text
+            during tokenization). Defaults to None.
 
     """
 
-    token_classes = {
+    token_classes: set[str] = {
         "URL",
         "XML_entity",
         "XML_tag",
@@ -56,19 +53,19 @@ class Token:
 
     def __init__(
             self,
-            text,
+            text: str,
             *,
-            markup=False,
-            markup_class=None,
-            markup_eos=None,
-            locked=False,
-            token_class=None,
-            space_after=True,
-            original_spelling=None,
-            first_in_sentence=False,
-            last_in_sentence=False,
-            character_offset=None
-    ):
+            markup: bool = False,
+            markup_class: Literal["start", "end"] | None = None,
+            markup_eos: bool | None = None,
+            locked: bool = False,
+            token_class: str | None = None,
+            space_after: bool = True,
+            original_spelling: str | None = None,
+            first_in_sentence: bool = False,
+            last_in_sentence: bool = False,
+            character_offset: Tuple[int, int] | None = None
+    ) -> None:
         self.text = text
         if markup:
             assert markup_class is not None, "You need to specify a `markup_class` for markup tokens."
@@ -92,28 +89,25 @@ class Token:
         self.last_in_sentence = last_in_sentence
         self.character_offset = character_offset
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.text
 
     @property
-    def extra_info(self):
+    def extra_info(self) -> str:
         """String representation of extra information.
 
-        Returns
-        -------
-        str
-            A string representation of the `space_after` and `original_spelling` attributes.
+        Returns:
+            str: A string representation of the `space_after` and `original_spelling` attributes.
 
-        Examples
-        --------
-        >>> tok = Token(":)", token_class="regular", space_after=False, original_spelling=": )")
-        >>> print(tok.text)
-        :)
-        >>> print(tok.extra_info)
-        SpaceAfter=No, OriginalSpelling=": )"
+        Examples:
+            >>> tok = Token(":)", token_class="regular", space_after=False, original_spelling=": )")
+            >>> print(tok.text)
+            :)
+            >>> print(tok.extra_info)
+            SpaceAfter=No, OriginalSpelling=": )"
 
         """
-        info = []
+        info: list[str] = []
         if not self.space_after:
             info.append("SpaceAfter=No")
         if self.original_spelling is not None:

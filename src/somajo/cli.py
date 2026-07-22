@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+"""Command-line interface for SoMaJo tokenizer."""
 
 import argparse
 import logging
 import time
+from typing import IO
 
 from . import (
     SoMaJo,
@@ -12,8 +14,13 @@ from . import (
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
 
-def arguments():
-    """"""
+def arguments() -> argparse.Namespace:
+    """Parse command-line arguments.
+
+    Returns:
+        argparse.Namespace: Parsed arguments.
+
+    """
     parser = argparse.ArgumentParser(description="A tokenizer and sentence splitter for German and English texts. Currently, two tokenization guidelines are implemented: The EmpiriST guidelines for German web and social media texts (de_CMC) and the \"new\" Penn Treebank conventions for English texts (en_PTB).")
     parser.add_argument("-l", "--language", choices=SoMaJo.supported_languages, default=SoMaJo._default_language, help="Choose a language. Currently supported are German EmpiriST-style tokenization (de_CMC) and English Penn-Treebank-style tokenization(en_PTB). (Default: de_CMC)")
     parser.add_argument("-s", "--paragraph_separator", choices=SoMaJo.paragraph_separators, default=SoMaJo._default_parsep, help="How are paragraphs separated in the input text? Will be ignored if option -x/--xml is used. (Default: empty_lines)")
@@ -34,10 +41,11 @@ def arguments():
     return args
 
 
-def main():
+def main() -> None:
+    """Main entry point for the CLI."""
     args = arguments()
-    n_tokens = 0
-    n_sentences = 0
+    n_tokens: int = 0
+    n_sentences: int = 0
     t0 = time.perf_counter()
     is_xml = False
     if args.xml or args.strip_tags or (args.tag is not None) or (args.prune is not None):
@@ -65,10 +73,12 @@ def main():
             if not token.markup:
                 n_tokens += 1
                 if args.token_classes:
+                    assert isinstance(token.token_class, str)  # for mypy
                     output += "\t" + token.token_class
                 if args.extra_info:
                     output += "\t" + token.extra_info
                 if args.character_offsets:
+                    assert isinstance(token.character_offset, tuple)  # for mypy
                     output += f"\t{token.character_offset[0]}, {token.character_offset[1]}"
             print(output)
         if args.split_sentences and args.sentence_tag is None:
