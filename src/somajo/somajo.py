@@ -58,7 +58,7 @@ class SoMaJo:
         if self.split_sentences:
             self._sentence_splitter = SentenceSplitter(language=self.language)
 
-    def _tokenize(self, token_info: tuple[list[Token], str, int], xml_input: bool) -> list[Token] | list[list[Token]]:
+    def _tokenize(self, token_info: tuple[list[Token], str, int], xml_input: bool) -> list[list[Token]]:
         """Tokenize and sentence split a single token_dll.
 
         Args:
@@ -66,9 +66,8 @@ class SoMaJo:
             xml_input: Whether the input is XML.
 
         Returns:
-            List of Token objects after tokenization or list of lists
-            of Token objects after tokenization and sentence
-            splitting.
+            List of lists of Token objects after tokenization and
+            optional sentence splitting.
 
         """
         token_list, raw, position = token_info
@@ -80,7 +79,8 @@ class SoMaJo:
                 tokens[i].character_offset = offsets[i]
         if self.split_sentences:
             return self._sentence_splitter._split_sentences(tokens)
-        return tokens
+        else:
+            return [tokens]
 
     def _parallel_tokenize(
         self,
@@ -119,8 +119,8 @@ class SoMaJo:
                 functools.partial(self._tokenize, xml_input=xml_input),
                 token_info
             )
+        tokens = itertools.chain.from_iterable(tokens)
         if self.split_sentences:
-            tokens = itertools.chain.from_iterable(tokens)
             tokens = self._sentence_splitter._merge_empty_sentences(tokens)
         if strip_tags:
             tokens = ([t for t in par if not t.markup] for par in tokens)
