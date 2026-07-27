@@ -19,13 +19,14 @@ class SoMaJo:
     """Tokenization and sentence splitting.
 
     Args:
-        language: Language-specific tokenization rules. Must be one of 'de_CMC' or 'en_PTB'.
+        language: Language-specific tokenization rules. 'de_CMC' for
+            German, 'en_PTB' for English.
         split_camel_case: Split words written in camelCase (excluding established names
             and terms). Defaults to False.
         split_sentences: Perform sentence splitting in addition to tokenization.
             Defaults to True.
         xml_sentences: Delimit sentences by XML tags of this name
-            (e.g., ``xml_sentences='s'`` produces <s>...</s> tags). When used with XML input,
+            (e.g., ``xml_sentences='s'`` produces ``<s>...</s>`` tags). When used with XML input,
             this might lead to minor changes to the original tags to guarantee well-formed
             output (tags might need to be closed and re-opened at sentence boundaries).
             Defaults to None.
@@ -41,7 +42,7 @@ class SoMaJo:
 
     def __init__(
         self,
-        language: str,
+        language: Literal["de_CMC", "en_PTB"],
         *,
         split_camel_case: bool = False,
         split_sentences: bool = True,
