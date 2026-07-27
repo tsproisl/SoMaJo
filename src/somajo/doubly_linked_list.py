@@ -79,9 +79,9 @@ class DLL:
     def _find_matching_element(
         self,
         item: DLLElement,
-        attrgetter: Callable,
+        attrgetter: Callable[[DLLElement], Any],
         value: Any,
-        ignore_attrgetter: Callable | None = None,
+        ignore_attrgetter: Callable[[DLLElement], Any] | None = None,
         ignore_value: Any = None,
         forward: bool = True
     ) -> DLLElement | None:
@@ -145,9 +145,9 @@ class DLL:
     def next_matching(
         self,
         item: DLLElement,
-        attrgetter: Callable,
+        attrgetter: Callable[[DLLElement], Any],
         value: Any,
-        ignore_attrgetter: Callable | None = None,
+        ignore_attrgetter: Callable[[DLLElement], Any] | None = None,
         ignore_value: Any = None
     ) -> DLLElement | None:
         return self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=True)
@@ -163,9 +163,9 @@ class DLL:
     def previous_matching(
         self,
         item: DLLElement,
-        attrgetter: Callable,
+        attrgetter: Callable[[DLLElement], Any],
         value: Any,
-        ignore_attrgetter: Callable | None = None,
+        ignore_attrgetter: Callable[[DLLElement], Any] | None = None,
         ignore_value: Any = None
     ) -> DLLElement | None:
         return self._find_matching_element(item, attrgetter, value, ignore_attrgetter, ignore_value, forward=False)

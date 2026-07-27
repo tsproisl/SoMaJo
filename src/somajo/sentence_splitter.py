@@ -5,7 +5,7 @@ from __future__ import annotations
 
 import collections
 import regex as re
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, cast
 
 from . import (
     doubly_linked_list,
@@ -84,16 +84,16 @@ class SentenceSplitter:
         """
         # Positions of XML tags w.r.t. the actual sentence:
         start, inside, end, na = 1, 2, 3, 4
-        open_tags: collections.deque[dict] = collections.deque()
-        reopen_after_start: collections.deque[dict] = collections.deque()
-        reopen_after_end: collections.deque[dict] = collections.deque()
+        open_tags: collections.deque[dict[str, str | int | doubly_linked_list.DLLElement | None]] = collections.deque()
+        reopen_after_start: collections.deque[dict[str, str | int | doubly_linked_list.DLLElement | None]] = collections.deque()
+        reopen_after_end: collections.deque[dict[str, str | int | doubly_linked_list.DLLElement | None]] = collections.deque()
         start_tag = re.compile(r"^<([^ ]+)[ ]?[^>]*>$")
         end_tag = re.compile(r"^</(.+)>$")
         for sentence in tokens:
             # print([(t.text, t.first_in_sentence, t.last_in_sentence) for t in sentence])
             sentence_dll = doubly_linked_list.DLL(sentence)
             position = start
-            tags: collections.deque[dict] = collections.deque()
+            tags: collections.deque[dict[str, str | int | doubly_linked_list.DLLElement | None]] = collections.deque()
             first_token: doubly_linked_list.DLLElement | None = None
             last_token: doubly_linked_list.DLLElement | None = None
             for tag in reversed(reopen_after_end):
@@ -152,12 +152,14 @@ class SentenceSplitter:
                 elif tag["start"] == start:
                     if tag["end"] == inside:
                         # put starting s-tag to the left
+                        assert isinstance(tag["start_token"], doubly_linked_list.DLLElement)  # for mypy
                         if not sentence_dll.is_left_of(s_start, tag["start_token"]):
                             s_start = tag["start_token"]
                 elif tag["start"] == inside:
                     if tag["end"] == end:
                         # put ending s-tag to the right
                         assert isinstance(s_end, doubly_linked_list.DLLElement)  # for mypy
+                        assert isinstance(tag["end_token"], doubly_linked_list.DLLElement)  # for mypy
                         if not sentence_dll.is_right_of(s_end, tag["end_token"]):
                             s_end = tag["end_token"]
                     elif tag["end"] == na:
@@ -225,7 +227,7 @@ class SentenceSplitter:
         tokens, sentence_boundaries = self._split_token_objects(tokens)
         return [tokens[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
-    def split(self, tokenized_paragraph: list) -> list:
+    def split(self, tokenized_paragraph: list[str | tuple[str]]) -> list[list[str | tuple[str]]]:
         """Split tokenized_paragraph into sentences.
 
         Args:
@@ -238,11 +240,12 @@ class SentenceSplitter:
         if self.is_tuple:
             tokens = [token.Token(t[0]) for t in tokenized_paragraph]
         else:
-            tokens = [token.Token(t) for t in tokenized_paragraph]
+            tp = cast(list[str], tokenized_paragraph)  # for mypy
+            tokens = [token.Token(t) for t in tp]
         tokens, sentence_boundaries = self._split_token_objects(tokens)
         return [tokenized_paragraph[i:j] for i, j in zip([0] + sentence_boundaries[:-1], sentence_boundaries)]
 
-    def split_xml(self, tokenized_xml: list, eos_tags: set = set()) -> list:
+    def split_xml(self, tokenized_xml: list[str | tuple[str]], eos_tags: set[str] = set()) -> list[list[str | tuple[str]]]:
         """Split tokenized XML into sentences.
 
         Args:
@@ -258,7 +261,8 @@ class SentenceSplitter:
         if self.is_tuple:
             tokens = [token.Token(t[0]) for t in tokenized_xml]
         else:
-            tokens = [token.Token(t) for t in tokenized_xml]
+            tx = cast(list[str], tokenized_xml)  # for mypy
+            tokens = [token.Token(t) for t in tx]
         first_token_in_sentence = True
         for i, t in enumerate(tokens):
             opening = opening_tag.search(t.text)

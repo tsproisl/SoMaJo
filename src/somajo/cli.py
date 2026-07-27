@@ -4,7 +4,6 @@
 import argparse
 import logging
 import time
-from typing import IO
 
 from . import (
     SoMaJo,

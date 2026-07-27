@@ -463,8 +463,8 @@ class Tokenizer:
     def _split_on_boundaries(
         self,
         node: doubly_linked_list.DLLElement,
-        boundaries: list,
-        token_class: str,
+        boundaries: list[tuple[int, int, str | None]],
+        token_class: str | None,
         *,
         lock_match: bool = True,
         delete_whitespace: bool = False
@@ -533,8 +533,16 @@ class Tokenizer:
                 token_dll.insert_left(Token(right, token_class="regular", space_after=node.value.space_after, last_in_sentence=right_last_in_sentence), node)
         token_dll.remove(node)
 
-    def _split_matches(self, regex, node, token_class="regular", repl=None, split_named_subgroups=True, delete_whitespace=False):
-        boundaries = []
+    def _split_matches(
+            self,
+            regex: re.Pattern[str],
+            node: doubly_linked_list.DLLElement,
+            token_class: str = "regular",
+            repl: str | None = None,
+            split_named_subgroups: bool = True,
+            delete_whitespace: bool = False
+    ) -> None:
+        boundaries: list[tuple[int, int, str | None]] = []
         split_groups = split_named_subgroups and len(regex.groupindex) > 0
         group_numbers = sorted(regex.groupindex.values())
         for m in regex.finditer(node.value.text):
@@ -549,8 +557,8 @@ class Tokenizer:
                     boundaries.append((m.start(), m.end(), m.expand(repl)))
         self._split_on_boundaries(node, boundaries, token_class, delete_whitespace=delete_whitespace)
 
-    def _split_emojis(self, node, token_class="emoticon"):
-        boundaries = []
+    def _split_emojis(self, node: doubly_linked_list.DLLElement, token_class: str = "emoticon") -> None:
+        boundaries: list[tuple[int, int, str | None]] = []
         for m in re.finditer(r"\X", node.value.text):
             if m.end() - m.start() > 1:
                 if re.search(r"[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F]", m.group()):
@@ -560,8 +568,15 @@ class Tokenizer:
                     boundaries.append((m.start(), m.end(), None))
         self._split_on_boundaries(node, boundaries, token_class)
 
-    def _split_set(self, regex, node, items, token_class="regular", to_lower=False):
-        boundaries = []
+    def _split_set(
+            self,
+            regex: re.Pattern[str],
+            node: doubly_linked_list.DLLElement,
+            items: set[str],
+            token_class: str = "regular",
+            to_lower: bool = False
+    ) -> None:
+        boundaries: list[tuple[int, int, str | None]] = []
         for m in regex.finditer(node.value.text):
             instance = m.group(0)
             if to_lower:
@@ -570,22 +585,39 @@ class Tokenizer:
                 boundaries.append((m.start(), m.end(), None))
         self._split_on_boundaries(node, boundaries, token_class)
 
-    def _split_left(self, regex, node):
-        boundaries = []
+    def _split_left(self, regex: re.Pattern[str], node: doubly_linked_list.DLLElement) -> None:
+        boundaries: list[tuple[int, int, str | None]] = []
         prev_end = 0
         for m in regex.finditer(node.value.text):
             boundaries.append((prev_end, m.start(), None))
             prev_end = m.start()
         self._split_on_boundaries(node, boundaries, token_class=None, lock_match=False)
 
-    def _split_all_matches(self, regex, token_dll, token_class="regular", *, repl=None, split_named_subgroups=True, delete_whitespace=False):
+    def _split_all_matches(
+            self,
+            regex: re.Pattern[str],
+            token_dll: doubly_linked_list.DLL,
+            token_class: str = "regular",
+            *,
+            repl: str | None = None,
+            split_named_subgroups: bool = True,
+            delete_whitespace: bool = False
+    ) -> None:
         """Turn matches for the regex into tokens."""
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
             self._split_matches(regex, t, token_class, repl, split_named_subgroups, delete_whitespace)
 
-    def _split_all_matches_in_match(self, regex1, regex2, token_dll, token_class="regular", *, delete_whitespace=False):
+    def _split_all_matches_in_match(
+            self,
+            regex1: re.Pattern[str],
+            regex2: re.Pattern[str],
+            token_dll: doubly_linked_list.DLL,
+            token_class: str = "regular",
+            *,
+            delete_whitespace: bool = False
+    ) -> None:
         """Find all matches for regex1 and turn all matches for regex2 within
         the matches for regex1 into tokens.
 
@@ -593,13 +625,13 @@ class Tokenizer:
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
-            boundaries = []
+            boundaries: list[tuple[int, int, str | None]] = []
             for m1 in regex1.finditer(t.value.text):
                 for m2 in regex2.finditer(m1.group(0)):
                     boundaries.append((m2.start() + m1.start(), m2.end() + m1.start(), None))
             self._split_on_boundaries(t, boundaries, token_class, delete_whitespace=delete_whitespace)
 
-    def _split_all_emojis(self, token_dll, token_class="emoticon"):
+    def _split_all_emojis(self, token_dll: doubly_linked_list.DLL, token_class: str = "emoticon") -> None:
         """Replace all emoji sequences"""
         self._split_all_matches(self.textfaces_emoji, token_dll, "emoticon")
         for t in token_dll:
@@ -607,7 +639,14 @@ class Tokenizer:
                 continue
             self._split_emojis(t, token_class)
 
-    def _split_all_set(self, token_dll, regex, items, token_class="regular", to_lower=False):
+    def _split_all_set(
+            self,
+            token_dll: doubly_linked_list.DLL,
+            regex: re.Pattern[str],
+            items: set[str],
+            token_class: str = "regular",
+            to_lower: bool = False
+    ) -> None:
         """Turn all elements from items into separate tokens. Note: All
         elements need to be matched by regex. Optionally lowercase the
         matches before the comparison. Note: to_lower does not modify
@@ -620,14 +659,18 @@ class Tokenizer:
                 continue
             self._split_set(regex, t, items, token_class, to_lower)
 
-    def _split_all_left(self, regex, token_dll):
+    def _split_all_left(self, regex: re.Pattern[str], token_dll: doubly_linked_list.DLL) -> None:
         """Split to the left of the match."""
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
             self._split_left(regex, t)
 
-    def _split_abbreviations(self, token_dll, split_multipart_abbrevs=True):
+    def _split_abbreviations(
+            self,
+            token_dll: doubly_linked_list.DLL,
+            split_multipart_abbrevs: bool = True
+    ) -> None:
         """Turn instances of abbreviations into tokens."""
         self._split_all_matches(self.single_letter_ellipsis, token_dll, "abbreviation")
         self._split_all_matches(self.and_cetera, token_dll, "abbreviation")
@@ -640,7 +683,7 @@ class Tokenizer:
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
-            boundaries = []
+            boundaries: list[tuple[int, int, str | None]] = []
             for m in self.abbreviation.finditer(t.value.text):
                 instance = m.group(0)
                 if split_multipart_abbrevs and self.multipart_abbreviation.fullmatch(instance):
@@ -654,7 +697,7 @@ class Tokenizer:
                     boundaries.append((m.start(), m.end(), None))
             self._split_on_boundaries(t, boundaries, "abbreviation")
 
-    def _remove_empty_tokens(self, token_dll):
+    def _remove_empty_tokens(self, token_dll: doubly_linked_list.DLL) -> None:
         for t in token_dll:
             if t.value.markup or t.value._locked:
                 continue
@@ -889,7 +932,7 @@ class Tokenizer:
 
         return token_dll.to_list()
 
-    def _convert_to_legacy(self, tokens: list[Token]) -> list:
+    def _convert_to_legacy(self, tokens: list[Token]) -> list[str | tuple[str, str | None] | tuple[str, str | None, str]]:
         """Convert tokens to legacy format.
 
         Args:
@@ -899,17 +942,18 @@ class Tokenizer:
             list: List of tokens in legacy format (strings or tuples).
 
         """
+        legacy_tokens: list[str | tuple[str, str | None] | tuple[str, str | None, str]] = []
         if self.token_classes and self.extra_info:
-            tokens = [(t.text, t.token_class, t.extra_info) for t in tokens]  # type: ignore
+            legacy_tokens = [(t.text, t.token_class, t.extra_info) for t in tokens]
         elif self.token_classes:
-            tokens = [(t.text, t.token_class) for t in tokens]  # type: ignore
+            legacy_tokens = [(t.text, t.token_class) for t in tokens]
         elif self.extra_info:
-            tokens = [(t.text, t.extra_info) for t in tokens]  # type: ignore
+            legacy_tokens = [(t.text, t.extra_info) for t in tokens]
         else:
-            tokens = [t.text for t in tokens]  # type: ignore
-        return tokens
+            legacy_tokens = [t.text for t in tokens]
+        return legacy_tokens
 
-    def tokenize(self, paragraph: str) -> list:
+    def tokenize(self, paragraph: str) -> list[str | tuple[str, str | None] | tuple[str, str | None, str]]:
         """An alias for tokenize_paragraph.
 
         Deprecated:
@@ -925,7 +969,7 @@ class Tokenizer:
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize() is deprecated. Please use somajo.SoMaJo.tokenize_text() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         return self.tokenize_paragraph(paragraph)
 
-    def tokenize_file(self, filename: str, parsep_empty_lines: bool = True) -> Generator[list, None, None]:
+    def tokenize_file(self, filename: str, parsep_empty_lines: bool = True) -> Generator[list[str | tuple[str, str | None] | tuple[str, str | None, str]]]:
         """Tokenize utf-8-encoded text file and yield tokenized paragraphs.
 
         Deprecated:
@@ -952,7 +996,7 @@ class Tokenizer:
                 if tp:
                     yield tp
 
-    def tokenize_paragraph(self, paragraph: str) -> list:
+    def tokenize_paragraph(self, paragraph: str) -> list[str | tuple[str, str | None] | tuple[str, str | None, str]]:
         """Tokenize paragraph (may contain newlines) according to the
         guidelines of the EmpiriST 2015 shared task on automatic
         linguistic annotation of computer-mediated communication /
@@ -973,7 +1017,12 @@ class Tokenizer:
         tokens = self._tokenize(token_dll)
         return self._convert_to_legacy(tokens)
 
-    def tokenize_xml(self, xml: str, is_file: bool = True, eos_tags: list[str] | None = None) -> list:
+    def tokenize_xml(
+            self,
+            xml: str,
+            is_file: bool = True,
+            eos_tags: list[str] | None = None
+    ) -> list[str | tuple[str, str | None] | tuple[str, str | None, str]]:
         """Tokenize XML file or XML string according to the guidelines of the
         EmpiriST 2015 shared task on automatic linguistic annotation
         of computer-mediated communication / social media.
@@ -992,11 +1041,13 @@ class Tokenizer:
         """
         logging.warning("Since version 2.0.0, somajo.Tokenizer.tokenize_xml() is deprecated. Please use somajo.SoMaJo.tokenize_xml() instead. For more details see https://github.com/tsproisl/SoMaJo/blob/master/doc/build/markdown/somajo.md")
         if eos_tags is not None:
-            eos_tags = set(eos_tags)  # type: ignore
-        chunk_info = utils.xml_chunk_generator(xml, is_file, eos_tags)  # type: ignore
+            eos_tags_set = set(eos_tags)
+        else:
+            eos_tags_set = None
+        chunk_info = utils.xml_chunk_generator(xml, is_file, eos_tags_set)
         chunk_lists = (ci[0] for ci in chunk_info)
         token_dlls = map(doubly_linked_list.DLL, chunk_lists)
         tokens = map(self._tokenize, token_dlls)
         tokens = map(utils.escape_xml_tokens, tokens)
-        tokens = map(self._convert_to_legacy, tokens)
-        return list(itertools.chain.from_iterable(tokens))
+        legacy_tokens = map(self._convert_to_legacy, tokens)
+        return list(itertools.chain.from_iterable(legacy_tokens))

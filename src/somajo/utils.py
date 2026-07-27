@@ -8,7 +8,7 @@ import os
 import regex as re
 import xml.sax
 import xml.sax.saxutils
-from typing import IO, Generator, Iterable, Iterator, Literal
+from typing import IO, Generator, Literal
 
 from . import alignment
 from .token import Token
@@ -45,7 +45,7 @@ def get_paragraphs_str(fh: IO[str], paragraph_separator: str = "empty_lines") ->
             yield "".join(paragraph), position
 
 
-def get_paragraphs_list(text_file: str | IO[str], paragraph_separator: str = "empty_lines") -> Generator[tuple[list[Token], str, int], None, None]:
+def get_paragraphs_list(text_file: str | IO[str], paragraph_separator: str = "empty_lines") -> Generator[tuple[list[Token], str, int]]:
     """Generator for the paragraphs in the file.
 
     Args:
@@ -134,7 +134,7 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
         if not self.open_prune_tags:
             self.content += data
 
-    def startElement(self, name: str, attrs) -> None:
+    def startElement(self, name: str, attrs: xml.sax.xmlreader.AttributesImpl) -> None:
         if self.prune_tags is not None and name in self.prune_tags:
             self.open_prune_tags.append(name)
         if not self.open_prune_tags:
@@ -153,7 +153,11 @@ class SaxTokenHandler(xml.sax.handler.ContentHandler):
             assert top == name
 
 
-def incremental_xml_parser(f: IO[str], eos_tags: set[str] | None = None, prune_tags: set[str] | None = None) -> Generator[tuple[list[Token], list[str]], None, None]:
+def incremental_xml_parser(
+        f: IO[str],
+        eos_tags: set[str] | None = None,
+        prune_tags: set[str] | None = None
+) -> Generator[tuple[list[Token], list[str]]]:
     """Parse XML incrementally and yield token lists and line buffers.
 
     Args:
@@ -180,7 +184,12 @@ def incremental_xml_parser(f: IO[str], eos_tags: set[str] | None = None, prune_t
     parser.close()
 
 
-def _xml_chunk_generator(f: IO[str], eos_tags: set[str] | None, prune_tags: set[str] | None, character_offsets: bool) -> Generator[tuple[list[Token], str, int], None, None]:
+def _xml_chunk_generator(
+        f: IO[str],
+        eos_tags: set[str] | None,
+        prune_tags: set[str] | None,
+        character_offsets: bool
+) -> Generator[tuple[list[Token], str, int]]:
     """Parse the XML data and yield doubly linked lists of Token objects that are delimited by eos_tags.
 
     Args:
@@ -385,7 +394,13 @@ def _xml_chunk_generator(f: IO[str], eos_tags: set[str] | None, prune_tags: set[
         yield current, raw_xml, position
 
 
-def xml_chunk_generator(data: str | IO[str], is_file: bool = True, eos_tags: set[str] | None = None, prune_tags: set[str] | None = None, character_offsets: bool = False) -> Generator[tuple[list[Token], str, int], None, None]:
+def xml_chunk_generator(
+        data: str | IO[str],
+        is_file: bool = True,
+        eos_tags: set[str] | None = None,
+        prune_tags: set[str] | None = None,
+        character_offsets: bool = False
+) -> Generator[tuple[list[Token], str, int]]:
     """Parse the XML data and yield doubly linked lists of Token objects that are delimited by eos_tags.
 
     Args:

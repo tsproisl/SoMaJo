@@ -2,6 +2,7 @@
 """Character alignment utilities for token offset calculation."""
 
 from __future__ import annotations
+from typing import cast
 
 import unicodedata
 
@@ -75,7 +76,7 @@ def _determine_offsets(tokens: list[Token], raw: str, position: int) -> list[tup
     raw = re.sub(r"\s", " ", raw)
     for token in tokens:
         if token.markup:
-            start, end = token.character_offset  # type: ignore
+            start, end = cast(tuple[int, int], token.character_offset)  # for mypy
             start -= position
             end -= position
         else:
@@ -162,7 +163,8 @@ def token_offsets(
 
     """
     if xml_input:
-        chunk_offsets = [(t.character_offset[0] - position, t.character_offset[1] - position) for t in token_list]  # type: ignore
+        t_character_offsets = cast(list[tuple[int, int]], [t.character_offset for t in token_list])  # for mypy
+        chunk_offsets = [(tco[0] - position, tco[1] - position) for tco in t_character_offsets]
         raw, align_to_entities = _resolve_entities(raw)
         align_from_entities = {i: char_i for char_i, (start, end) in enumerate(align_to_entities) for i in range(start, end)}
         chunks = [raw[align_from_entities[start]:align_from_entities[end - 1] + 1] for start, end in chunk_offsets]
@@ -184,7 +186,7 @@ def token_offsets(
     if xml_input:
         for i in range(len(tokens)):
             if tokens[i].markup:
-                s, e = tokens[i].character_offset  # type: ignore
+                s, e = cast(tuple[int, int], tokens[i].character_offset)  # for mypy
                 tokens[i].character_offset = (
                     align_from_raw[align_from_entities[s - position]][0] + position,
                     align_from_raw[align_from_entities[e - position - 1]][1] + position

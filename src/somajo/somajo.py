@@ -3,7 +3,7 @@
 import functools
 import itertools
 import multiprocessing
-from typing import Iterable, Iterator, Literal, TextIO
+from typing import Iterable, Iterator, Literal, TextIO, cast
 
 from . import (
     alignment,
@@ -103,7 +103,7 @@ class SoMaJo:
             Iterator of lists of Token objects.
 
         """
-        def partok():
+        def partok() -> Iterator[list[list[Token]]]:
             with multiprocessing.Pool(min(parallel, multiprocessing.cpu_count())) as pool:
                 tokens = pool.imap(
                     functools.partial(self._tokenize, xml_input=xml_input),
@@ -114,13 +114,13 @@ class SoMaJo:
                     yield par
 
         if parallel > 1:
-            tokens = partok()
+            tokenized = partok()
         else:
-            tokens = map(
+            tokenized = map(
                 functools.partial(self._tokenize, xml_input=xml_input),
                 token_info
             )
-        tokens = itertools.chain.from_iterable(tokens)
+        tokens = cast(Iterator[list[Token]], itertools.chain.from_iterable(tokenized))  # for mypy
         if self.split_sentences:
             tokens = self._sentence_splitter._merge_empty_sentences(tokens)
         if strip_tags:
