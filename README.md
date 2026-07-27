@@ -17,7 +17,7 @@
 
 ## Introduction
 
-```
+```sh
 echo 'Wow, superTool!;)' | somajo-tokenizer -c -
 Wow
 ,
@@ -45,7 +45,7 @@ For part-of-speech tagging (in particular of German web and social
 media texts), we recommend
 [SoMeWeTa](https://github.com/tsproisl/SoMeWeTa):
 
-```
+```sh
 somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 ```
 
@@ -504,7 +504,7 @@ following paper:
     EmpiriST Shared Task*, edited by Paul Cook, Stefan Evert, Roland
     Schäfer, and Egon Stemle, 57–62. Berlin: Association for
     Computational Linguistics. <https://doi.org/10.18653/v1/W16-2607>.
-    
+	
     ```bibtex
     @InProceedings{Proisl_Uhrig_EmpiriST:2016,
       author    = {Proisl, Thomas and Uhrig, Peter},

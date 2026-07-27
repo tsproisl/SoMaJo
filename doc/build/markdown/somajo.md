@@ -1,47 +1,46 @@
 # somajo package
 
-* [class somajo.somajo.SoMaJo](#class-somajosomajosomajolanguage--split_camel_casefalse-split_sentencestrue-xml_sentencesnone)
-    * [tokenize_text](#tokenize_textparagraphs--parallel1)
-    * [tokenize_text_file](#tokenize_text_filetext_file-paragraph_separator--parallel1)
-    * [tokenize_xml](#tokenize_xmlxml_data-eos_tags--strip_tagsfalse-parallel1-prune_tagsnone)
-    * [tokenize_xml_file](#tokenize_xml_filexml_file-eos_tags--strip_tagsfalse-parallel1-prune_tagsnone)
-* [class somajo.token.Token](#class-somajotokentokentext--markupfalse-markup_classnone-markup_eosnone-lockedfalse-token_classnone-space_aftertrue-original_spellingnone-first_in_sentencefalse-last_in_sentencefalse)
-    * [property extra_info()](#property-extra_info)
-
-
 ## somajo.somajo module
 
-### *class* somajo.somajo.SoMaJo(language, \*, split_camel_case=False, split_sentences=True, xml_sentences=None, character_offsets=False)
+### *class* somajo.somajo.SoMaJo(language: Literal['de_CMC', 'en_PTB'], , split_camel_case: bool = False, split_sentences: bool = True, xml_sentences: str | None = None, character_offsets: bool = False)
 
 Bases: `object`
 
 Tokenization and sentence splitting.
 
-* **Parameters**
-  * **language** (*{'de_CMC', 'en_PTB'}*) – Language-specific tokenization rules.
-  * **split_camel_case** (*bool, (**default=False**)*) – Split words written in camelCase (excluding established names
-    and terms).
-  * **split_sentences** (*bool, (**default=True**)*) – Perform sentence splitting in addition to tokenization.
-  * **xml_sentences** (*str, (**default=None**)*) – Delimit sentences by XML tags of this name
-    (`xml_sentences='s'` → &lt;s>…&lt;/s>). When used with XML input,
-    this might lead to minor changes to the original tags to
-    guarantee well-formed output (tags might need to be closed and
-    re-opened at sentence boundaries).
-  * **character_offsets** (*bool, (**default=False**)*) – Compute the character offsets in the input for each token.
-    This allows for stand-off tokenization.
+* **Parameters:**
+  * **language** – Language-specific tokenization rules. ‘de_CMC’ for
+    German, ‘en_PTB’ for English.
+  * **split_camel_case** – Split words written in camelCase (excluding established names
+    and terms). Defaults to False.
+  * **split_sentences** – Perform sentence splitting in addition to tokenization.
+    Defaults to True.
+  * **xml_sentences** – Delimit sentences by XML tags of this name
+    (e.g., `xml_sentences='s'` produces `<s>...</s>` tags). When used with XML input,
+    this might lead to minor changes to the original tags to guarantee well-formed
+    output (tags might need to be closed and re-opened at sentence boundaries).
+    Defaults to None.
+  * **character_offsets** – Compute the character offsets in the input for each token.
+    This allows for stand-off tokenization. Defaults to False.
 
-#### tokenize_text(paragraphs, \*, parallel=1)
+#### paragraph_separators *: set[str]* *= {'empty_lines', 'single_newlines'}*
+
+#### supported_languages *: set[str]* *= {'de_CMC', 'en_PTB'}*
+
+#### tokenize_text(paragraphs: Iterable[str], , parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split paragraphs of text into sequences of tokens.
 
-* **Parameters**
-  * **paragraphs** (*iterable*) – An iterable of single paragraphs of text.
-  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
-* **Yields**
-  *list* – The `Token` objects in a single sentence or paragraph
-  (depending on the value of `split_sentences`).
+* **Parameters:**
+  * **paragraphs** – An iterable of single paragraphs of text.
+  * **parallel** – Number of processes to use. Defaults to 1.
+* **Yields:**
+  *list* –
 
-##### Examples
+  The Token objects in a single sentence or paragraph
+  : (depending on the value of `split_sentences`).
+
+### Examples
 
 Tokenization and sentence splitting; print one sentence per
 line:
@@ -78,24 +77,24 @@ after each sentence:
 >>> sentences = tokenizer.tokenize_text(paragraphs)
 >>> for sentence in sentences:
 ...     for token in sentence:
-...         print("{token.text}\t{token.token_class}\t{token.extra_info}")
+...         print("{token.text}     {token.token_class}     {token.extra_info}")
 ...     print()
 ...
-Heyi    regular SpaceAfter=No
-:)      emoticon
+Heyi        regular SpaceAfter=No
+:)  emoticon
 ​
-Was     regular
-machst  regular
-du      regular
-morgen  regular
-Abend   regular SpaceAfter=No
-?!      symbol
+Was regular
+machst      regular
+du  regular
+morgen      regular
+Abend       regular SpaceAfter=No
+?!  symbol
 ​
-Lust    regular
-auf     regular
-Film    regular SpaceAfter=No
-?       symbol  SpaceAfter=No
-;-)     emoticon
+Lust        regular
+auf regular
+Film        regular SpaceAfter=No
+?   symbol  SpaceAfter=No
+;-) emoticon
 ​
 ```
 
@@ -130,21 +129,24 @@ Film
 </s>
 ```
 
-#### tokenize_text_file(text_file, paragraph_separator, \*, parallel=1)
+#### tokenize_text_file(text_file: str | TextIO, paragraph_separator: Literal['empty_lines', 'single_newlines'], , parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split the contents of a text file into sequences of tokens.
 
-* **Parameters**
-  * **text_file** (*str* *or* *file-like object*) – Either a filename or a file-like object containing text.
-  * **paragraph_separator** (*{'single_newlines', 'empty_lines'}*) – How are paragraphs separated in the input? Is there one
-    paragraph per line (‘single_newlines’) or do paragraphs
-    span several lines and are separated by ‘empty_lines’?
-  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
-* **Yields**
-  *list* – The `Token` objects in a single sentence or paragraph
-  (depending on the value of `split_sentences`).
+* **Parameters:**
+  * **text_file** – Either a filename or a file-like object containing text.
+  * **paragraph_separator** – How are paragraphs separated in the input?
+    ‘single_newlines’ means one paragraph per line.
+    ‘empty_lines’ means paragraphs span several lines and are
+    separated by empty lines.
+  * **parallel** – Number of processes to use. Defaults to 1.
+* **Yields:**
+  *list* –
 
-##### Examples
+  The Token objects in a single sentence or paragraph
+  : (depending on the value of `split_sentences`).
+
+### Examples
 
 Tokenization and sentence splitting; input file with
 paragraphs separated by empty lines; print one token per line
@@ -161,24 +163,24 @@ Was machst du morgen Abend?! Lust auf Film?;-)
 >>> sentences = tokenizer.tokenize_text_file("example_empty_lines.txt", paragraph_separator="single_newlines")
 >>> for sentence in sentences:
 ...     for token in sentence:
-...         print("{token.text}\t{token.token_class}\t{token.extra_info}")
+...         print("{token.text}     {token.token_class}     {token.extra_info}")
 ...     print()
 ...
-Heyi    regular SpaceAfter=No
-:)      emoticon
+Heyi        regular SpaceAfter=No
+:)  emoticon
 ​
-Was     regular
-machst  regular
-du      regular
-morgen  regular
-Abend   regular SpaceAfter=No
-?!      symbol
+Was regular
+machst      regular
+du  regular
+morgen      regular
+Abend       regular SpaceAfter=No
+?!  symbol
 ​
-Lust    regular
-auf     regular
-Film    regular SpaceAfter=No
-?       symbol  SpaceAfter=No
-;-)     emoticon
+Lust        regular
+auf regular
+Film        regular SpaceAfter=No
+?   symbol  SpaceAfter=No
+;-) emoticon
 ​
 ```
 
@@ -203,29 +205,31 @@ Was machst du morgen Abend ?!
 Lust auf Film ? ;-)
 ```
 
-#### tokenize_xml(xml_data, eos_tags, \*, strip_tags=False, parallel=1, prune_tags=None)
+#### tokenize_xml(xml_data: str, eos_tags: Iterable[str], , strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split a string of XML data into sequences of tokens.
 
-* **Parameters**
-  * **xml_data** (*str*) – A string containing XML data.
-  * **eos_tags** (*iterable*) – XML tags that constitute sentence breaks, i.e. tags that
+* **Parameters:**
+  * **xml_data** – A string containing XML data.
+  * **eos_tags** – XML tags that constitute sentence breaks, i.e. tags that
     do not occur in the middle of a sentence. For HTML input,
-    you might use the following list of tags: `['title',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr',
-    'div', 'ol', 'ul', 'dl', 'table']`
-  * **strip_tags** (*bool, (**default=False**)*) – Remove the XML tags from the output.
-  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
-  * **prune_tags** (*iterable*) – These XML tags and their contents will be removed from the
+    you might use the following list of tags: [‘title’,
+    ‘h1’, ‘h2’, ‘h3’, ‘h4’, ‘h5’, ‘h6’, ‘p’, ‘br’, ‘hr’,
+    ‘div’, ‘ol’, ‘ul’, ‘dl’, ‘table’]
+  * **strip_tags** – Remove the XML tags from the output. Defaults to False.
+  * **parallel** – Number of processes to use. Defaults to 1.
+  * **prune_tags** – These XML tags and their contents will be removed from the
     input before tokenization. For HTML input, you might use
-    `['script', 'style']` or, depending on your use case,
-    `['head']`.
-* **Yields**
-  *list* – The `Token` objects in a single sentence or stretch of
-  XML delimited by `eos_tags` (depending on the value of
-  `split_sentences`).
+    [‘script’, ‘style’] or, depending on your use case,
+    [‘head’]. Defaults to None.
+* **Yields:**
+  *list* –
 
-##### Examples
+  The Token objects in a single sentence or stretch of
+  : XML delimited by `eos_tags` (depending on the value of
+    `split_sentences`).
+
+### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -334,30 +338,31 @@ Film
 </html>
 ```
 
-#### tokenize_xml_file(xml_file, eos_tags, \*, strip_tags=False, parallel=1, prune_tags=None)
+#### tokenize_xml_file(xml_file: str | TextIO, eos_tags: Iterable[str], , strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split the contents of an xml file into sequences of tokens.
 
-* **Parameters**
-  * **xml_file** (*str* *or* *file-like object*) – A file containing XML data. Either a filename or a
-    file-like object.
-  * **eos_tags** (*iterable*) – XML tags that constitute sentence breaks, i.e. tags that
+* **Parameters:**
+  * **xml_file** – A file containing XML data. Either a filename or a file-like object.
+  * **eos_tags** – XML tags that constitute sentence breaks, i.e. tags that
     do not occur in the middle of a sentence. For HTML input,
-    you might use the following list of tags: `['title',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr',
-    'div', 'ol', 'ul', 'dl', 'table']`
-  * **strip_tags** (*bool, (**default=False**)*) – Remove all XML tags from the output.
-  * **parallel** (*int, (**default=1**)*) – Number of processes to use.
-  * **prune_tags** (*iterable*) – These XML tags and their contents will be removed from the
+    you might use the following list of tags: [‘title’,
+    ‘h1’, ‘h2’, ‘h3’, ‘h4’, ‘h5’, ‘h6’, ‘p’, ‘br’, ‘hr’,
+    ‘div’, ‘ol’, ‘ul’, ‘dl’, ‘table’]
+  * **strip_tags** – Remove all XML tags from the output. Defaults to False.
+  * **parallel** – Number of processes to use. Defaults to 1.
+  * **prune_tags** – These XML tags and their contents will be removed from the
     input before tokenization. For HTML input, you might use
-    `['script', 'style']` or, depending on your use case,
-    `['head']`.
-* **Yields**
-  *list* – The `Token` objects in a single sentence or stretch of
-  XML delimited by `eos_tags` (depending on the value of
-  `split_sentences`).
+    [‘script’, ‘style’] or, depending on your use case,
+    [‘head’]. Defaults to None.
+* **Yields:**
+  *list* –
 
-##### Examples
+  The Token objects in a single sentence or stretch of
+  : XML delimited by `eos_tags` (depending on the value of
+    `split_sentences`).
+
+### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -454,37 +459,44 @@ Film
 
 ## somajo.token module
 
-### *class* somajo.token.Token(text, \*, markup=False, markup_class=None, markup_eos=None, locked=False, token_class=None, space_after=True, original_spelling=None, first_in_sentence=False, last_in_sentence=False, character_offset=None)
+### *class* somajo.token.Token(text: str, , markup: bool = False, markup_class: Literal['start', 'end'] | None = None, markup_eos: bool | None = None, locked: bool = False, token_class: str | None = None, space_after: bool = True, original_spelling: str | None = None, first_in_sentence: bool = False, last_in_sentence: bool = False, character_offset: Tuple[int, int] | None = None)
 
 Bases: `object`
 
 Token objects store a piece of text (in the end a single token) with additional information.
 
-* **Parameters**
-  * **text** (*str*) – The text that makes up the token object
-  * **markup** (*bool, (**default=False**)*) – Is the token a markup token?
-  * **markup_class** (*{'start', 'end'}, optional* *(**default=None**)*) – If markup=True, then markup_class must be either “start” or “end”.
-  * **markup_eos** (*bool, optional* *(**default=None**)*) – Is the markup token a sentence boundary?
-  * **locked** (*bool, (**default=False**)*) – Mark the token as locked.
-  * **token_class** (*{'URL', 'XML_entity', 'XML_tag', 'abbreviation', 'action_word', 'amount', 'date', 'email_address', 'emoticon', 'hashtag', 'measurement', 'mention', 'number', 'ordinal', 'regular', 'semester', 'symbol', 'time'}, optional* *(**default=None**)*) – The class of the token, e.g. “regular”, “emoticon”, “URL”, etc.
-  * **space_after** (*bool, (**default=True**)*) – Was there a space after the token in the original data?
-  * **original_spelling** (*str, optional* *(**default=None**)*) – The original spelling of the token, if it is different from the one in text.
-  * **first_in_sentence** (*bool, (**default=False**)*) – Is it the first token of a sentence?
-  * **last_in_sentence** (*bool, (**default=False**)*) – Is it the last token of a sentence?
-  * **character_offset** (*tuple, (**default=None**)*) – Character offset of the token in the input as tuple (start, end)
-    such that input[start:end] == text (if there are no changes to
-    the token text during tokenization)
+* **Parameters:**
+  * **text** – The text that makes up the token object.
+  * **markup** – Is the token a markup token? Defaults to False.
+  * **markup_class** – If markup=True, then markup_class must be either “start” or “end”.
+    Defaults to None.
+  * **markup_eos** – Is the markup token a sentence boundary? Defaults to None.
+  * **locked** – Mark the token as locked. Defaults to False.
+  * **token_class** – The class of the token, e.g. “regular”, “emoticon”, “URL”, etc.
+    Must be one of: ‘URL’, ‘XML_entity’, ‘XML_tag’, ‘abbreviation’, ‘action_word’,
+    ‘amount’, ‘date’, ‘email_address’, ‘emoticon’, ‘hashtag’, ‘measurement’,
+    ‘mention’, ‘number’, ‘ordinal’, ‘regular’, ‘semester’, ‘symbol’, ‘time’.
+    Defaults to None.
+  * **space_after** – Was there a space after the token in the original data?
+    Defaults to True.
+  * **original_spelling** – The original spelling of the token, if it is different from
+    the one in text. Defaults to None.
+  * **first_in_sentence** – Is it the first token of a sentence? Defaults to False.
+  * **last_in_sentence** – Is it the last token of a sentence? Defaults to False.
+  * **character_offset** – Character offset of the token in the input as tuple (start, end)
+    such that input[start:end] == text (if there are no changes to the token text
+    during tokenization). Defaults to None.
 
-#### *property* extra_info
+#### *property* extra_info *: str*
 
 String representation of extra information.
 
-* **Returns**
+* **Returns:**
   A string representation of the space_after and original_spelling attributes.
-* **Return type**
+* **Return type:**
   str
 
-##### Examples
+### Examples
 
 ```pycon
 >>> tok = Token(":)", token_class="regular", space_after=False, original_spelling=": )")
@@ -493,3 +505,5 @@ String representation of extra information.
 >>> print(tok.extra_info)
 SpaceAfter=No, OriginalSpelling=": )"
 ```
+
+#### token_classes *: set[str]* *= {'URL', 'XML_entity', 'XML_tag', 'abbreviation', 'action_word', 'amount', 'date', 'email_address', 'emoticon', 'hashtag', 'measurement', 'mention', 'number', 'ordinal', 'regular', 'semester', 'symbol', 'time'}*
