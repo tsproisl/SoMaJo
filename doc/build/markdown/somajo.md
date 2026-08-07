@@ -1,5 +1,13 @@
 # somajo package
 
+* [class somajo.somajo.SoMaJo](#class-somajosomajosomajolanguage-literalde_cmc-en_ptb--split_camel_case-bool--false-split_sentences-bool--true-xml_sentences-str--none--none-character_offsets-bool--false)
+    * [tokenize_text](#tokenize_textparagraphs-iterablestr--parallel-int--1--iteratorlisttoken)
+    * [tokenize_text_file](#tokenize_text_filetext_file-str--textio-paragraph_separator-literalempty_lines-single_newlines--parallel-int--1--iteratorlisttoken)
+    * [tokenize_xml](#tokenize_xmlxml_data-str-eos_tags-iterablestr--strip_tags-bool--false-parallel-int--1-prune_tags-iterablestr--none--none--iteratorlisttoken)
+    * [tokenize_xml_file](#tokenize_xml_filexml_file-str--textio-eos_tags-iterablestr--strip_tags-bool--false-parallel-int--1-prune_tags-iterablestr--none--none--iteratorlisttoken)
+* [class somajo.token.Token](#class-somajotokentokentext-str--markup-bool--false-markup_class-literalstart-end--none--none-markup_eos-bool--none--none-locked-bool--false-token_class-str--none--none-space_after-bool--true-original_spelling-str--none--none-first_in_sentence-bool--false-last_in_sentence-bool--false-character_offset-tupleint-int--none--none)
+    * [property extra_info()](#property-extra_info--str)
+
 ## somajo.somajo module
 
 ### *class* somajo.somajo.SoMaJo(language: Literal['de_CMC', 'en_PTB'], \*, split_camel_case: bool = False, split_sentences: bool = True, xml_sentences: str | None = None, character_offsets: bool = False)
@@ -23,7 +31,7 @@ Tokenization and sentence splitting.
   * **character_offsets** – Compute the character offsets in the input for each token.
     This allows for stand-off tokenization. Defaults to False.
 
-#### tokenize_text(paragraphs: Iterable[str], \*, parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_text(paragraphs: Iterable[str], \*, parallel: int = 1) → Iterator[list[[Token](#class-somajotokentokentext-str--markup-bool--false-markup_class-literalstart-end--none--none-markup_eos-bool--none--none-locked-bool--false-token_class-str--none--none-space_after-bool--true-original_spelling-str--none--none-first_in_sentence-bool--false-last_in_sentence-bool--false-character_offset-tupleint-int--none--none)]]
 
 Split paragraphs of text into sequences of tokens.
 
@@ -36,7 +44,7 @@ Split paragraphs of text into sequences of tokens.
   The Token objects in a single sentence or paragraph
   : (depending on the value of `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one sentence per
 line:
@@ -125,7 +133,7 @@ Film
 </s>
 ```
 
-#### tokenize_text_file(text_file: str | TextIO, paragraph_separator: Literal['empty_lines', 'single_newlines'], \*, parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_text_file(text_file: str | TextIO, paragraph_separator: Literal['empty_lines', 'single_newlines'], \*, parallel: int = 1) → Iterator[list[[Token](#class-somajotokentokentext-str--markup-bool--false-markup_class-literalstart-end--none--none-markup_eos-bool--none--none-locked-bool--false-token_class-str--none--none-space_after-bool--true-original_spelling-str--none--none-first_in_sentence-bool--false-last_in_sentence-bool--false-character_offset-tupleint-int--none--none)]]
 
 Split the contents of a text file into sequences of tokens.
 
@@ -142,7 +150,7 @@ Split the contents of a text file into sequences of tokens.
   The Token objects in a single sentence or paragraph
   : (depending on the value of `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; input file with
 paragraphs separated by empty lines; print one token per line
@@ -201,7 +209,7 @@ Was machst du morgen Abend ?!
 Lust auf Film ? ;-)
 ```
 
-#### tokenize_xml(xml_data: str, eos_tags: Iterable[str], \*, strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_xml(xml_data: str, eos_tags: Iterable[str], \*, strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#class-somajotokentokentext-str--markup-bool--false-markup_class-literalstart-end--none--none-markup_eos-bool--none--none-locked-bool--false-token_class-str--none--none-space_after-bool--true-original_spelling-str--none--none-first_in_sentence-bool--false-last_in_sentence-bool--false-character_offset-tupleint-int--none--none)]]
 
 Split a string of XML data into sequences of tokens.
 
@@ -225,7 +233,7 @@ Split a string of XML data into sequences of tokens.
   : XML delimited by `eos_tags` (depending on the value of
     `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -334,7 +342,7 @@ Film
 </html>
 ```
 
-#### tokenize_xml_file(xml_file: str | TextIO, eos_tags: Iterable[str], \*, strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_xml_file(xml_file: str | TextIO, eos_tags: Iterable[str], \*, strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#class-somajotokentokentext-str--markup-bool--false-markup_class-literalstart-end--none--none-markup_eos-bool--none--none-locked-bool--false-token_class-str--none--none-space_after-bool--true-original_spelling-str--none--none-first_in_sentence-bool--false-last_in_sentence-bool--false-character_offset-tupleint-int--none--none)]]
 
 Split the contents of an xml file into sequences of tokens.
 
@@ -358,7 +366,7 @@ Split the contents of an xml file into sequences of tokens.
   : XML delimited by `eos_tags` (depending on the value of
     `split_sentences`).
 
-### Examples
+##### Examples
 
 Tokenization and sentence splitting; print one token per line
 and an empty line after each sentence:
@@ -492,7 +500,7 @@ String representation of extra information.
 * **Return type:**
   str
 
-### Examples
+##### Examples
 
 ```pycon
 >>> tok = Token(":)", token_class="regular", space_after=False, original_spelling=": )")
