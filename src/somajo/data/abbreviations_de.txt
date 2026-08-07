@@ -1228,3 +1228,32 @@ zzt.
 Übk.
 übl.
 üblw.
+
+# custom additions
+# https://de.wikipedia.org/wiki/Abk%C3%BCrzungen/Gesetze_und_Recht
+# https://de.wikipedia.org/wiki/Liste_von_Listen_von_Abk%C3%BCrzungen
+# http://personal.kent.edu/~gkoby/GermanAbbreviations/
+GBl.
+S.
+GV.NRW.
+GV.NW.
+B.Sc.
+M.Sc.
+B.A.
+M.A.
+B.Eng.
+M.Eng.
+LL.B.
+LL.M.
+B.F.A.
+M.F.A.
+B.Mus.
+M.Mus.
+B.Ed.
+M.Ed.
+Bundesgesetzbl.
+Reichsgesetzbl.
+NRW.
+GMBl.
+BStBl.
+BAnz.
