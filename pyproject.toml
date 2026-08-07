@@ -14,7 +14,7 @@ name = "SoMaJo"
 version = "2.4.3"
 description = "A tokenizer and sentence splitter for German and English web and social media texts."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = {file = "LICENSE.txt"}
 keywords = ["tokenizer", "sentence-splitter"]
 authors = [
