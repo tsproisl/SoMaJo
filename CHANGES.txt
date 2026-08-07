@@ -1,22 +1,26 @@
-# CHANGELOG #
+# CHANGELOG
 
-## Version 2.4.3, 2024-08-05 ##
+## Version 2.5.0, 2026-08-07
+
+- Add type hints.
+
+## Version 2.4.3, 2024-08-05
 
 - Move non-abbreviation tokens that should not be split from
   `single_token_abbreviations_<LANG>.txt` to
   `single_tokens_<LANG>.txt` and add cellular networks generations
   (issue #32).
 
-## Version 2.4.2, 2024-02-10 ##
+## Version 2.4.2, 2024-02-10
 
 - Fix issues #28 and #29 (markdown links with trailing symbols after
   URL part).
 
-## Version 2.4.1, 2024-02-09 ##
+## Version 2.4.1, 2024-02-09
 
 - Fix issue #27 (URLs in angle brackets).
 
-## Version 2.4.0, 2023-12-23 ##
+## Version 2.4.0, 2023-12-23
 
 - New feature: SoMaJo can output character offsets for tokens,
   allowing for stand-off tokenization. Pass `character_offsets=True`
@@ -26,11 +30,11 @@
   therefore activating the feature incurs a noticeable increase in
   processing time.
 
-## Version 2.3.1, 2023-09-23 ##
+## Version 2.3.1, 2023-09-23
 
 - Fix issue #26 (markdown links that contain a URL in the link text).
 
-## Version 2.3.0, 2023-08-14 ##
+## Version 2.3.0, 2023-08-14
 
 - **Potentially breaking change:** The somajo-tokenizer script is
   automatically created upon installation and bin/somajo-tokenizer is
@@ -44,26 +48,26 @@
   passed.
 - Fix issue #25 (dates at the end of sentences)
 
-## Version 2.2.4, 2023-06-23 ##
+## Version 2.2.4, 2023-06-23
 
 - Improvements to tokenization of words containing numbers (e.g.
   COVID-19-Pandemie, FFP2-Maske).
 
-## Version 2.2.3, 2023-02-02 ##
+## Version 2.2.3, 2023-02-02
 
 - Improvements to tokenization: Roman ordinals, abbreviation “Art.”
   preceding a number, certain units of measurement at the end of a
   sentence (e.g. km/h).
 
-## Version 2.2.2, 2022-09-12 ##
+## Version 2.2.2, 2022-09-12
 
 - Bugfix: Command-line option --sentence_tag implies option --split_sentences.
 
-## Version 2.2.1, 2022-03-08 ##
+## Version 2.2.1, 2022-03-08
 
 - Bugfix: Command-line option --strip-tags implies option --xml.
 
-## Version 2.2.0, 2022-01-18 ##
+## Version 2.2.0, 2022-01-18
 
 - New feature: Prune XML tags and their contents from the input before
   tokenization (via the command line option --prune TAGNAME1 --prune
@@ -72,23 +76,23 @@
   processing HTML files, e.g. for removing any <script> and <style>
   tags from the input.
 
-## Version 2.1.6, 2021-12-13 ##
+## Version 2.1.6, 2021-12-13
 
 - Recognize more URLs without protocol.
 - Fix a small bug in implementation of doubly linked lists.
 
-## Version 2.1.5, 2021-08-24 ##
+## Version 2.1.5, 2021-08-24
 
 - Split sequences of hashtags without spaces.
 - Add legal abbreviations (issue #21).
 
-## Version 2.1.4, 2021-07-09 ##
+## Version 2.1.4, 2021-07-09
 
 - Add a few abbreviations.
 - Improve detection of sentence boundaries when punctuation is
   followed by emoticons, mentions or hashtags.
 
-## Version 2.1.3, 2021-03-05 ##
+## Version 2.1.3, 2021-03-05
 
 - Add a few abbreviations.
 - Improve tokenization of protocol-less URLs.
@@ -96,18 +100,18 @@
 - Improve tokenization of gendered nouns (gender star, gender colon).
 - Improve tokenization of simple arithmetic operations.
 
-## Version 2.1.2, 2021-01-29 ##
+## Version 2.1.2, 2021-01-29
 
 - Allow hyphens in hashtags. While hyphens cannot be part of Twitter
   hashtags, we do not want to split compounds like
   “#Refugeeswelcome-Bewegung”.
 
-## Version 2.1.1, 2020-06-30 ##
+## Version 2.1.1, 2020-06-30
 
 - Detection of quotes delimited by apostrophes ('…') is more
   conservative, now (issue #16).
 
-## Version 2.1.0, 2020-06-17 ##
+## Version 2.1.0, 2020-06-17
 
 - New feature: Delimit sentences with XML tags (via the command line
   option --sentence-tag TAGNAME or by passing xml_sentences="TAGNAME"
@@ -121,41 +125,41 @@
   re-open it afterwards:
   <p> <s> Hi <i> there ! </i> </s> <s> <i> How </i> are you ? </s> </p>
 
-## Version 2.0.6, 2020-06-12 ##
+## Version 2.0.6, 2020-06-12
 
 - Support all textual smileys and textfaces from Signal messenger.
 - Raise a TypeError if tokenize_text is called with a string instead
   of an iterable of strings (issue #13)
 
-## Version 2.0.5, 2020-04-09 ##
+## Version 2.0.5, 2020-04-09
 
 - Add heuristics for ambiguous quotation marks (issue #11).
 - Avoid false positives for emoticons that contain a space (issue #12).
 - Correctly tokenize obfuscated email addresses that contain spaces.
 - Do not split tl;dr and its German variant zl;ng.
 
-## Version 2.0.4, 2020-03-05 ##
+## Version 2.0.4, 2020-03-05
 
 - Bugfix: Prevent race conditions between tokenizer and sentence
   splitter in parallel processing (--parallel > 1).
 
-## Version 2.0.3, 2020-02-27 ##
+## Version 2.0.3, 2020-02-27
 
 - Skip tests for unimplemented features (some builds will fail if any
   of the unit tests fail).
 
-## Version 2.0.2, 2020-02-27 ##
+## Version 2.0.2, 2020-02-27
 
 - Bugfix: Parallel tokenization (--parallel > 1) works again.
 - Support for musical notes (sharps).
 
-## Version 2.0.1, 2019-12-19 ##
+## Version 2.0.1, 2019-12-19
 
 - Bugfix.
 
-## Version 2.0.0, 2019-12-19 ##
+## Version 2.0.0, 2019-12-19
 
-### New features and improvements ###
+### New features and improvements
 
 - New API: Use new class SoMaJo instead of Tokenizer and
   SentenceSplitter. Currently, the old API is still supported but will
@@ -173,57 +177,57 @@
   :stuck_out_tongue_winking_eye:, etc.).
 - Support for textfaces (༼ʘ̚ل͜ʘ̚༽, ╚(ಠ_ಠ)=┐, etc.).
 
-### Breaking changes ###
+### Breaking changes
 
 - Removed the tokenizer script (deprecated since version 1.5.0
   released in October 2017). Use somajo-tokenizer instead.
 - Language codes contain the tokenization guideline: "de_CMC" instead
   of "de" and "en_PTB" instead of "en".
 
-## Version 1.11.0, 2019-11-08 ##
+## Version 1.11.0, 2019-11-08
 
 - XML sentence splitting: Added hr tag to default sentence breaks
 - Recognize Reddit links in shorthand notation
 - Improved robustness of XML processing
 
-## Version 1.10.7, 2019-11-01 ##
+## Version 1.10.7, 2019-11-01
 
 - Make recognition of gender star case insensitive
 - Fix problem with “nasty” character as last character of text unit
 
-## Version 1.10.6, 2019-10-02 ##
+## Version 1.10.6, 2019-10-02
 
 - Recognize gender star.
 - Improve recognition of lists of numbers, section numbers and IPv4
   addresses
 
-## Version 1.10.5, 2019-08-02 ##
+## Version 1.10.5, 2019-08-02
 
 - Correctly tokenize flags followed by a variation selector.
 - Delete variation selector that occurs on its own.
 
-## Version 1.10.4, 2019-08-01 ##
+## Version 1.10.4, 2019-08-01
 
 - Bugfix related to the --version option.
 
-## Version 1.10.3, 2019-07-19 ##
+## Version 1.10.3, 2019-07-19
 
 - New option -v/--version to output version information.
 - Explicitly specify input encoding as UTF-8.
 
-## Version 1.10.2, 2019-07-02 ##
+## Version 1.10.2, 2019-07-02
 
 - The error that 1.10.1 tried to fix was not really caused by the
   version numbers of regex but by specifying our own version number in
   __init__.py where we also indirectly load required modules.
 
-## Version 1.10.1, 2019-07-02 ##
+## Version 1.10.1, 2019-07-02
 
 - Use semantic versioning to specify minimal required version of
   regex. This fixes a bug where the dependency was not correctly
   installed.
 
-## Version 1.10.0, 2019-06-28 ##
+## Version 1.10.0, 2019-06-28
 
 - Treat emoji sequences that render as a single grapheme as a single
   token. This includes flags and sequences containing modifiers and
@@ -233,53 +237,53 @@
 - Replaced POSIX character classes with built-ins or Unicode
   properties.
 
-## Version 1.9.0, 2019-04-01 ##
+## Version 1.9.0, 2019-04-01
 
 - New method Tokenizer.tokenize_file for easy tokenization of files
   from Python
 - Added text and emoji variation selectors.
 - Added new English abbreviation (Appl'n.).
 
-## Version 1.8.3, 2018-11-02 ##
+## Version 1.8.3, 2018-11-02
 
 - Fixed a bug that caused abbreviations with internal dots but without
   final dot to be split up erroneously (e.g. E.ON).
 
-## Version 1.8.2, 2018-10-26 ##
+## Version 1.8.2, 2018-10-26
 
 - Fixed a bug with degree measurements in English (°F, etc.).
 - Fixed a bug that caused SoMaJo to hang when an XML tag occured
   within a token that is allowed to contain whitespace.
 
-## Version 1.8.1, 2018-07-30 ##
+## Version 1.8.1, 2018-07-30
 
 - Fixed the following bug: When using option -e, “nasty” characters
   between whitespace within tokens that are allowed to contain
   whitespace (e.g. XML tags) caused SoMaJo to hang.
 - Added zero-width no-break space (FEFF) to “nasty” characters.
 
-## Version 1.8.0, 2018-07-04 ##
+## Version 1.8.0, 2018-07-04
 
 - New language: SoMaJo can tokenize English texts (using the new
   option -l/--language).
 - Small improvements to tokenization (URLs, emoticons, number
   compounds, …).
 
-## Version 1.7.0, 2018-03-22 ##
+## Version 1.7.0, 2018-03-22
 
 SoMaJo has now full XML support. To tokenize an XML file, use the
 option -x/--xml. Via the option --tag (can be used multiple times),
 you can specify which tags always constitute sentence breaks, e.g.
 title, h1 or p tags in an HTML file.
 
-## Version 1.6.0, 2018-03-05 ##
+## Version 1.6.0, 2018-03-05
 
 - XML declarations are recognized as single tokens.
 - Additional “nasty” characters (zero-width joiners and non-joiners,
   left-to-right and right-to-left marks) are removed from the input.
 - The input is normalized to Unicode normal form C (NFC).
 
-## Version 1.5.0, 2017-10-23 ##
+## Version 1.5.0, 2017-10-23
 
 - Bugfix: Removed trailing space from last token in
   paragraph/sentence.
@@ -290,60 +294,60 @@ title, h1 or p tags in an HTML file.
   boundaries if they are followed by a potential sentence start.
 - We also print a log message that indicates tokenization speed.
 
-## Version 1.4.4, 2017-08-03 ##
+## Version 1.4.4, 2017-08-03
 
 This release improves sentence splitting for sentences ending in
 German closing quotation marks (“).
 
-## Version 1.4.3, 2017-08-02 ##
+## Version 1.4.3, 2017-08-02
 
 This is a bugfix release that fixes a bug that occured in 1.4.2 when
 using the option -e on some inputs containing control characters and
 other “nasty” characters.
 
-## Version 1.4.2, 2017-07-31 ##
+## Version 1.4.2, 2017-07-31
 
 Control characters and other “nasty” characters (soft hyphens and
 zero-width spaces) are removed from the input.
 
-## Version 1.4.1, 2017-07-28 ##
+## Version 1.4.1, 2017-07-28
 
 Added support for Unicode emoticons and various other Unicode symbols.
 
-## Version 1.4.0, 2017-07-13 ##
+## Version 1.4.0, 2017-07-13
 
 SoMaJo can now perform sentence splitting (using the new option
 --split_sentences).
 
-## Version 1.3.1, 2017-07-04 ##
+## Version 1.3.1, 2017-07-04
 
 SoMaJo is now hosted on Github and the changes made in this version
 reflect that change.
 
-## Version 1.3.0, 2016-09-02 ##
+## Version 1.3.0, 2016-09-02
 
 Matching of items containing “+” or “&” or being written in camel case
 has been optimized a bit. Now the tokenizer runs roughly three to four
 times faster.
 
-## Version 1.2.0, 2016-09-01 ##
+## Version 1.2.0, 2016-09-01
 
 Two new options added: With -s/--paragraph_separator, you can specify
 how paragraphs are delimited in the input data, i.e. by empty lines or
 by single newlines. The --parallelization option makes it possible to
 use a pool of worker processes to speed up tokenization.
 
-## Version 1.1.2, 2016-08-25 ##
+## Version 1.1.2, 2016-08-25
 
 The example in the documentation is now self-contained: Sample input
 has been added and the output will be printed.
 
-## Version 1.1.1, 2016-08-19 ##
+## Version 1.1.1, 2016-08-19
 
 The link in the Evaluation section of the Readme now points to the
 complete gold standard data.
 
-## Version 1.1.0, 2016-08-19 ##
+## Version 1.1.0, 2016-08-19
 
 SoMaJo can now output additional information about the original
 spelling of the tokens, i.e. if a token was followed by whitespace or
@@ -351,7 +355,7 @@ if a token contained internal whitespace (according to the
 tokenization guidelines, things like “: )” get normalized to “:)”). To
 use this feature, provide the tokenizer script with the -e option.
 
-## Version 1.0.3, 2016-08-18 ##
+## Version 1.0.3, 2016-08-18
 
 This version works around a bug in the regex module that caused
 exponential runtimes on certain inputs.

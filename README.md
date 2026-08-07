@@ -45,7 +45,7 @@ For part-of-speech tagging (in particular of German web and social
 media texts), we recommend
 [SoMeWeTa](https://github.com/tsproisl/SoMeWeTa):
 
-```sh
+```
 somajo-tokenizer --split_sentences <file> | somewe-tagger --tag <model> -
 ```
 
