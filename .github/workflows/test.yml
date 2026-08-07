@@ -24,7 +24,7 @@ jobs:
         python -m pip install .
 
     - name: Type checking
-      if: contains(['3.10', '3.11', '3.12', '3.13', '3.14'], matrix.python-version)
+      if: contains(fromJson('["3.10", "3.11", "3.12", "3.13", "3.14"]'), matrix.python-version)
       run: |
         python -m pip install mypy types-regex
         mypy --strict src/somajo
