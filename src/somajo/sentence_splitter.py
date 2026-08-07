@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
-"""Sentence splitting functionality for tokenized text."""
 
 from __future__ import annotations
 
 import collections
-import regex as re
 from typing import Iterable, Iterator, cast
 
-from . import (
-    doubly_linked_list,
-    token,
-    utils
-)
+import regex as re
+
+from . import doubly_linked_list, token, utils
 
 
 class SentenceSplitter:

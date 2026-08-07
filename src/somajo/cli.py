@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-"""Command-line interface for SoMaJo tokenizer."""
 
 import argparse
 import logging
 import time
 
-from . import (
-    SoMaJo,
-    __version__
-)
+from . import SoMaJo, __version__
 
 logging.basicConfig(format="%(levelname)s: %(message)s", level=logging.INFO)
 
@@ -41,7 +37,6 @@ def arguments() -> argparse.Namespace:
 
 
 def main() -> None:
-    """Main entry point for the CLI."""
     args = arguments()
     n_tokens: int = 0
     n_sentences: int = 0

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""Tokenizer implementation for SoMaJo."""
 
 from __future__ import annotations
 
@@ -7,19 +6,16 @@ import itertools
 import logging
 import operator
 import unicodedata
-
-import regex as re
 from typing import Generator
 
-from . import (
-    doubly_linked_list,
-    utils
-)
+import regex as re
+
+from . import doubly_linked_list, utils
 from .token import Token
 
 
 class Tokenizer:
-    """Tokenizer for text processing.
+    """Tokenizer class.
 
     Args:
         split_camel_case: Whether to split camelCase tokens. Defaults to False.

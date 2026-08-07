@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""Character alignment utilities for token offset calculation."""
 
 from __future__ import annotations
-from typing import cast
 
 import unicodedata
+from typing import cast
 
 import regex as re
 

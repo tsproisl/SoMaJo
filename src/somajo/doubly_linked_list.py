@@ -1,5 +1,4 @@
 #!usr/bin/env python3
-"""Doubly linked list implementation for SoMaJo tokenization."""
 
 from __future__ import annotations
 

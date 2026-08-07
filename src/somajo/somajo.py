@@ -5,11 +5,7 @@ import itertools
 import multiprocessing
 from typing import Iterable, Iterator, Literal, TextIO, cast
 
-from . import (
-    alignment,
-    doubly_linked_list,
-    utils
-)
+from . import alignment, doubly_linked_list, utils
 from .sentence_splitter import SentenceSplitter
 from .token import Token
 from .tokenizer import Tokenizer

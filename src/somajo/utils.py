@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Utility functions for tokenization and XML processing."""
 
 from __future__ import annotations
 
 import io
 import os
-import regex as re
 import xml.sax
 import xml.sax.saxutils
 from typing import IO, Generator, Literal
+
+import regex as re
 
 from . import alignment
 from .token import Token
