@@ -2,7 +2,7 @@
 
 ## somajo.somajo module
 
-### *class* somajo.somajo.SoMaJo(language: Literal['de_CMC', 'en_PTB'], , split_camel_case: bool = False, split_sentences: bool = True, xml_sentences: str | None = None, character_offsets: bool = False)
+### *class* somajo.somajo.SoMaJo(language: Literal['de_CMC', 'en_PTB'], \*, split_camel_case: bool = False, split_sentences: bool = True, xml_sentences: str | None = None, character_offsets: bool = False)
 
 Bases: `object`
 
@@ -23,11 +23,7 @@ Tokenization and sentence splitting.
   * **character_offsets** – Compute the character offsets in the input for each token.
     This allows for stand-off tokenization. Defaults to False.
 
-#### paragraph_separators *: set[str]* *= {'empty_lines', 'single_newlines'}*
-
-#### supported_languages *: set[str]* *= {'de_CMC', 'en_PTB'}*
-
-#### tokenize_text(paragraphs: Iterable[str], , parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_text(paragraphs: Iterable[str], \*, parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split paragraphs of text into sequences of tokens.
 
@@ -129,7 +125,7 @@ Film
 </s>
 ```
 
-#### tokenize_text_file(text_file: str | TextIO, paragraph_separator: Literal['empty_lines', 'single_newlines'], , parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_text_file(text_file: str | TextIO, paragraph_separator: Literal['empty_lines', 'single_newlines'], \*, parallel: int = 1) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split the contents of a text file into sequences of tokens.
 
@@ -205,7 +201,7 @@ Was machst du morgen Abend ?!
 Lust auf Film ? ;-)
 ```
 
-#### tokenize_xml(xml_data: str, eos_tags: Iterable[str], , strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_xml(xml_data: str, eos_tags: Iterable[str], \*, strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split a string of XML data into sequences of tokens.
 
@@ -338,7 +334,7 @@ Film
 </html>
 ```
 
-#### tokenize_xml_file(xml_file: str | TextIO, eos_tags: Iterable[str], , strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
+#### tokenize_xml_file(xml_file: str | TextIO, eos_tags: Iterable[str], \*, strip_tags: bool = False, parallel: int = 1, prune_tags: Iterable[str] | None = None) → Iterator[list[[Token](#somajo.token.Token)]]
 
 Split the contents of an xml file into sequences of tokens.
 
@@ -459,7 +455,7 @@ Film
 
 ## somajo.token module
 
-### *class* somajo.token.Token(text: str, , markup: bool = False, markup_class: Literal['start', 'end'] | None = None, markup_eos: bool | None = None, locked: bool = False, token_class: str | None = None, space_after: bool = True, original_spelling: str | None = None, first_in_sentence: bool = False, last_in_sentence: bool = False, character_offset: Tuple[int, int] | None = None)
+### *class* somajo.token.Token(text: str, \*, markup: bool = False, markup_class: Literal['start', 'end'] | None = None, markup_eos: bool | None = None, locked: bool = False, token_class: str | None = None, space_after: bool = True, original_spelling: str | None = None, first_in_sentence: bool = False, last_in_sentence: bool = False, character_offset: Tuple[int, int] | None = None)
 
 Bases: `object`
 
